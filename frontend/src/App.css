@@ -294,6 +294,42 @@
   cursor: pointer;
 }
 
+.urun-ekle-karti {
+  width: 150px;
+  min-height: 108px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #c9dbf3;
+  background: #f9fbff;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+}
+
+.urun-ekle-ikon {
+  width: 56px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #d5e5f8;
+  background: #fff;
+  color: #2f7dd6;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+}
+
+.urun-ekle-metin {
+  width: 100%;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #2f7dd6 0%, #1f61b8 100%);
+}
+
 .ozet-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(130px, 1fr));
@@ -320,11 +356,58 @@
   font-size: 1.28rem;
 }
 
-.ozet-kartcik span {
+.ozet-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.ozet-ikon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid #d8e5f5;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #334b66;
+  background: #fff;
+}
+
+.ozet-menu {
+  border: 0;
+  background: transparent;
+  color: #7d8fa5;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.ozet-alt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ozet-degisim {
   display: inline-block;
-  margin-top: 6px;
-  color: #1c8551;
-  font-size: 0.82rem;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ozet-degisim.pozitif {
+  color: #198754;
+  background: #e7f7ef;
+  border: 1px solid #bee7d2;
+}
+
+.ozet-degisim.negatif {
+  color: #c43b45;
+  background: #ffebed;
+  border: 1px solid #f5c6ca;
 }
 
 .dashboard-liste {
@@ -354,6 +437,65 @@
 
 .dashboard-liste strong {
   color: #1e5daa;
+}
+
+.grafikli-liste li {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.urun-grafik-satiri {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+}
+
+.urun-grafik-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.urun-grafik-zemin {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e5effb;
+  overflow: hidden;
+}
+
+.urun-grafik-dolgu {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2f7dd6 0%, #1f61b8 100%);
+}
+
+.durum-baloncuk {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.durum-yolda {
+  color: #184f99;
+  background: #e6f0ff;
+  border-color: #bdd8ff;
+}
+
+.durum-hazirlaniyor {
+  color: #8a6b00;
+  background: #fff7db;
+  border-color: #f3dd90;
+}
+
+.durum-teslim {
+  color: #1d7e4f;
+  background: #e6f7ef;
+  border-color: #b9e9d1;
 }
 
 .panel-kart {
@@ -455,6 +597,16 @@ th {
 .ikon-dugme.duzenle {
   background: #dff0ff;
   color: #1a66b2;
+}
+
+.ikon-dugme.favori {
+  background: #eef2f7;
+  color: #7a8796;
+}
+
+.ikon-dugme.favori.aktif {
+  background: #fff3c9;
+  color: #d39b00;
 }
 
 .ikon-dugme.sil {
@@ -645,8 +797,126 @@ th {
   font-size: 0.74rem;
 }
 
+.dashboard-alt-grafikler {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.grafik-kart {
+  display: grid;
+  gap: 8px;
+}
+
+.cizgi-grafik {
+  width: 100%;
+  height: 140px;
+}
+
+.cizgi-grafik line {
+  stroke: #d8e5f5;
+  stroke-width: 1.5;
+}
+
+.cizgi-grafik polyline {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mavi-cizgi {
+  stroke: #2f7dd6;
+}
+
+.kirmizi-cizgi {
+  stroke: #e44e57;
+}
+
+.grafik-etiketleri {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.grafik-etiketleri span {
+  text-align: center;
+  color: #6f839d;
+  font-size: 0.75rem;
+}
+
+.grafik-lejant {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.grafik-lejant span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #3a4f67;
+  font-size: 0.8rem;
+}
+
+.lejant-kutu {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.lejant-kutu.mavi {
+  background: #2f7dd6;
+}
+
+.lejant-kutu.kirmizi {
+  background: #e44e57;
+}
+
+.sutun-grafik {
+  height: 175px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(28px, 1fr));
+  gap: 10px;
+  align-items: end;
+  padding-top: 16px;
+}
+
+.sutun-ogesi {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: end;
+  justify-items: center;
+  gap: 6px;
+}
+
+.sutun-deger {
+  color: #6b819b;
+  font-size: 0.74rem;
+}
+
+.sutun {
+  width: 100%;
+  max-width: 28px;
+  border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(180deg, #7eb2f2 0%, #2f7dd6 100%);
+}
+
+.sutun-ogesi small {
+  color: #6f839d;
+  font-size: 0.74rem;
+}
+
 @media (max-width: 1100px) {
   .dashboard-orta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-alt-grafikler {
     grid-template-columns: 1fr;
   }
 }

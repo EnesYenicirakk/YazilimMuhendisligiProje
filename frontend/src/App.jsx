@@ -5,21 +5,21 @@ const DEFAULT_USERNAME = 'admin'
 const DEFAULT_PASSWORD = 'admin123'
 
 const baslangicUrunleri = [
-  { uid: 1, urunId: 'FRN-1001', ad: 'Fren Balatasi On Takim', avatar: 'FB', urunAdedi: 84, magazaStok: 126 },
-  { uid: 2, urunId: 'YGF-1002', ad: 'Yag Filtresi', avatar: 'YF', urunAdedi: 145, magazaStok: 210 },
-  { uid: 3, urunId: 'HVF-1003', ad: 'Hava Filtresi', avatar: 'HF', urunAdedi: 112, magazaStok: 168 },
-  { uid: 4, urunId: 'BUJ-1004', ad: 'Buji Takimi', avatar: 'BT', urunAdedi: 63, magazaStok: 95 },
-  { uid: 5, urunId: 'AMR-1005', ad: 'Amortisor On Cift', avatar: 'AM', urunAdedi: 29, magazaStok: 44 },
-  { uid: 6, urunId: 'DBR-1006', ad: 'Debriyaj Seti', avatar: 'DS', urunAdedi: 38, magazaStok: 57 },
-  { uid: 7, urunId: 'AKU-1007', ad: 'Aku 72Ah', avatar: 'AK', urunAdedi: 21, magazaStok: 35 },
-  { uid: 8, urunId: 'TRM-1008', ad: 'Triger Kayisi Seti', avatar: 'TK', urunAdedi: 52, magazaStok: 73 },
+  { uid: 1, urunId: 'FRN-1001', ad: 'Fren Balatasi On Takim', avatar: 'FB', urunAdedi: 84, magazaStok: 126, favori: false },
+  { uid: 2, urunId: 'YGF-1002', ad: 'Yag Filtresi', avatar: 'YF', urunAdedi: 145, magazaStok: 210, favori: false },
+  { uid: 3, urunId: 'HVF-1003', ad: 'Hava Filtresi', avatar: 'HF', urunAdedi: 112, magazaStok: 168, favori: false },
+  { uid: 4, urunId: 'BUJ-1004', ad: 'Buji Takimi', avatar: 'BT', urunAdedi: 63, magazaStok: 95, favori: false },
+  { uid: 5, urunId: 'AMR-1005', ad: 'Amortisor On Cift', avatar: 'AM', urunAdedi: 29, magazaStok: 44, favori: false },
+  { uid: 6, urunId: 'DBR-1006', ad: 'Debriyaj Seti', avatar: 'DS', urunAdedi: 38, magazaStok: 57, favori: false },
+  { uid: 7, urunId: 'AKU-1007', ad: 'Aku 72Ah', avatar: 'AK', urunAdedi: 21, magazaStok: 35, favori: false },
+  { uid: 8, urunId: 'TRM-1008', ad: 'Triger Kayisi Seti', avatar: 'TK', urunAdedi: 52, magazaStok: 73, favori: false },
 ]
 
 const dashboardOzet = [
-  { baslik: 'Toplam Gelir', deger: '₺512.400', degisim: '+%11' },
-  { baslik: 'Acil Siparis', deger: '17', degisim: '+%4' },
-  { baslik: 'Bekleyen Kargo', deger: '23', degisim: '-%8' },
-  { baslik: 'Ortalama Teslimat', deger: '2,6 Gun', degisim: '-%5' },
+  { baslik: 'Toplam Gelir', deger: '₺512.400', degisim: '+%11', ikon: '₺' },
+  { baslik: 'Acil Siparis', deger: '17', degisim: '-%6', ikon: '◻' },
+  { baslik: 'Toplam Siparis', deger: '1865', degisim: '+%12', ikon: '▣' },
+  { baslik: 'Ortalama Teslimat', deger: '2,6 Gun', degisim: '+%8', ikon: '◷' },
 ]
 
 const haftalikSatis = [56, 42, 31, 49, 68, 61, 37]
@@ -30,6 +30,32 @@ const sonSatislar = [
   { siparis: '#SP-2119', urun: 'Yag Filtresi', musteri: 'Hizli Servis', teslimat: '3 is gunu', tutar: '₺1.760', durum: 'Hazirlaniyor' },
   { siparis: '#SP-2118', urun: 'Triger Kayisi Seti', musteri: 'Tekin Otomotiv', teslimat: '2 is gunu', tutar: '₺3.980', durum: 'Yolda' },
 ]
+
+const aylar = ['May', 'Haz', 'Tem', 'Agu', 'Eyl', 'Eki']
+const gelirSerisi = [92000, 108000, 104000, 121000, 129000, 137000]
+const giderSerisi = [76000, 82000, 79000, 96000, 102000, 101000]
+const aylikSatilanUrun = [360, 245, 278, 332, 406, 452]
+
+const cizgiNoktalari = (degerler, maksimumDeger) => {
+  const maxDeger = maksimumDeger || Math.max(...degerler, 1)
+  const xAlan = 300
+  const yAlan = 90
+
+  return degerler
+    .map((deger, index) => {
+      const x = 10 + (index * xAlan) / Math.max(degerler.length - 1, 1)
+      const y = 10 + yAlan - (deger / maxDeger) * yAlan
+      return `${x},${y}`
+    })
+    .join(' ')
+}
+
+const durumSinifi = (durum) => {
+  if (durum === 'Yolda') return 'durum-yolda'
+  if (durum === 'Hazirlaniyor') return 'durum-hazirlaniyor'
+  if (durum === 'Teslim Edildi') return 'durum-teslim'
+  return ''
+}
 
 const bosForm = {
   urunId: '',
@@ -130,6 +156,7 @@ function App() {
           .slice(0, 2),
         urunAdedi,
         magazaStok,
+        favori: false,
       }
 
       setUrunler((onceki) => [yeniUrun, ...onceki])
@@ -165,6 +192,12 @@ function App() {
     if (!silinecekUrun) return
     setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinecekUrun.uid))
     setSilinecekUrun(null)
+  }
+
+  const favoriDegistir = (uid) => {
+    setUrunler((onceki) =>
+      onceki.map((urun) => (urun.uid === uid ? { ...urun, favori: !urun.favori } : urun)),
+    )
   }
 
   if (!isLoggedIn) {
@@ -276,9 +309,19 @@ function App() {
               <div className="ozet-grid">
                 {dashboardOzet.map((kart) => (
                   <article key={kart.baslik} className="ozet-kartcik">
+                    <div className="ozet-ust">
+                      <span className="ozet-ikon">{kart.ikon}</span>
+                      <button type="button" className="ozet-menu" aria-label="Kart Menusu">
+                        ⋮
+                      </button>
+                    </div>
                     <p>{kart.baslik}</p>
-                    <h3>{kart.deger}</h3>
-                    <span>{kart.degisim}</span>
+                    <div className="ozet-alt">
+                      <h3>{kart.deger}</h3>
+                      <span className={`ozet-degisim ${kart.degisim.startsWith('+') ? 'pozitif' : 'negatif'}`}>
+                        {kart.degisim}
+                      </span>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -304,13 +347,24 @@ function App() {
                     <h2>En Cok Satilan Urunler</h2>
                     <small>Aylik</small>
                   </div>
-                  <ul className="dashboard-liste">
-                    {urunler.slice(0, 6).map((urun) => (
+                  <ul className="dashboard-liste grafikli-liste">
+                    {urunler.slice(0, 6).map((urun) => {
+                      const maksimum = Math.max(...urunler.map((u) => u.urunAdedi), 1)
+                      const oran = Math.max((urun.urunAdedi / maksimum) * 100, 8)
+                      return (
                       <li key={urun.uid}>
-                        <span>{urun.ad}</span>
-                        <strong>{urun.urunAdedi} adet</strong>
+                        <div className="urun-grafik-satiri">
+                          <div className="urun-grafik-ust">
+                            <span>{urun.ad}</span>
+                            <strong>{urun.urunAdedi} adet</strong>
+                          </div>
+                          <div className="urun-grafik-zemin">
+                            <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
+                          </div>
+                        </div>
                       </li>
-                    ))}
+                      )
+                    })}
                   </ul>
                 </article>
               </section>
@@ -340,13 +394,76 @@ function App() {
                           <td>{satis.musteri}</td>
                           <td>{satis.teslimat}</td>
                           <td>{satis.tutar}</td>
-                          <td>{satis.durum}</td>
+                          <td>
+                            <span className={`durum-baloncuk ${durumSinifi(satis.durum)}`}>{satis.durum}</span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </article>
+
+              <section className="dashboard-alt-grafikler">
+                <article className="panel-kart grafik-kart">
+                  <div className="panel-baslik">
+                    <h2>Harcanan Tutar ve Elde Edilen Gelir</h2>
+                    <small>Son 6 ay</small>
+                  </div>
+                  <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Gelir ve gider grafigi">
+                    <line x1="10" y1="100" x2="310" y2="100" />
+                    <polyline points={cizgiNoktalari(gelirSerisi)} className="mavi-cizgi" />
+                    <polyline points={cizgiNoktalari(giderSerisi)} className="kirmizi-cizgi" />
+                  </svg>
+                  <div className="grafik-etiketleri">
+                    {aylar.map((ay) => (
+                      <span key={ay}>{ay}</span>
+                    ))}
+                  </div>
+                  <div className="grafik-lejant">
+                    <span><i className="lejant-kutu mavi" /> Toplam Gelir</span>
+                    <span><i className="lejant-kutu kirmizi" /> Toplam Gider</span>
+                  </div>
+                </article>
+
+                <article className="panel-kart grafik-kart">
+                  <div className="panel-baslik">
+                    <h2>Aylara Gore Satilan Toplam Urun</h2>
+                    <small>Adet bazli</small>
+                  </div>
+                  <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Aylik satilan urun grafigi">
+                    <line x1="10" y1="100" x2="310" y2="100" />
+                    <polyline points={cizgiNoktalari(aylikSatilanUrun)} className="kirmizi-cizgi" />
+                  </svg>
+                  <div className="grafik-etiketleri">
+                    {aylar.map((ay) => (
+                      <span key={ay}>{ay}</span>
+                    ))}
+                  </div>
+                  <div className="grafik-lejant">
+                    <span><i className="lejant-kutu kirmizi" /> Satilan Urun (Adet)</span>
+                  </div>
+                </article>
+
+                <article className="panel-kart grafik-kart">
+                  <div className="panel-baslik">
+                    <h2>Satilan Urunlerin Sutun Grafigi</h2>
+                    <small>Ayni verinin sutun gorunumu</small>
+                  </div>
+                  <div className="sutun-grafik" aria-label="Satilan urunlerin sutun grafigi">
+                    {aylikSatilanUrun.map((deger, index) => (
+                      <div key={`${aylar[index]}-${deger}`} className="sutun-ogesi">
+                        <span className="sutun-deger">{deger}</span>
+                        <div
+                          className="sutun"
+                          style={{ height: `${Math.max((deger / Math.max(...aylikSatilanUrun)) * 100, 8)}%` }}
+                        />
+                        <small>{aylar[index]}</small>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              </section>
             </section>
           )}
 
@@ -357,7 +474,12 @@ function App() {
                   <h1>Envanter</h1>
                   <p>Magaza: Merkez Sube</p>
                 </div>
-                <button type="button" onClick={eklemePenceresiniAc}>Urun Ekle</button>
+                <button type="button" className="urun-ekle-karti" onClick={eklemePenceresiniAc}>
+                  <span className="urun-ekle-ikon" aria-hidden="true">
+                    🛍
+                  </span>
+                  <span className="urun-ekle-metin">Yeni Urun</span>
+                </button>
               </header>
 
               <section className="panel-kart envanter-kart">
@@ -398,6 +520,14 @@ function App() {
                           <td>{urun.magazaStok}</td>
                           <td>
                             <div className="islem-dugmeleri">
+                              <button
+                                type="button"
+                                className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`}
+                                title="Favori"
+                                onClick={() => favoriDegistir(urun.uid)}
+                              >
+                                ★
+                              </button>
                               <button
                                 type="button"
                                 className="ikon-dugme duzenle"

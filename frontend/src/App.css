@@ -294,6 +294,70 @@
   cursor: pointer;
 }
 
+.siparisler-baslik {
+  margin-bottom: 14px;
+}
+
+.siparisler-kart {
+  padding: 14px;
+}
+
+.siparis-yeni-buton {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(90deg, #1f61b8, #2f7dd6);
+  cursor: pointer;
+}
+
+.siparis-kontrol {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.siparis-kontrol input,
+.siparis-kontrol select {
+  border: 1px solid #d6e4f5;
+  background: #f8fbff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #324a65;
+}
+
+.siparis-kontrol input {
+  flex: 1;
+}
+
+.siparis-kontrol select {
+  width: 190px;
+}
+
+.odeme-durumu {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.odeme-durumu.odendi {
+  color: #1d7e4f;
+  background: #e6f7ef;
+  border-color: #b9e9d1;
+}
+
+.odeme-durumu.beklemede {
+  color: #b9373f;
+  background: #ffebed;
+  border-color: #f7c6cb;
+}
+
 .urun-ekle-karti {
   width: 150px;
   min-height: 108px;
@@ -614,6 +678,38 @@ th {
   color: #b72837;
 }
 
+.sayfalama {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+
+.sayfa-buton,
+.sayfa-ok {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #d6e4f5;
+  background: #fff;
+  color: #355173;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.sayfa-buton.aktif {
+  background: #e7f1ff;
+  border-color: #b7d3fa;
+  color: #1d5fad;
+  font-weight: 700;
+}
+
+.sayfa-ok:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .modal-kaplama {
   position: fixed;
   inset: 0;
@@ -738,6 +834,15 @@ th {
   .panel-ust-cizgi {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .siparis-kontrol {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .siparis-kontrol select {
+    width: 100%;
   }
 
   .ozet-grid {

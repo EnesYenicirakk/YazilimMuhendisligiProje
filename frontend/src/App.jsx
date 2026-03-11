@@ -1,8 +1,9 @@
-﻿import { useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const DEFAULT_USERNAME = 'admin'
 const DEFAULT_PASSWORD = 'admin123'
+const SAYFA_BASINA_URUN = 8
 
 const baslangicUrunleri = [
   { uid: 1, urunId: 'FRN-1001', ad: 'Fren Balatasi On Takim', avatar: 'FB', urunAdedi: 84, magazaStok: 126, favori: false },
@@ -13,6 +14,22 @@ const baslangicUrunleri = [
   { uid: 6, urunId: 'DBR-1006', ad: 'Debriyaj Seti', avatar: 'DS', urunAdedi: 38, magazaStok: 57, favori: false },
   { uid: 7, urunId: 'AKU-1007', ad: 'Aku 72Ah', avatar: 'AK', urunAdedi: 21, magazaStok: 35, favori: false },
   { uid: 8, urunId: 'TRM-1008', ad: 'Triger Kayisi Seti', avatar: 'TK', urunAdedi: 52, magazaStok: 73, favori: false },
+  { uid: 9, urunId: 'RAD-1009', ad: 'Radyator Ust Hortum', avatar: 'RH', urunAdedi: 46, magazaStok: 70, favori: false },
+  { uid: 10, urunId: 'BLC-1010', ad: 'Balata Spreyi', avatar: 'BS', urunAdedi: 76, magazaStok: 120, favori: false },
+  { uid: 11, urunId: 'KLR-1011', ad: 'Klima Kompresoru', avatar: 'KK', urunAdedi: 18, magazaStok: 27, favori: false },
+  { uid: 12, urunId: 'MTR-1012', ad: 'Motor Takozu', avatar: 'MT', urunAdedi: 41, magazaStok: 62, favori: false },
+  { uid: 13, urunId: 'SRS-1013', ad: 'Sarz Dinamosu', avatar: 'SD', urunAdedi: 24, magazaStok: 36, favori: false },
+  { uid: 14, urunId: 'DST-1014', ad: 'Direksiyon Kutusu', avatar: 'DK', urunAdedi: 12, magazaStok: 19, favori: false },
+  { uid: 15, urunId: 'EKS-1015', ad: 'Eksantrik Sensoru', avatar: 'ES', urunAdedi: 58, magazaStok: 88, favori: false },
+  { uid: 16, urunId: 'ENJ-1016', ad: 'Enjektor Takimi', avatar: 'ET', urunAdedi: 35, magazaStok: 51, favori: false },
+  { uid: 17, urunId: 'ROL-1017', ad: 'Rolanti Motoru', avatar: 'RM', urunAdedi: 33, magazaStok: 47, favori: false },
+  { uid: 18, urunId: 'YGR-1018', ad: 'Yag Radyatoru', avatar: 'YR', urunAdedi: 17, magazaStok: 24, favori: false },
+  { uid: 19, urunId: 'KRN-1019', ad: 'Krank Kasnagi', avatar: 'KK', urunAdedi: 27, magazaStok: 39, favori: false },
+  { uid: 20, urunId: 'TRB-1020', ad: 'Turbo Hortumu', avatar: 'TH', urunAdedi: 22, magazaStok: 31, favori: false },
+  { uid: 21, urunId: 'ABS-1021', ad: 'ABS Sensoru', avatar: 'AS', urunAdedi: 49, magazaStok: 74, favori: false },
+  { uid: 22, urunId: 'SUS-1022', ad: 'Susturucu Arka', avatar: 'SA', urunAdedi: 14, magazaStok: 20, favori: false },
+  { uid: 23, urunId: 'BIL-1023', ad: 'Bijon Somunu Seti', avatar: 'BS', urunAdedi: 90, magazaStok: 140, favori: false },
+  { uid: 24, urunId: 'FAR-1024', ad: 'Far Ampulu H7', avatar: 'FA', urunAdedi: 110, magazaStok: 165, favori: false },
 ]
 
 const dashboardOzet = [
@@ -24,12 +41,29 @@ const dashboardOzet = [
 
 const haftalikSatis = [56, 42, 31, 49, 68, 61, 37]
 
-const sonSatislar = [
-  { siparis: '#SP-2121', urun: 'Fren Balatasi On Takim', musteri: 'Yildiz Oto', teslimat: '2 is gunu', tutar: '₺8.400', durum: 'Yolda' },
-  { siparis: '#SP-2120', urun: 'Debriyaj Seti', musteri: 'Mert Motor', teslimat: '1 is gunu', tutar: '₺6.150', durum: 'Teslim Edildi' },
-  { siparis: '#SP-2119', urun: 'Yag Filtresi', musteri: 'Hizli Servis', teslimat: '3 is gunu', tutar: '₺1.760', durum: 'Hazirlaniyor' },
-  { siparis: '#SP-2118', urun: 'Triger Kayisi Seti', musteri: 'Tekin Otomotiv', teslimat: '2 is gunu', tutar: '₺3.980', durum: 'Yolda' },
+const baslangicSiparisleri = [
+  { siparisNo: '#SP-2134', musteri: 'Yildiz Oto', urun: 'Fren Balatasi On Takim', toplamTutar: 8400, siparisTarihi: '2026-03-10', odemeDurumu: 'Odendi', urunHazirlik: 'Toplandi', teslimatDurumu: 'Yolda', teslimatSuresi: '2 is gunu' },
+  { siparisNo: '#SP-2133', musteri: 'Tekin Otomotiv', urun: 'Amortisor On Cift', toplamTutar: 9250, siparisTarihi: '2026-03-09', odemeDurumu: 'Odendi', urunHazirlik: 'Toplandi', teslimatDurumu: 'Hazirlaniyor', teslimatSuresi: '3 is gunu' },
+  { siparisNo: '#SP-2132', musteri: 'Mert Motor', urun: 'Debriyaj Seti', toplamTutar: 6150, siparisTarihi: '2026-03-08', odemeDurumu: 'Odendi', urunHazirlik: 'Toplandi', teslimatDurumu: 'Teslim Edildi', teslimatSuresi: '1 is gunu' },
+  { siparisNo: '#SP-2131', musteri: 'Hizli Servis', urun: 'Yag Filtresi', toplamTutar: 1760, siparisTarihi: '2026-03-07', odemeDurumu: 'Beklemede', urunHazirlik: 'Hazirlaniyor', teslimatDurumu: 'Yolda', teslimatSuresi: '2 is gunu' },
+  { siparisNo: '#SP-2130', musteri: 'Akin Oto', urun: 'Triger Kayisi Seti', toplamTutar: 3980, siparisTarihi: '2026-03-06', odemeDurumu: 'Odendi', urunHazirlik: 'Toplandi', teslimatDurumu: 'Hazirlaniyor', teslimatSuresi: '2 is gunu' },
+  { siparisNo: '#SP-2129', musteri: 'Bora Yedek Parca', urun: 'Aku 72Ah', toplamTutar: 11200, siparisTarihi: '2026-03-05', odemeDurumu: 'Beklemede', urunHazirlik: 'Tedarik Bekleniyor', teslimatDurumu: 'Hazirlaniyor', teslimatSuresi: '4 is gunu' },
+  { siparisNo: '#SP-2128', musteri: 'Demir Oto', urun: 'Radyator Ust Hortum', toplamTutar: 2350, siparisTarihi: '2026-03-04', odemeDurumu: 'Odendi', urunHazirlik: 'Toplandi', teslimatDurumu: 'Teslim Edildi', teslimatSuresi: '1 is gunu' },
+  { siparisNo: '#SP-2127', musteri: 'Asil Sanayi', urun: 'Klima Kompresoru', toplamTutar: 18750, siparisTarihi: '2026-03-03', odemeDurumu: 'Beklemede', urunHazirlik: 'Hazirlaniyor', teslimatDurumu: 'Yolda', teslimatSuresi: '3 is gunu' },
+  { siparisNo: '#SP-2126', musteri: 'Nehir Otomotiv', urun: 'ABS Sensoru', toplamTutar: 3270, siparisTarihi: '2026-03-02', odemeDurumu: 'Odendi', urunHazirlik: 'Toplandi', teslimatDurumu: 'Teslim Edildi', teslimatSuresi: '1 is gunu' },
+  { siparisNo: '#SP-2125', musteri: 'Kaya Oto Servis', urun: 'Turbo Hortumu', toplamTutar: 2860, siparisTarihi: '2026-03-01', odemeDurumu: 'Beklemede', urunHazirlik: 'Tedarik Bekleniyor', teslimatDurumu: 'Hazirlaniyor', teslimatSuresi: '5 is gunu' },
+  { siparisNo: '#SP-2124', musteri: 'Yaman Yedek', urun: 'Far Ampulu H7', toplamTutar: 980, siparisTarihi: '2026-02-28', odemeDurumu: 'Odendi', urunHazirlik: 'Toplandi', teslimatDurumu: 'Teslim Edildi', teslimatSuresi: '1 is gunu' },
+  { siparisNo: '#SP-2123', musteri: 'Gurkan Oto', urun: 'Direksiyon Kutusu', toplamTutar: 15600, siparisTarihi: '2026-02-27', odemeDurumu: 'Beklemede', urunHazirlik: 'Hazirlaniyor', teslimatDurumu: 'Yolda', teslimatSuresi: '3 is gunu' },
 ]
+
+const tarihFormatla = (isoTarih) => {
+  const tarih = new Date(isoTarih)
+  return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(tarih)
+}
+
+const paraFormatla = (deger) => {
+  return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(deger)
+}
 
 const aylar = ['May', 'Haz', 'Tem', 'Agu', 'Eyl', 'Eki']
 const gelirSerisi = [92000, 108000, 104000, 121000, 129000, 137000]
@@ -71,9 +105,12 @@ function App() {
   const [error, setError] = useState('')
 
   const [aktifSayfa, setAktifSayfa] = useState('dashboard')
-
   const [urunler, setUrunler] = useState(baslangicUrunleri)
+  const [siparisler] = useState(baslangicSiparisleri)
+  const [siparisArama, setSiparisArama] = useState('')
+  const [siparisOdemeFiltresi, setSiparisOdemeFiltresi] = useState('Tum Siparisler')
   const [aramaMetni, setAramaMetni] = useState('')
+  const [envanterSayfa, setEnvanterSayfa] = useState(1)
 
   const [eklemeAcik, setEklemeAcik] = useState(false)
   const [duzenlemeAcik, setDuzenlemeAcik] = useState(false)
@@ -86,10 +123,47 @@ function App() {
     const metin = aramaMetni.trim().toLowerCase()
     if (!metin) return urunler
 
-    return urunler.filter((urun) => {
-      return urun.ad.toLowerCase().includes(metin) || urun.urunId.toLowerCase().includes(metin)
-    })
+    return urunler.filter((urun) => urun.ad.toLowerCase().includes(metin) || urun.urunId.toLowerCase().includes(metin))
   }, [aramaMetni, urunler])
+
+  const toplamEnvanterSayfa = Math.max(1, Math.ceil(filtreliUrunler.length / SAYFA_BASINA_URUN))
+  const sayfaBaslangic = (envanterSayfa - 1) * SAYFA_BASINA_URUN
+  const sayfadakiUrunler = filtreliUrunler.slice(sayfaBaslangic, sayfaBaslangic + SAYFA_BASINA_URUN)
+
+  const siraliSiparisler = useMemo(() => {
+    return [...siparisler].sort((a, b) => new Date(b.siparisTarihi).getTime() - new Date(a.siparisTarihi).getTime())
+  }, [siparisler])
+
+  const filtreliSiparisler = useMemo(() => {
+    const arama = siparisArama.trim().toLowerCase()
+    return siraliSiparisler.filter((siparis) => {
+      const filtreUygun = siparisOdemeFiltresi === 'Tum Siparisler' || siparis.odemeDurumu === siparisOdemeFiltresi
+      if (!filtreUygun) return false
+      if (!arama) return true
+      return (
+        siparis.siparisNo.toLowerCase().includes(arama) ||
+        siparis.musteri.toLowerCase().includes(arama) ||
+        siparis.urun.toLowerCase().includes(arama)
+      )
+    })
+  }, [siparisArama, siparisOdemeFiltresi, siraliSiparisler])
+
+  const dashboardYakinSatislar = useMemo(() => {
+    return siraliSiparisler.slice(0, 4).map((siparis) => ({
+      siparis: siparis.siparisNo,
+      urun: siparis.urun,
+      musteri: siparis.musteri,
+      teslimat: siparis.teslimatSuresi,
+      tutar: paraFormatla(siparis.toplamTutar),
+      durum: siparis.teslimatDurumu,
+    }))
+  }, [siraliSiparisler])
+
+  useEffect(() => {
+    if (envanterSayfa > toplamEnvanterSayfa) {
+      setEnvanterSayfa(toplamEnvanterSayfa)
+    }
+  }, [envanterSayfa, toplamEnvanterSayfa])
 
   const handleLogin = (event) => {
     event.preventDefault()
@@ -108,6 +182,7 @@ function App() {
     setEklemeAcik(false)
     setDuzenlemeAcik(false)
     setSilinecekUrun(null)
+    if (sayfa === 'envanter') setEnvanterSayfa(1)
   }
 
   const formGuncelle = (alan, deger) => {
@@ -148,12 +223,7 @@ function App() {
         uid: Date.now(),
         urunId,
         ad,
-        avatar: ad
-          .split(' ')
-          .slice(0, 2)
-          .map((parca) => parca[0]?.toUpperCase() || '')
-          .join('')
-          .slice(0, 2),
+        avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
         urunAdedi,
         magazaStok,
         favori: false,
@@ -162,6 +232,7 @@ function App() {
       setUrunler((onceki) => [yeniUrun, ...onceki])
       setEklemeAcik(false)
       formuTemizle()
+      setEnvanterSayfa(1)
       return
     }
 
@@ -174,12 +245,7 @@ function App() {
           ad,
           urunAdedi,
           magazaStok,
-          avatar: ad
-            .split(' ')
-            .slice(0, 2)
-            .map((parca) => parca[0]?.toUpperCase() || '')
-            .join('')
-            .slice(0, 2),
+          avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
         }
       }),
     )
@@ -195,9 +261,12 @@ function App() {
   }
 
   const favoriDegistir = (uid) => {
-    setUrunler((onceki) =>
-      onceki.map((urun) => (urun.uid === uid ? { ...urun, favori: !urun.favori } : urun)),
-    )
+    setUrunler((onceki) => onceki.map((urun) => (urun.uid === uid ? { ...urun, favori: !urun.favori } : urun)))
+  }
+
+  const envanterSayfayaGit = (sayfa) => {
+    if (sayfa < 1 || sayfa > toplamEnvanterSayfa) return
+    setEnvanterSayfa(sayfa)
   }
 
   if (!isLoggedIn) {
@@ -270,21 +339,15 @@ function App() {
         <aside className="yan-menu">
           <h2>Menu</h2>
           <nav>
-            <button
-              type="button"
-              className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`}
-              onClick={() => sayfaDegistir('dashboard')}
-            >
+            <button type="button" className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('dashboard')}>
               Dashboard
             </button>
-            <button
-              type="button"
-              className={`menu-link ${aktifSayfa === 'envanter' ? 'aktif' : ''}`}
-              onClick={() => sayfaDegistir('envanter')}
-            >
+            <button type="button" className={`menu-link ${aktifSayfa === 'envanter' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('envanter')}>
               Envanter
             </button>
-            <button type="button" className="menu-link pasif">Siparisler</button>
+            <button type="button" className={`menu-link ${aktifSayfa === 'siparisler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('siparisler')}>
+              Siparisler
+            </button>
             <button type="button" className="menu-link pasif">Kayitli Musteriler</button>
             <button type="button" className="menu-link pasif">Kayitli Alicilar</button>
             <button type="button" className="menu-link pasif">Nakit Akisi</button>
@@ -311,16 +374,12 @@ function App() {
                   <article key={kart.baslik} className="ozet-kartcik">
                     <div className="ozet-ust">
                       <span className="ozet-ikon">{kart.ikon}</span>
-                      <button type="button" className="ozet-menu" aria-label="Kart Menusu">
-                        ⋮
-                      </button>
+                      <button type="button" className="ozet-menu" aria-label="Kart Menusu">⋮</button>
                     </div>
                     <p>{kart.baslik}</p>
                     <div className="ozet-alt">
                       <h3>{kart.deger}</h3>
-                      <span className={`ozet-degisim ${kart.degisim.startsWith('+') ? 'pozitif' : 'negatif'}`}>
-                        {kart.degisim}
-                      </span>
+                      <span className={`ozet-degisim ${kart.degisim.startsWith('+') ? 'pozitif' : 'negatif'}`}>{kart.degisim}</span>
                     </div>
                   </article>
                 ))}
@@ -352,17 +411,17 @@ function App() {
                       const maksimum = Math.max(...urunler.map((u) => u.urunAdedi), 1)
                       const oran = Math.max((urun.urunAdedi / maksimum) * 100, 8)
                       return (
-                      <li key={urun.uid}>
-                        <div className="urun-grafik-satiri">
-                          <div className="urun-grafik-ust">
-                            <span>{urun.ad}</span>
-                            <strong>{urun.urunAdedi} adet</strong>
+                        <li key={urun.uid}>
+                          <div className="urun-grafik-satiri">
+                            <div className="urun-grafik-ust">
+                              <span>{urun.ad}</span>
+                              <strong>{urun.urunAdedi} adet</strong>
+                            </div>
+                            <div className="urun-grafik-zemin">
+                              <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
+                            </div>
                           </div>
-                          <div className="urun-grafik-zemin">
-                            <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
-                          </div>
-                        </div>
-                      </li>
+                        </li>
                       )
                     })}
                   </ul>
@@ -387,16 +446,14 @@ function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sonSatislar.map((satis) => (
+                      {dashboardYakinSatislar.map((satis) => (
                         <tr key={satis.siparis}>
                           <td>{satis.siparis}</td>
                           <td>{satis.urun}</td>
                           <td>{satis.musteri}</td>
                           <td>{satis.teslimat}</td>
                           <td>{satis.tutar}</td>
-                          <td>
-                            <span className={`durum-baloncuk ${durumSinifi(satis.durum)}`}>{satis.durum}</span>
-                          </td>
+                          <td><span className={`durum-baloncuk ${durumSinifi(satis.durum)}`}>{satis.durum}</span></td>
                         </tr>
                       ))}
                     </tbody>
@@ -415,11 +472,7 @@ function App() {
                     <polyline points={cizgiNoktalari(gelirSerisi)} className="mavi-cizgi" />
                     <polyline points={cizgiNoktalari(giderSerisi)} className="kirmizi-cizgi" />
                   </svg>
-                  <div className="grafik-etiketleri">
-                    {aylar.map((ay) => (
-                      <span key={ay}>{ay}</span>
-                    ))}
-                  </div>
+                  <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
                   <div className="grafik-lejant">
                     <span><i className="lejant-kutu mavi" /> Toplam Gelir</span>
                     <span><i className="lejant-kutu kirmizi" /> Toplam Gider</span>
@@ -435,14 +488,8 @@ function App() {
                     <line x1="10" y1="100" x2="310" y2="100" />
                     <polyline points={cizgiNoktalari(aylikSatilanUrun)} className="kirmizi-cizgi" />
                   </svg>
-                  <div className="grafik-etiketleri">
-                    {aylar.map((ay) => (
-                      <span key={ay}>{ay}</span>
-                    ))}
-                  </div>
-                  <div className="grafik-lejant">
-                    <span><i className="lejant-kutu kirmizi" /> Satilan Urun (Adet)</span>
-                  </div>
+                  <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
+                  <div className="grafik-lejant"><span><i className="lejant-kutu kirmizi" /> Satilan Urun (Adet)</span></div>
                 </article>
 
                 <article className="panel-kart grafik-kart">
@@ -454,15 +501,75 @@ function App() {
                     {aylikSatilanUrun.map((deger, index) => (
                       <div key={`${aylar[index]}-${deger}`} className="sutun-ogesi">
                         <span className="sutun-deger">{deger}</span>
-                        <div
-                          className="sutun"
-                          style={{ height: `${Math.max((deger / Math.max(...aylikSatilanUrun)) * 100, 8)}%` }}
-                        />
+                        <div className="sutun" style={{ height: `${Math.max((deger / Math.max(...aylikSatilanUrun)) * 100, 8)}%` }} />
                         <small>{aylar[index]}</small>
                       </div>
                     ))}
                   </div>
                 </article>
+              </section>
+            </section>
+          )}
+
+          {aktifSayfa === 'siparisler' && (
+            <section>
+              <header className="ust-baslik siparisler-baslik">
+                <div>
+                  <h1>Siparisler</h1>
+                  <p>En yeni siparisten en eski siparise dogru listelenir.</p>
+                </div>
+                <button type="button" className="siparis-yeni-buton">Yeni Siparis</button>
+              </header>
+
+              <section className="panel-kart siparisler-kart">
+                <div className="siparis-kontrol">
+                  <input
+                    type="text"
+                    placeholder="Siparis no, musteri veya urun ara"
+                    value={siparisArama}
+                    onChange={(event) => setSiparisArama(event.target.value)}
+                  />
+                  <select value={siparisOdemeFiltresi} onChange={(event) => setSiparisOdemeFiltresi(event.target.value)}>
+                    <option>Tum Siparisler</option>
+                    <option>Odendi</option>
+                    <option>Beklemede</option>
+                  </select>
+                </div>
+
+                <div className="tablo-sarmal">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Siparis No</th>
+                        <th>Musteri Adi</th>
+                        <th>Toplam Tutar</th>
+                        <th>Siparis Tarihi</th>
+                        <th>Odeme</th>
+                        <th>Urun Hazirlik</th>
+                        <th>Teslimat</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtreliSiparisler.map((siparis) => (
+                        <tr key={siparis.siparisNo}>
+                          <td>{siparis.siparisNo}</td>
+                          <td>{siparis.musteri}</td>
+                          <td>{paraFormatla(siparis.toplamTutar)}</td>
+                          <td>{tarihFormatla(siparis.siparisTarihi)}</td>
+                          <td>
+                            <span className={`odeme-durumu ${siparis.odemeDurumu === 'Odendi' ? 'odendi' : 'beklemede'}`}>
+                              {siparis.odemeDurumu}
+                            </span>
+                          </td>
+                          <td>{siparis.urunHazirlik}</td>
+                          <td>
+                            <span className={`durum-baloncuk ${durumSinifi(siparis.teslimatDurumu)}`}>{siparis.teslimatDurumu}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </section>
             </section>
           )}
@@ -475,9 +582,7 @@ function App() {
                   <p>Magaza: Merkez Sube</p>
                 </div>
                 <button type="button" className="urun-ekle-karti" onClick={eklemePenceresiniAc}>
-                  <span className="urun-ekle-ikon" aria-hidden="true">
-                    🛍
-                  </span>
+                  <span className="urun-ekle-ikon" aria-hidden="true">🛍</span>
                   <span className="urun-ekle-metin">Yeni Urun</span>
                 </button>
               </header>
@@ -489,7 +594,10 @@ function App() {
                     type="text"
                     placeholder="Urun veya ID ara"
                     value={aramaMetni}
-                    onChange={(event) => setAramaMetni(event.target.value)}
+                    onChange={(event) => {
+                      setAramaMetni(event.target.value)
+                      setEnvanterSayfa(1)
+                    }}
                   />
                 </div>
 
@@ -506,9 +614,9 @@ function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filtreliUrunler.map((urun, index) => (
+                      {sayfadakiUrunler.map((urun, index) => (
                         <tr key={urun.uid}>
-                          <td>{String(index + 1).padStart(2, '0')}</td>
+                          <td>{String(sayfaBaslangic + index + 1).padStart(2, '0')}</td>
                           <td>
                             <div className="urun-hucre">
                               <span className="urun-avatar">{urun.avatar}</span>
@@ -520,36 +628,37 @@ function App() {
                           <td>{urun.magazaStok}</td>
                           <td>
                             <div className="islem-dugmeleri">
-                              <button
-                                type="button"
-                                className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`}
-                                title="Favori"
-                                onClick={() => favoriDegistir(urun.uid)}
-                              >
-                                ★
-                              </button>
-                              <button
-                                type="button"
-                                className="ikon-dugme duzenle"
-                                title="Duzenle"
-                                onClick={() => duzenlemePenceresiniAc(urun)}
-                              >
-                                ✎
-                              </button>
-                              <button
-                                type="button"
-                                className="ikon-dugme sil"
-                                title="Sil"
-                                onClick={() => setSilinecekUrun(urun)}
-                              >
-                                🗑
-                              </button>
+                              <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}>★</button>
+                              <button type="button" className="ikon-dugme duzenle" title="Duzenle" onClick={() => duzenlemePenceresiniAc(urun)}>✎</button>
+                              <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekUrun(urun)}>🗑</button>
                             </div>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                <div className="sayfalama">
+                  <button type="button" className="sayfa-ok" onClick={() => envanterSayfayaGit(envanterSayfa - 1)} disabled={envanterSayfa === 1}>‹</button>
+                  {Array.from({ length: toplamEnvanterSayfa }, (_, i) => i + 1).map((sayfaNo) => (
+                    <button
+                      key={sayfaNo}
+                      type="button"
+                      className={`sayfa-buton ${envanterSayfa === sayfaNo ? 'aktif' : ''}`}
+                      onClick={() => envanterSayfayaGit(sayfaNo)}
+                    >
+                      {sayfaNo}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="sayfa-ok"
+                    onClick={() => envanterSayfayaGit(envanterSayfa + 1)}
+                    disabled={envanterSayfa === toplamEnvanterSayfa}
+                  >
+                    ›
+                  </button>
                 </div>
               </section>
             </section>
@@ -572,11 +681,7 @@ function App() {
               <input type="number" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
 
               <label>Magazadaki Urun Sayisi</label>
-              <input
-                type="number"
-                value={form.magazaStok}
-                onChange={(event) => formGuncelle('magazaStok', event.target.value)}
-              />
+              <input type="number" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setEklemeAcik(false)}>Iptal</button>
@@ -601,11 +706,7 @@ function App() {
               <input type="number" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
 
               <label>Magazadaki Urun Sayisi</label>
-              <input
-                type="number"
-                value={form.magazaStok}
-                onChange={(event) => formGuncelle('magazaStok', event.target.value)}
-              />
+              <input type="number" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setDuzenlemeAcik(false)}>Iptal</button>

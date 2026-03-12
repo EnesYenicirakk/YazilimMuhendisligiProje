@@ -39,6 +39,17 @@
   background: #fff;
 }
 
+.sayfa-logo {
+  display: block;
+  object-fit: contain;
+}
+
+.login-logo {
+  width: 84px;
+  height: 84px;
+  margin-bottom: 12px;
+}
+
 .left-panel h1 {
   margin: 0;
   font-size: 2rem;
@@ -224,6 +235,12 @@
   border-right: 1px solid var(--cizgi);
   padding: 20px 14px;
   background: #fff;
+}
+
+.menu-logo {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 8px;
 }
 
 .yan-menu h2 {

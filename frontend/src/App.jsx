@@ -459,6 +459,15 @@ function App() {
       <main className="login-page">
         <section className="login-shell" aria-label="Giriş Ekranı">
           <div className="panel left-panel">
+            <img
+              src="/ytu-logo.png"
+              alt="Üniversite Logosu"
+              className="sayfa-logo login-logo"
+              onError={(event) => {
+                event.currentTarget.onerror = null
+                event.currentTarget.src = '/ytu-logo.svg'
+              }}
+            />
             <h1>Giriş Yap</h1>
             <p className="subtitle">Envanter paneline erişmek için bilgilerinizi girin.</p>
 
@@ -522,6 +531,15 @@ function App() {
     <main className="dashboard-page">
       <section className="dashboard-shell">
         <aside className="yan-menu">
+          <img
+            src="/ytu-logo.png"
+            alt="Üniversite Logosu"
+            className="sayfa-logo menu-logo"
+            onError={(event) => {
+              event.currentTarget.onerror = null
+              event.currentTarget.src = '/ytu-logo.svg'
+            }}
+          />
           <h2>Menü</h2>
           <nav>
             <button type="button" className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('dashboard')}>

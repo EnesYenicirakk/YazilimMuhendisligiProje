@@ -7,30 +7,30 @@ const SAYFA_BASINA_URUN = 8
 const ODEME_SAYFA_BASINA = 10
 
 const baslangicUrunleri = [
-  { uid: 1, urunId: 'FRN-1001', ad: 'Fren Balatası Ön Takım', avatar: 'FB', urunAdedi: 84, magazaStok: 126, favori: false },
-  { uid: 2, urunId: 'YGF-1002', ad: 'Yağ Filtresi', avatar: 'YF', urunAdedi: 145, magazaStok: 210, favori: false },
-  { uid: 3, urunId: 'HVF-1003', ad: 'Hava Filtresi', avatar: 'HF', urunAdedi: 112, magazaStok: 168, favori: false },
-  { uid: 4, urunId: 'BUJ-1004', ad: 'Buji Takımı', avatar: 'BT', urunAdedi: 63, magazaStok: 95, favori: false },
-  { uid: 5, urunId: 'AMR-1005', ad: 'Amortisör Ön Çift', avatar: 'AM', urunAdedi: 29, magazaStok: 44, favori: false },
-  { uid: 6, urunId: 'DBR-1006', ad: 'Debriyaj Seti', avatar: 'DS', urunAdedi: 38, magazaStok: 57, favori: false },
-  { uid: 7, urunId: 'AKU-1007', ad: 'Aku 72Ah', avatar: 'AK', urunAdedi: 21, magazaStok: 35, favori: false },
-  { uid: 8, urunId: 'TRM-1008', ad: 'Triger Kayışı Seti', avatar: 'TK', urunAdedi: 52, magazaStok: 73, favori: false },
-  { uid: 9, urunId: 'RAD-1009', ad: 'Radyatör Üst Hortum', avatar: 'RH', urunAdedi: 46, magazaStok: 70, favori: false },
-  { uid: 10, urunId: 'BLC-1010', ad: 'Balata Spreyi', avatar: 'BS', urunAdedi: 76, magazaStok: 120, favori: false },
-  { uid: 11, urunId: 'KLR-1011', ad: 'Klima Kompresörü', avatar: 'KK', urunAdedi: 18, magazaStok: 27, favori: false },
-  { uid: 12, urunId: 'MTR-1012', ad: 'Motor Takozu', avatar: 'MT', urunAdedi: 41, magazaStok: 62, favori: false },
-  { uid: 13, urunId: 'SRS-1013', ad: 'Şarj Dinamosu', avatar: 'SD', urunAdedi: 24, magazaStok: 36, favori: false },
-  { uid: 14, urunId: 'DST-1014', ad: 'Direksiyon Kutusu', avatar: 'DK', urunAdedi: 12, magazaStok: 19, favori: false },
-  { uid: 15, urunId: 'EKS-1015', ad: 'Eksantrik Sensörü', avatar: 'ES', urunAdedi: 58, magazaStok: 88, favori: false },
-  { uid: 16, urunId: 'ENJ-1016', ad: 'Enjektör Takımı', avatar: 'ET', urunAdedi: 35, magazaStok: 51, favori: false },
-  { uid: 17, urunId: 'ROL-1017', ad: 'Rölanti Motoru', avatar: 'RM', urunAdedi: 33, magazaStok: 47, favori: false },
-  { uid: 18, urunId: 'YGR-1018', ad: 'Yağ Radyatörü', avatar: 'YR', urunAdedi: 17, magazaStok: 24, favori: false },
-  { uid: 19, urunId: 'KRN-1019', ad: 'Krank Kasnağı', avatar: 'KK', urunAdedi: 27, magazaStok: 39, favori: false },
-  { uid: 20, urunId: 'TRB-1020', ad: 'Turbo Hortumu', avatar: 'TH', urunAdedi: 22, magazaStok: 31, favori: false },
-  { uid: 21, urunId: 'ABS-1021', ad: 'ABS Sensörü', avatar: 'AS', urunAdedi: 49, magazaStok: 74, favori: false },
-  { uid: 22, urunId: 'SUS-1022', ad: 'Susturucu Arka', avatar: 'SA', urunAdedi: 14, magazaStok: 20, favori: false },
-  { uid: 23, urunId: 'BIL-1023', ad: 'Bijon Somunu Seti', avatar: 'BS', urunAdedi: 90, magazaStok: 140, favori: false },
-  { uid: 24, urunId: 'FAR-1024', ad: 'Far Ampulü H7', avatar: 'FA', urunAdedi: 110, magazaStok: 165, favori: false },
+  { uid: 1, urunId: 'FRN-1001', ad: 'Fren Balatası Ön Takım', avatar: 'FB', urunAdedi: 84, magazaStok: 126, alisFiyati: 1850, satisFiyati: 2480, favori: false },
+  { uid: 2, urunId: 'YGF-1002', ad: 'Yağ Filtresi', avatar: 'YF', urunAdedi: 145, magazaStok: 210, alisFiyati: 180, satisFiyati: 320, favori: false },
+  { uid: 3, urunId: 'HVF-1003', ad: 'Hava Filtresi', avatar: 'HF', urunAdedi: 112, magazaStok: 168, alisFiyati: 240, satisFiyati: 390, favori: false },
+  { uid: 4, urunId: 'BUJ-1004', ad: 'Buji Takımı', avatar: 'BT', urunAdedi: 63, magazaStok: 95, alisFiyati: 620, satisFiyati: 880, favori: false },
+  { uid: 5, urunId: 'AMR-1005', ad: 'Amortisör Ön Çift', avatar: 'AM', urunAdedi: 29, magazaStok: 44, alisFiyati: 3250, satisFiyati: 4520, favori: false },
+  { uid: 6, urunId: 'DBR-1006', ad: 'Debriyaj Seti', avatar: 'DS', urunAdedi: 38, magazaStok: 57, alisFiyati: 2780, satisFiyati: 3910, favori: false },
+  { uid: 7, urunId: 'AKU-1007', ad: 'Aku 72Ah', avatar: 'AK', urunAdedi: 21, magazaStok: 35, alisFiyati: 2150, satisFiyati: 3060, favori: false },
+  { uid: 8, urunId: 'TRM-1008', ad: 'Triger Kayışı Seti', avatar: 'TK', urunAdedi: 52, magazaStok: 73, alisFiyati: 1240, satisFiyati: 1760, favori: false },
+  { uid: 9, urunId: 'RAD-1009', ad: 'Radyatör Üst Hortum', avatar: 'RH', urunAdedi: 46, magazaStok: 70, alisFiyati: 310, satisFiyati: 520, favori: false },
+  { uid: 10, urunId: 'BLC-1010', ad: 'Balata Spreyi', avatar: 'BS', urunAdedi: 76, magazaStok: 120, alisFiyati: 95, satisFiyati: 165, favori: false },
+  { uid: 11, urunId: 'KLR-1011', ad: 'Klima Kompresörü', avatar: 'KK', urunAdedi: 18, magazaStok: 27, alisFiyati: 6900, satisFiyati: 8950, favori: false },
+  { uid: 12, urunId: 'MTR-1012', ad: 'Motor Takozu', avatar: 'MT', urunAdedi: 41, magazaStok: 62, alisFiyati: 540, satisFiyati: 760, favori: false },
+  { uid: 13, urunId: 'SRS-1013', ad: 'Şarj Dinamosu', avatar: 'SD', urunAdedi: 24, magazaStok: 36, alisFiyati: 3150, satisFiyati: 4280, favori: false },
+  { uid: 14, urunId: 'DST-1014', ad: 'Direksiyon Kutusu', avatar: 'DK', urunAdedi: 12, magazaStok: 19, alisFiyati: 7450, satisFiyati: 9380, favori: false },
+  { uid: 15, urunId: 'EKS-1015', ad: 'Eksantrik Sensörü', avatar: 'ES', urunAdedi: 58, magazaStok: 88, alisFiyati: 430, satisFiyati: 690, favori: false },
+  { uid: 16, urunId: 'ENJ-1016', ad: 'Enjektör Takımı', avatar: 'ET', urunAdedi: 35, magazaStok: 51, alisFiyati: 4820, satisFiyati: 6190, favori: false },
+  { uid: 17, urunId: 'ROL-1017', ad: 'Rölanti Motoru', avatar: 'RM', urunAdedi: 33, magazaStok: 47, alisFiyati: 860, satisFiyati: 1240, favori: false },
+  { uid: 18, urunId: 'YGR-1018', ad: 'Yağ Radyatörü', avatar: 'YR', urunAdedi: 17, magazaStok: 24, alisFiyati: 1710, satisFiyati: 2380, favori: false },
+  { uid: 19, urunId: 'KRN-1019', ad: 'Krank Kasnağı', avatar: 'KK', urunAdedi: 27, magazaStok: 39, alisFiyati: 920, satisFiyati: 1380, favori: false },
+  { uid: 20, urunId: 'TRB-1020', ad: 'Turbo Hortumu', avatar: 'TH', urunAdedi: 22, magazaStok: 31, alisFiyati: 380, satisFiyati: 610, favori: false },
+  { uid: 21, urunId: 'ABS-1021', ad: 'ABS Sensörü', avatar: 'AS', urunAdedi: 49, magazaStok: 74, alisFiyati: 690, satisFiyati: 960, favori: false },
+  { uid: 22, urunId: 'SUS-1022', ad: 'Susturucu Arka', avatar: 'SA', urunAdedi: 14, magazaStok: 20, alisFiyati: 1280, satisFiyati: 1820, favori: false },
+  { uid: 23, urunId: 'BIL-1023', ad: 'Bijon Somunu Seti', avatar: 'BS', urunAdedi: 90, magazaStok: 140, alisFiyati: 110, satisFiyati: 210, favori: false },
+  { uid: 24, urunId: 'FAR-1024', ad: 'Far Ampulü H7', avatar: 'FA', urunAdedi: 110, magazaStok: 165, alisFiyati: 75, satisFiyati: 145, favori: false },
 ]
 
 const dashboardOzetSablon = [
@@ -140,6 +140,15 @@ const bosForm = {
   ad: '',
   urunAdedi: '',
   magazaStok: '',
+}
+
+const bosUrunDuzenlemeFormu = {
+  urunId: '',
+  ad: '',
+  urunAdedi: '',
+  magazaStok: '',
+  alisFiyati: '',
+  satisFiyati: '',
 }
 
 const merkezMenusu = [
@@ -273,13 +282,19 @@ function App() {
   const [gecisBalonu, setGecisBalonu] = useState('')
   const [aramaMetni, setAramaMetni] = useState('')
   const [envanterSayfa, setEnvanterSayfa] = useState(1)
+  const [urunDuzenlemeArama, setUrunDuzenlemeArama] = useState('')
+  const [urunDuzenlemeSayfa, setUrunDuzenlemeSayfa] = useState(1)
 
   const [eklemeAcik, setEklemeAcik] = useState(false)
   const [duzenlemeAcik, setDuzenlemeAcik] = useState(false)
   const [silinecekUrun, setSilinecekUrun] = useState(null)
+  const [urunDuzenlemeModalAcik, setUrunDuzenlemeModalAcik] = useState(false)
+  const [silinecekDuzenlemeUrunu, setSilinecekDuzenlemeUrunu] = useState(null)
 
   const [seciliUid, setSeciliUid] = useState(null)
   const [form, setForm] = useState(bosForm)
+  const [urunDuzenlemeUid, setUrunDuzenlemeUid] = useState(null)
+  const [urunDuzenlemeFormu, setUrunDuzenlemeFormu] = useState(bosUrunDuzenlemeFormu)
 
   const filtreliUrunler = useMemo(() => {
     const metin = aramaMetni.trim().toLowerCase()
@@ -291,6 +306,23 @@ function App() {
   const toplamEnvanterSayfa = Math.max(1, Math.ceil(filtreliUrunler.length / SAYFA_BASINA_URUN))
   const sayfaBaslangic = (envanterSayfa - 1) * SAYFA_BASINA_URUN
   const sayfadakiUrunler = filtreliUrunler.slice(sayfaBaslangic, sayfaBaslangic + SAYFA_BASINA_URUN)
+
+  const filtreliDuzenlemeUrunleri = useMemo(() => {
+    const metin = urunDuzenlemeArama.trim().toLowerCase()
+    if (!metin) return urunler
+
+    return urunler.filter((urun) =>
+      urun.ad.toLowerCase().includes(metin) ||
+      urun.urunId.toLowerCase().includes(metin),
+    )
+  }, [urunDuzenlemeArama, urunler])
+
+  const toplamUrunDuzenlemeSayfa = Math.max(1, Math.ceil(filtreliDuzenlemeUrunleri.length / SAYFA_BASINA_URUN))
+  const urunDuzenlemeBaslangic = (urunDuzenlemeSayfa - 1) * SAYFA_BASINA_URUN
+  const sayfadakiDuzenlemeUrunleri = filtreliDuzenlemeUrunleri.slice(
+    urunDuzenlemeBaslangic,
+    urunDuzenlemeBaslangic + SAYFA_BASINA_URUN,
+  )
 
   const siraliSiparisler = useMemo(() => {
     return [...siparisler].sort((a, b) => new Date(b.siparisTarihi).getTime() - new Date(a.siparisTarihi).getTime())
@@ -387,9 +419,12 @@ function App() {
     setEklemeAcik(false)
     setDuzenlemeAcik(false)
     setSilinecekUrun(null)
+    setUrunDuzenlemeModalAcik(false)
+    setSilinecekDuzenlemeUrunu(null)
     setDuzenlenenOdeme(null)
     setSilinecekOdeme(null)
     if (sayfa === 'envanter') setEnvanterSayfa(1)
+    if (sayfa === 'urun-duzenleme') setUrunDuzenlemeSayfa(1)
     if (sayfa === 'odemeler') {
       setOdemeSekmesi('gelen')
       setGelenSayfa(1)
@@ -443,15 +478,17 @@ function App() {
     if (!urunId || !ad || Number.isNaN(urunAdedi) || Number.isNaN(magazaStok)) return
 
     if (mod === 'ekle') {
-      const yeniUrun = {
-        uid: Date.now(),
-        urunId,
-        ad,
-        avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
-        urunAdedi,
-        magazaStok,
-        favori: false,
-      }
+        const yeniUrun = {
+          uid: Date.now(),
+          urunId,
+          ad,
+          avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
+          urunAdedi,
+          magazaStok,
+          alisFiyati: 0,
+          satisFiyati: 0,
+          favori: false,
+        }
 
       setUrunler((onceki) => [yeniUrun, ...onceki])
       setEklemeAcik(false)
@@ -484,6 +521,57 @@ function App() {
     setSilinecekUrun(null)
   }
 
+  const urunDuzenlemeModaliniAc = (urun) => {
+    setUrunDuzenlemeUid(urun.uid)
+    setUrunDuzenlemeFormu({
+      urunId: urun.urunId,
+      ad: urun.ad,
+      urunAdedi: String(urun.urunAdedi),
+      magazaStok: String(urun.magazaStok),
+      alisFiyati: String(urun.alisFiyati ?? 0),
+      satisFiyati: String(urun.satisFiyati ?? 0),
+    })
+    setUrunDuzenlemeModalAcik(true)
+  }
+
+  const urunDuzenlemeKaydet = () => {
+    const urunId = urunDuzenlemeFormu.urunId.trim()
+    const ad = urunDuzenlemeFormu.ad.trim()
+    const urunAdedi = Number(urunDuzenlemeFormu.urunAdedi)
+    const magazaStok = Number(urunDuzenlemeFormu.magazaStok)
+    const alisFiyati = Number(urunDuzenlemeFormu.alisFiyati)
+    const satisFiyati = Number(urunDuzenlemeFormu.satisFiyati)
+
+    if (!urunId || !ad || [urunAdedi, magazaStok, alisFiyati, satisFiyati].some((deger) => Number.isNaN(deger))) return
+
+    setUrunler((onceki) =>
+      onceki.map((urun) =>
+        urun.uid === urunDuzenlemeUid
+          ? {
+              ...urun,
+              urunId,
+              ad,
+              urunAdedi,
+              magazaStok,
+              alisFiyati,
+              satisFiyati,
+              avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
+            }
+          : urun,
+      ),
+    )
+
+    setUrunDuzenlemeModalAcik(false)
+    setUrunDuzenlemeUid(null)
+    setUrunDuzenlemeFormu(bosUrunDuzenlemeFormu)
+  }
+
+  const urunDuzenlemeSil = () => {
+    if (!silinecekDuzenlemeUrunu) return
+    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinecekDuzenlemeUrunu.uid))
+    setSilinecekDuzenlemeUrunu(null)
+  }
+
   const favoriDegistir = (uid) => {
     setUrunler((onceki) => onceki.map((urun) => (urun.uid === uid ? { ...urun, favori: !urun.favori } : urun)))
   }
@@ -491,6 +579,11 @@ function App() {
   const envanterSayfayaGit = (sayfa) => {
     if (sayfa < 1 || sayfa > toplamEnvanterSayfa) return
     setEnvanterSayfa(sayfa)
+  }
+
+  const urunDuzenlemeSayfayaGit = (sayfa) => {
+    if (sayfa < 1 || sayfa > toplamUrunDuzenlemeSayfa) return
+    setUrunDuzenlemeSayfa(sayfa)
   }
 
   const odemeListesiGuncelle = (sekme, guncelleyici) => {
@@ -1192,15 +1285,90 @@ function App() {
 
           {aktifSayfa === 'urun-duzenleme' && (
             <section>
-              <header className="ust-baslik siparisler-baslik">
+              <header className="ust-baslik envanter-baslik">
                 <div>
                   <h1>Ürün Düzenleme</h1>
-                  <p>Toplu ürün işlemleri için ayrılan alan.</p>
+                  <p>Alış ve satış fiyatlarını ürün bazında yönetin.</p>
                 </div>
               </header>
-              <section className="panel-kart bos-modul-karti">
-                <h2>Ürün düzenleme paneli hazırlanıyor</h2>
-                <p>Toplu güncelleme, fiyat revizyonu ve ürün durum değişiklikleri burada olacak.</p>
+
+              <section className="panel-kart envanter-kart">
+                <div className="panel-ust-cizgi">
+                  <h2>Ürün Fiyat Listesi</h2>
+                  <input
+                    type="text"
+                    placeholder="Ürün veya ID ara"
+                    value={urunDuzenlemeArama}
+                    onChange={(event) => {
+                      setUrunDuzenlemeArama(event.target.value)
+                      setUrunDuzenlemeSayfa(1)
+                    }}
+                  />
+                </div>
+
+                <div className="tablo-sarmal">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Ürün</th>
+                        <th>Ürün ID</th>
+                        <th>Ürün Adedi</th>
+                        <th>Alış Fiyatı</th>
+                        <th>Satış Fiyatı</th>
+                        <th>Mağaza Stok</th>
+                        <th>İşlem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sayfadakiDuzenlemeUrunleri.map((urun, index) => (
+                        <tr key={`duzenleme-${urun.uid}`}>
+                          <td>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')}</td>
+                          <td>
+                            <div className="urun-bilgi">
+                              <span className="urun-avatar">{urun.avatar}</span>
+                              <span>{urun.ad}</span>
+                            </div>
+                          </td>
+                          <td>{urun.urunId}</td>
+                          <td>{urun.urunAdedi}</td>
+                          <td>{paraFormatla(urun.alisFiyati ?? 0)}</td>
+                          <td>{paraFormatla(urun.satisFiyati ?? 0)}</td>
+                          <td>{urun.magazaStok}</td>
+                          <td>
+                            <div className="islem-dugmeleri">
+                              <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}>★</button>
+                              <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => urunDuzenlemeModaliniAc(urun)}>✎</button>
+                              <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekDuzenlemeUrunu(urun)}>🗑</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="sayfalama">
+                  <button type="button" className="sayfa-ok" onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa - 1)} disabled={urunDuzenlemeSayfa === 1}>‹</button>
+                  {Array.from({ length: toplamUrunDuzenlemeSayfa }, (_, i) => i + 1).map((sayfaNo) => (
+                    <button
+                      key={`duzenleme-sayfa-${sayfaNo}`}
+                      type="button"
+                      className={`sayfa-buton ${urunDuzenlemeSayfa === sayfaNo ? 'aktif' : ''}`}
+                      onClick={() => urunDuzenlemeSayfayaGit(sayfaNo)}
+                    >
+                      {sayfaNo}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="sayfa-ok"
+                    onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa + 1)}
+                    disabled={urunDuzenlemeSayfa === toplamUrunDuzenlemeSayfa}
+                  >
+                    ›
+                  </button>
+                </div>
               </section>
             </section>
           )}
@@ -1400,6 +1568,37 @@ function App() {
         </div>
       )}
 
+      {urunDuzenlemeModalAcik && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu">
+            <h3>Ürünü Düzenle</h3>
+            <div className="modal-form">
+              <label>Ürün İsmi</label>
+              <input value={urunDuzenlemeFormu.ad} onChange={(event) => setUrunDuzenlemeFormu((onceki) => ({ ...onceki, ad: event.target.value }))} />
+
+              <label>Ürün ID</label>
+              <input value={urunDuzenlemeFormu.urunId} onChange={(event) => setUrunDuzenlemeFormu((onceki) => ({ ...onceki, urunId: event.target.value }))} />
+
+              <label>Ürün Adedi</label>
+              <input type="number" value={urunDuzenlemeFormu.urunAdedi} onChange={(event) => setUrunDuzenlemeFormu((onceki) => ({ ...onceki, urunAdedi: event.target.value }))} />
+
+              <label>Alış Fiyatı</label>
+              <input type="number" value={urunDuzenlemeFormu.alisFiyati} onChange={(event) => setUrunDuzenlemeFormu((onceki) => ({ ...onceki, alisFiyati: event.target.value }))} />
+
+              <label>Satış Fiyatı</label>
+              <input type="number" value={urunDuzenlemeFormu.satisFiyati} onChange={(event) => setUrunDuzenlemeFormu((onceki) => ({ ...onceki, satisFiyati: event.target.value }))} />
+
+              <label>Mağazadaki Ürün Sayısı</label>
+              <input type="number" value={urunDuzenlemeFormu.magazaStok} onChange={(event) => setUrunDuzenlemeFormu((onceki) => ({ ...onceki, magazaStok: event.target.value }))} />
+            </div>
+            <div className="modal-aksiyon">
+              <button type="button" className="ikinci" onClick={() => setUrunDuzenlemeModalAcik(false)}>İptal</button>
+              <button type="button" onClick={urunDuzenlemeKaydet}>Kaydet</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {silinecekUrun && (
         <div className="modal-kaplama">
           <div className="modal-kutu kucuk">
@@ -1408,6 +1607,19 @@ function App() {
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setSilinecekUrun(null)}>Hayır</button>
               <button type="button" className="tehlike" onClick={urunSil}>Evet</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {silinecekDuzenlemeUrunu && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu kucuk">
+            <h3>Silmek istediğinizden emin misiniz?</h3>
+            <p><strong>{silinecekDuzenlemeUrunu.ad}</strong> ürün düzenleme listesinden kaldırılacak.</p>
+            <div className="modal-aksiyon">
+              <button type="button" className="ikinci" onClick={() => setSilinecekDuzenlemeUrunu(null)}>Hayır</button>
+              <button type="button" className="tehlike" onClick={urunDuzenlemeSil}>Evet</button>
             </div>
           </div>
         </div>

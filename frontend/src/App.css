@@ -231,6 +231,10 @@
   overflow: hidden;
 }
 
+.dashboard-shell.merkez-modu {
+  grid-template-columns: 1fr;
+}
+
 .yan-menu {
   border-right: 1px solid var(--cizgi);
   padding: 20px 14px;
@@ -308,6 +312,426 @@
 .icerik-alani {
   padding: 18px;
   background: #f9fbff;
+}
+
+.merkez-icerik {
+  padding: 18px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.95), rgba(245, 248, 252, 0.92)),
+    linear-gradient(180deg, #fbfcfe 0%, #f3f7fb 100%);
+  display: grid;
+  place-items: center;
+}
+
+.geri-buton {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: #e9f2ff;
+  color: #1f56a4;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.merkez-ekrani {
+  position: relative;
+  width: min(100%, 1120px);
+  min-height: min(78vh, 860px);
+  --balon-cap: 165px;
+  --halka-cap: min(calc(100% - var(--balon-cap) - 110px), 620px);
+  --halka-yaricapi-x: calc(var(--halka-cap) / 2);
+  --halka-yaricapi-y: calc(var(--halka-cap) / 2);
+  border-radius: 28px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%);
+}
+
+.arka-plan-baloncuklari {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.arka-balon {
+  position: absolute;
+  border-radius: 50%;
+  display: grid;
+  align-content: stretch;
+  justify-items: center;
+  gap: 6px;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 1px solid rgba(113, 167, 232, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 12px 30px rgba(112, 152, 204, 0.14);
+  backdrop-filter: blur(3px);
+  opacity: 0.46;
+  animation: arka-baloncuk-yuzdur 18s ease-in-out infinite alternate;
+}
+
+.arka-balon-1 {
+  width: 150px;
+  height: 150px;
+  left: 8%;
+  top: 10%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95), rgba(111, 172, 244, 0.68));
+  animation-duration: 22s;
+}
+
+.arka-balon-2 {
+  width: 124px;
+  height: 124px;
+  right: 11%;
+  top: 14%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.94), rgba(98, 156, 226, 0.66));
+  animation-duration: 19s;
+  animation-delay: -4s;
+}
+
+.arka-balon-3 {
+  width: 106px;
+  height: 106px;
+  right: 18%;
+  bottom: 20%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.92), rgba(124, 185, 255, 0.62));
+  animation-duration: 24s;
+  animation-delay: -9s;
+}
+
+.arka-balon-4 {
+  width: 136px;
+  height: 136px;
+  left: 14%;
+  bottom: 14%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.94), rgba(94, 164, 232, 0.64));
+  animation-duration: 21s;
+  animation-delay: -7s;
+}
+
+.arka-balon-5 {
+  width: 92px;
+  height: 92px;
+  left: 47%;
+  top: 17%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.93), rgba(112, 171, 235, 0.58));
+  animation-duration: 17s;
+  animation-delay: -3s;
+}
+
+.arka-balon-6 {
+  width: 118px;
+  height: 118px;
+  left: 56%;
+  bottom: 10%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.93), rgba(102, 161, 231, 0.62));
+  animation-duration: 20s;
+  animation-delay: -11s;
+}
+
+.arka-balon-7 {
+  width: 134px;
+  height: 134px;
+  left: 28%;
+  top: 6%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.94), rgba(106, 168, 238, 0.64));
+  animation-duration: 23s;
+  animation-delay: -6s;
+}
+
+.arka-balon-8 {
+  width: 112px;
+  height: 112px;
+  right: 30%;
+  bottom: 8%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.93), rgba(120, 181, 247, 0.62));
+  animation-duration: 18s;
+  animation-delay: -8s;
+}
+
+.arka-balon small {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: rgba(29, 72, 126, 0.86);
+  margin-top: 4px;
+}
+
+.mini-cizgi-grafik,
+.mini-sutun-grafik,
+.mini-karsilastirma {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 5px;
+  width: 88%;
+  height: 62%;
+  margin-top: auto;
+  margin-bottom: 8px;
+}
+
+.mini-cizgi-grafik span,
+.mini-sutun-grafik span,
+.mini-karsilastirma span {
+  width: 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(56, 131, 224, 0.48), rgba(29, 98, 184, 0.95));
+}
+
+.mini-coklu-cizgi-grafik {
+  width: 92%;
+  height: 68%;
+  overflow: visible;
+  margin-top: auto;
+  margin-bottom: 4px;
+}
+
+.mini-coklu-cizgi-grafik path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.3;
+  stroke-dasharray: 4 4;
+}
+
+.mini-coklu-cizgi-grafik .cizgi-a {
+  stroke: rgba(52, 190, 195, 0.92);
+}
+
+.mini-coklu-cizgi-grafik .cizgi-b {
+  stroke: rgba(18, 112, 219, 0.92);
+}
+
+.mini-coklu-cizgi-grafik .cizgi-c {
+  stroke: rgba(255, 111, 84, 0.9);
+}
+
+.mini-halka-grafik {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.92) 0 52%, transparent 54%),
+    conic-gradient(rgba(34, 110, 202, 0.95) 0 68%, rgba(191, 220, 255, 0.7) 68% 100%);
+  color: rgba(22, 76, 145, 0.9);
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-top: auto;
+  margin-bottom: 10px;
+}
+
+.mini-liste-grafik {
+  display: grid;
+  gap: 6px;
+  width: 84%;
+  margin-top: auto;
+  margin-bottom: 10px;
+}
+
+.mini-liste-grafik span {
+  display: block;
+  height: 7px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(52, 126, 221, 0.9), rgba(158, 204, 255, 0.52));
+}
+
+.merkez-cember {
+  position: absolute;
+  border-radius: 50%;
+  border: 4px solid rgba(31, 48, 68, 0.1);
+  z-index: 1;
+}
+
+.dis-cember {
+  width: var(--halka-cap);
+  height: var(--halka-cap);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ic-cember {
+  width: min(calc(var(--halka-cap) * 0.4), 330px);
+  height: min(calc(var(--halka-cap) * 0.4), 330px);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-width: 1px;
+}
+
+.merkez-baslik-karti {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(24vw, 280px);
+  height: min(24vw, 280px);
+  min-width: 220px;
+  min-height: 220px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #eef1f5 0%, #e7eaee 100%);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  padding: 22px;
+  color: #36455a;
+  z-index: 2;
+}
+
+.merkez-baslik-karti p {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7d8ba0;
+}
+
+.merkez-baslik-karti h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  line-height: 1.08;
+}
+
+.merkez-baslik-karti span {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: #607086;
+}
+
+.merkez-balon {
+  position: absolute;
+  width: var(--balon-cap);
+  height: var(--balon-cap);
+  border-radius: 50%;
+  border: 0;
+  color: #fff;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 18px 34px rgba(22, 34, 46, 0.14);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+}
+
+.merkez-balon:hover {
+  transform: translate(-50%, -50%) scale(1.07);
+  box-shadow: 0 24px 42px rgba(22, 34, 46, 0.2);
+}
+
+.merkez-balon.giriliyor {
+  animation: balona-giris 180ms ease forwards;
+}
+
+.merkez-balon strong {
+  font-size: 1.95rem;
+  font-weight: 700;
+}
+
+.merkez-balon span {
+  width: 112px;
+  font-size: 0.96rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.merkez-balon small {
+  font-size: 0.72rem;
+  opacity: 0.84;
+}
+
+.renk-turuncu { background: #ea8f4b; }
+.renk-yesil-koyu { background: #165f59; }
+.renk-altin { background: #d0a246; }
+.renk-turkuaz { background: #368989; }
+.renk-lacivert { background: #174a54; }
+.renk-kehribar { background: #e9bd59; color: #fff; }
+.renk-mavi-gri { background: #446f9f; }
+.renk-kiremit { background: #c97139; }
+
+.balon-1 {
+  left: calc(50% - var(--halka-yaricapi-x) * 0.707);
+  top: calc(50% - var(--halka-yaricapi-y) * 0.707);
+}
+
+.balon-2 {
+  left: 50%;
+  top: calc(50% - var(--halka-yaricapi-y));
+}
+
+.balon-3 {
+  left: calc(50% + var(--halka-yaricapi-x) * 0.707);
+  top: calc(50% - var(--halka-yaricapi-y) * 0.707);
+}
+
+.balon-4 {
+  left: calc(50% + var(--halka-yaricapi-x));
+  top: 50%;
+}
+
+.balon-5 {
+  left: calc(50% + var(--halka-yaricapi-x) * 0.707);
+  top: calc(50% + var(--halka-yaricapi-y) * 0.707);
+}
+
+.balon-6 {
+  left: 50%;
+  top: calc(50% + var(--halka-yaricapi-y));
+}
+
+.balon-7 {
+  left: calc(50% - var(--halka-yaricapi-x) * 0.707);
+  top: calc(50% + var(--halka-yaricapi-y) * 0.707);
+}
+
+.balon-8 {
+  left: calc(50% - var(--halka-yaricapi-x));
+  top: 50%;
+}
+
+.bos-modul-karti {
+  min-height: 280px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.bos-modul-karti h2,
+.bos-modul-karti p {
+  margin: 0;
+}
+
+@keyframes balona-giris {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: saturate(1);
+  }
+  45% {
+    transform: translate(-50%, -50%) scale(0.92);
+    filter: saturate(1.08);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.14);
+    filter: saturate(1.15);
+  }
+}
+
+@keyframes arka-baloncuk-yuzdur {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(14px, -18px, 0) scale(1.07);
+  }
+  100% {
+    transform: translate3d(-12px, 12px, 0) scale(0.96);
+  }
 }
 
 .envanter-baslik {
@@ -980,6 +1404,11 @@ th {
   .ozet-grid {
     grid-template-columns: repeat(2, minmax(130px, 1fr));
   }
+
+  .merkez-balon {
+    width: 160px;
+    height: 160px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1036,6 +1465,54 @@ th {
 
   .ozet-grid {
     grid-template-columns: 1fr;
+  }
+
+  .merkez-ekrani {
+      min-height: auto;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .arka-plan-baloncuklari {
+      display: none;
+    }
+
+    .merkez-cember {
+      display: none;
+    }
+
+  .merkez-baslik-karti,
+  .merkez-balon,
+  .balon-1,
+  .balon-2,
+  .balon-3,
+  .balon-4,
+  .balon-5,
+  .balon-6,
+  .balon-7,
+  .balon-8 {
+    position: static;
+    transform: none;
+    width: 100%;
+    min-height: 150px;
+    height: auto;
+  }
+
+  .merkez-baslik-karti {
+    grid-column: 1 / -1;
+    border-radius: 22px;
+    width: 100%;
+    min-width: 0;
+    min-height: 190px;
+    height: auto;
+  }
+
+  .balon-7:hover,
+  .balon-8:hover,
+  .merkez-balon:hover {
+    transform: scale(1.03);
   }
 }
 

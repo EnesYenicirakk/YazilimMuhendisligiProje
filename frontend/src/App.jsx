@@ -142,13 +142,24 @@ const bosForm = {
   magazaStok: '',
 }
 
+const merkezMenusu = [
+  { sayfa: 'dashboard', baslik: 'Dashboard', ikon: '▦', renk: 'turuncu', aciklama: 'Özet görünüm' },
+  { sayfa: 'envanter', baslik: 'Envanter', ikon: '▣', renk: 'yesil-koyu', aciklama: 'Stok yönetimi' },
+  { sayfa: 'siparisler', baslik: 'Siparişler', ikon: '≣', renk: 'altin', aciklama: 'Sipariş hareketleri' },
+  { sayfa: 'musteriler', baslik: 'Kayıtlı Müşteriler', ikon: '☎', renk: 'turkuaz', aciklama: 'Müşteri listesi' },
+  { sayfa: 'alicilar', baslik: 'Kayıtlı Alıcılar', ikon: '✆', renk: 'lacivert', aciklama: 'Alıcı kayıtları' },
+  { sayfa: 'odemeler', baslik: 'Finansal Akış', ikon: '₺', renk: 'kehribar', aciklama: 'Nakit akışı' },
+  { sayfa: 'urun-duzenleme', baslik: 'Ürün Düzenleme', ikon: '✎', renk: 'mavi-gri', aciklama: 'Ürün güncelleme' },
+  { sayfa: 'faturalama', baslik: 'Faturalama (PDF)', ikon: '▤', renk: 'kiremit', aciklama: 'Fatura üretimi' },
+]
+
 function App() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [error, setError] = useState('')
 
-  const [aktifSayfa, setAktifSayfa] = useState('dashboard')
+  const [aktifSayfa, setAktifSayfa] = useState('merkez')
   const [urunler, setUrunler] = useState(baslangicUrunleri)
   const [siparisler] = useState(baslangicSiparisleri)
   const [gelenNakitListesi, setGelenNakitListesi] = useState(() => gelenNakitKayitlari.map((k) => ({ ...k, favori: false })))
@@ -161,6 +172,7 @@ function App() {
   const [duzenlenenOdeme, setDuzenlenenOdeme] = useState(null)
   const [odemeFormu, setOdemeFormu] = useState({ taraf: '', tarih: '', durum: '', tutar: '' })
   const [silinecekOdeme, setSilinecekOdeme] = useState(null)
+  const [gecisBalonu, setGecisBalonu] = useState('')
   const [aramaMetni, setAramaMetni] = useState('')
   const [envanterSayfa, setEnvanterSayfa] = useState(1)
 
@@ -264,6 +276,7 @@ function App() {
 
     if (username.trim() === DEFAULT_USERNAME && password === DEFAULT_PASSWORD) {
       setIsLoggedIn(true)
+      setAktifSayfa('merkez')
       setError('')
       return
     }
@@ -284,6 +297,18 @@ function App() {
       setGelenSayfa(1)
       setGidenSayfa(1)
     }
+  }
+
+  const merkezeDon = () => {
+    sayfaDegistir('merkez')
+  }
+
+  const merkezdenSayfayaGit = (sayfa) => {
+    setGecisBalonu(sayfa)
+    window.setTimeout(() => {
+      setGecisBalonu('')
+      sayfaDegistir(sayfa)
+    }, 180)
   }
 
   const formGuncelle = (alan, deger) => {
@@ -529,77 +554,162 @@ function App() {
 
   return (
     <main className="dashboard-page">
-      <section className="dashboard-shell">
-        <aside className="yan-menu">
-          <img
-            src="/ytu-logo.png"
-            alt="Üniversite Logosu"
-            className="sayfa-logo menu-logo"
-            onError={(event) => {
-              event.currentTarget.onerror = null
-              event.currentTarget.src = '/ytu-logo.svg'
-            }}
-          />
-          <h2>Menü</h2>
-          <nav>
-            <button type="button" className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('dashboard')}>
-              <span className="menu-ikon" aria-hidden="true">▦</span>
-              <span>Dashboard</span>
-            </button>
-            <button type="button" className={`menu-link ${aktifSayfa === 'envanter' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('envanter')}>
-              <span className="menu-ikon menu-ikon-envanter" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="6.5" y="5.8" width="11" height="14.7" rx="1.8" />
-                  <path d="M9 4.8h6v2.1H9z" />
-                  <path d="M9.3 10h5.5M9.3 13h5.5M9.3 16h4.2" />
-                </svg>
-              </span>
-              <span>Envanter</span>
-            </button>
-            <button type="button" className={`menu-link ${aktifSayfa === 'siparisler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('siparisler')}>
-              <span className="menu-ikon" aria-hidden="true">≣</span>
-              <span>Siparişler</span>
-            </button>
-            <button type="button" className="menu-link pasif">
-              <span className="menu-ikon menu-ikon-telefon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 4.5h5l1.2 3.3-2.3 1.4a13.1 13.1 0 0 0 5.9 5.9l1.4-2.3L19.5 14v5a2 2 0 0 1-2.1 2A16.7 16.7 0 0 1 3 6.6 2 2 0 0 1 5 4.5z" />
-                </svg>
-              </span>
-              <span>Kayıtlı Müşteriler</span>
-            </button>
-            <button type="button" className="menu-link pasif">
-              <span className="menu-ikon menu-ikon-telefon2" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="7" y="2.8" width="10" height="18.5" rx="2.2" />
-                  <circle cx="12" cy="17.2" r="1" />
-                  <path d="M10 5.8h4" />
-                </svg>
-              </span>
-              <span>Kayıtlı Alıcılar</span>
-            </button>
-            <button type="button" className={`menu-link ${aktifSayfa === 'odemeler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('odemeler')}>
-              <span className="menu-ikon menu-ikon-cuzdan" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2.5" y="5" width="17" height="14" rx="2.5" />
-                  <path d="M19.5 9h2a1.5 1.5 0 0 1 0 6h-2" />
-                  <circle cx="16" cy="12" r="1.1" />
-                </svg>
-              </span>
-              <span>Finansal Akış</span>
-            </button>
-            <button type="button" className="menu-link pasif">
-              <span className="menu-ikon" aria-hidden="true">✎</span>
-              <span>Ürün Düzenleme</span>
-            </button>
-            <button type="button" className="menu-link pasif">
-              <span className="menu-ikon" aria-hidden="true">▤</span>
-              <span>Faturalama (PDF)</span>
-            </button>
-          </nav>
-        </aside>
+      <section className={`dashboard-shell ${aktifSayfa === 'merkez' ? 'merkez-modu' : ''}`}>
+        {aktifSayfa !== 'merkez' && (
+          <aside className="yan-menu">
+            <h2>Menü</h2>
+            <nav>
+              <button type="button" className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('dashboard')}>
+                <span className="menu-ikon" aria-hidden="true">▦</span>
+                <span>Dashboard</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'envanter' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('envanter')}>
+                <span className="menu-ikon menu-ikon-envanter" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="6.5" y="5.8" width="11" height="14.7" rx="1.8" />
+                    <path d="M9 4.8h6v2.1H9z" />
+                    <path d="M9.3 10h5.5M9.3 13h5.5M9.3 16h4.2" />
+                  </svg>
+                </span>
+                <span>Envanter</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'siparisler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('siparisler')}>
+                <span className="menu-ikon" aria-hidden="true">≣</span>
+                <span>Siparişler</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'musteriler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('musteriler')}>
+                <span className="menu-ikon menu-ikon-telefon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 4.5h5l1.2 3.3-2.3 1.4a13.1 13.1 0 0 0 5.9 5.9l1.4-2.3L19.5 14v5a2 2 0 0 1-2.1 2A16.7 16.7 0 0 1 3 6.6 2 2 0 0 1 5 4.5z" />
+                  </svg>
+                </span>
+                <span>Kayıtlı Müşteriler</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'alicilar' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('alicilar')}>
+                <span className="menu-ikon menu-ikon-telefon2" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="7" y="2.8" width="10" height="18.5" rx="2.2" />
+                    <circle cx="12" cy="17.2" r="1" />
+                    <path d="M10 5.8h4" />
+                  </svg>
+                </span>
+                <span>Kayıtlı Alıcılar</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'odemeler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('odemeler')}>
+                <span className="menu-ikon menu-ikon-cuzdan" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2.5" y="5" width="17" height="14" rx="2.5" />
+                    <path d="M19.5 9h2a1.5 1.5 0 0 1 0 6h-2" />
+                    <circle cx="16" cy="12" r="1.1" />
+                  </svg>
+                </span>
+                <span>Finansal Akış</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'urun-duzenleme' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('urun-duzenleme')}>
+                <span className="menu-ikon" aria-hidden="true">✎</span>
+                <span>Ürün Düzenleme</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'faturalama' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('faturalama')}>
+                <span className="menu-ikon" aria-hidden="true">▤</span>
+                <span>Faturalama (PDF)</span>
+              </button>
+            </nav>
+          </aside>
+        )}
 
-        <div className="icerik-alani">
+        <div className={`icerik-alani ${aktifSayfa === 'merkez' ? 'merkez-icerik' : ''}`}>
+          {aktifSayfa === 'merkez' && (
+            <section className="merkez-ekrani">
+              <div className="arka-plan-baloncuklari" aria-hidden="true">
+                <div className="arka-balon arka-balon-1">
+                  <small>Satış</small>
+                  <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
+                    <path d="M8 37 L25 30 L42 18 L60 23 L78 14 L92 28" className="cizgi-a" />
+                    <path d="M8 43 L25 35 L42 40 L60 29 L78 33 L92 22" className="cizgi-b" />
+                    <path d="M8 46 L25 48 L42 44 L60 47 L78 41 L92 45" className="cizgi-c" />
+                  </svg>
+                </div>
+                <div className="arka-balon arka-balon-2">
+                  <small>Nakit</small>
+                  <div className="mini-halka-grafik">
+                    <span>68%</span>
+                  </div>
+                </div>
+                <div className="arka-balon arka-balon-3">
+                  <small>Sipariş</small>
+                  <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
+                    <path d="M8 34 L25 22 L42 27 L60 16 L78 12 L92 19" className="cizgi-a" />
+                    <path d="M8 41 L25 39 L42 29 L60 33 L78 23 L92 26" className="cizgi-b" />
+                    <path d="M8 48 L25 46 L42 44 L60 40 L78 43 L92 38" className="cizgi-c" />
+                  </svg>
+                </div>
+                <div className="arka-balon arka-balon-4">
+                  <small>Envanter</small>
+                  <div className="mini-liste-grafik">
+                    <span style={{ width: '62%' }} />
+                    <span style={{ width: '48%' }} />
+                    <span style={{ width: '71%' }} />
+                  </div>
+                </div>
+                <div className="arka-balon arka-balon-5">
+                  <small>Trend</small>
+                  <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
+                    <path d="M8 38 L25 20 L42 31 L60 26 L78 9 L92 18" className="cizgi-a" />
+                    <path d="M8 44 L25 37 L42 34 L60 20 L78 29 L92 24" className="cizgi-b" />
+                    <path d="M8 50 L25 45 L42 46 L60 42 L78 38 L92 41" className="cizgi-c" />
+                  </svg>
+                </div>
+                <div className="arka-balon arka-balon-6">
+                  <small>Gelir</small>
+                  <div className="mini-karsilastirma">
+                    <span style={{ height: '48%' }} />
+                    <span style={{ height: '72%' }} />
+                  </div>
+                </div>
+                <div className="arka-balon arka-balon-7">
+                  <small>Sevkiyat</small>
+                  <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
+                    <path d="M8 42 L25 33 L42 19 L60 25 L78 17 L92 12" className="cizgi-a" />
+                    <path d="M8 47 L25 40 L42 35 L60 28 L78 24 L92 30" className="cizgi-b" />
+                    <path d="M8 49 L25 46 L42 43 L60 45 L78 39 L92 36" className="cizgi-c" />
+                  </svg>
+                </div>
+                <div className="arka-balon arka-balon-8">
+                  <small>Stok</small>
+                  <div className="mini-liste-grafik">
+                    <span style={{ width: '70%' }} />
+                    <span style={{ width: '56%' }} />
+                    <span style={{ width: '64%' }} />
+                  </div>
+                </div>
+              </div>
+              <div className="merkez-cember dis-cember" />
+              <div className="merkez-cember ic-cember" />
+              <div className="merkez-baslik-karti">
+                <p>Yönetim Merkezi</p>
+                <h1>Stok Takip Sistemi</h1>
+                <span>Bir modül seçerek devam edin</span>
+              </div>
+              {merkezMenusu.map((kart, index) => (
+                <button
+                  key={kart.sayfa}
+                  type="button"
+                  className={`merkez-balon renk-${kart.renk} balon-${index + 1} ${gecisBalonu === kart.sayfa ? 'giriliyor' : ''}`}
+                  onClick={() => merkezdenSayfayaGit(kart.sayfa)}
+                >
+                  <strong>{kart.ikon}</strong>
+                  <span>{kart.baslik}</span>
+                  <small>{kart.aciklama}</small>
+                </button>
+              ))}
+            </section>
+          )}
+
+          {aktifSayfa !== 'merkez' && (
+            <button type="button" className="geri-buton" onClick={merkezeDon}>
+              ← Merkeze Dön
+            </button>
+          )}
           {aktifSayfa === 'dashboard' && (
             <section>
               <header className="ust-baslik envanter-baslik">
@@ -968,6 +1078,66 @@ function App() {
                     ›
                   </button>
                 </div>
+              </section>
+            </section>
+          )}
+
+          {aktifSayfa === 'musteriler' && (
+            <section>
+              <header className="ust-baslik siparisler-baslik">
+                <div>
+                  <h1>Kayıtlı Müşteriler</h1>
+                  <p>Müşteri kayıtlarını bu ekrandan takip edeceksiniz.</p>
+                </div>
+              </header>
+              <section className="panel-kart bos-modul-karti">
+                <h2>Müşteri modülü hazırlanıyor</h2>
+                <p>Bu alan sonraki adımda müşteri listesi, iletişim bilgileri ve satın alma geçmişiyle doldurulacak.</p>
+              </section>
+            </section>
+          )}
+
+          {aktifSayfa === 'alicilar' && (
+            <section>
+              <header className="ust-baslik siparisler-baslik">
+                <div>
+                  <h1>Kayıtlı Alıcılar</h1>
+                  <p>Kurumsal alıcı bilgileri bu bölümde toplanacak.</p>
+                </div>
+              </header>
+              <section className="panel-kart bos-modul-karti">
+                <h2>Alıcı modülü hazırlanıyor</h2>
+                <p>Bu alanı bayi ve tedarik alıcı kayıtları için kullanacağız.</p>
+              </section>
+            </section>
+          )}
+
+          {aktifSayfa === 'urun-duzenleme' && (
+            <section>
+              <header className="ust-baslik siparisler-baslik">
+                <div>
+                  <h1>Ürün Düzenleme</h1>
+                  <p>Toplu ürün işlemleri için ayrılan alan.</p>
+                </div>
+              </header>
+              <section className="panel-kart bos-modul-karti">
+                <h2>Ürün düzenleme paneli hazırlanıyor</h2>
+                <p>Toplu güncelleme, fiyat revizyonu ve ürün durum değişiklikleri burada olacak.</p>
+              </section>
+            </section>
+          )}
+
+          {aktifSayfa === 'faturalama' && (
+            <section>
+              <header className="ust-baslik siparisler-baslik">
+                <div>
+                  <h1>Faturalama (PDF)</h1>
+                  <p>PDF fatura oluşturma ekranı bu bölümde yer alacak.</p>
+                </div>
+              </header>
+              <section className="panel-kart bos-modul-karti">
+                <h2>Faturalama modülü hazırlanıyor</h2>
+                <p>Fatura listesi, ön izleme ve PDF dışa aktarma burada konumlanacak.</p>
               </section>
             </section>
           )}

@@ -544,6 +544,8 @@ function App() {
   const [okunanBildirimler, setOkunanBildirimler] = useState([])
   const [temizlenenBildirimler, setTemizlenenBildirimler] = useState([])
   const [sifreGorunur, setSifreGorunur] = useState(false)
+  const [merkezeDonusAktif, setMerkezeDonusAktif] = useState(false)
+  const [merkezGirisEfekti, setMerkezGirisEfekti] = useState(false)
   const [aiTemaMenuAcik, setAiTemaMenuAcik] = useState(false)
   const [aiMesajMetni, setAiMesajMetni] = useState('')
   const [aiHizliKonularAcik, setAiHizliKonularAcik] = useState(true)
@@ -923,7 +925,17 @@ function App() {
   }
 
   const merkezeDon = () => {
-    sayfaDegistir('merkez')
+    if (merkezeDonusAktif) return
+
+    setMerkezeDonusAktif(true)
+    window.setTimeout(() => {
+      sayfaDegistir('merkez')
+      setMerkezGirisEfekti(true)
+      setMerkezeDonusAktif(false)
+      window.setTimeout(() => {
+        setMerkezGirisEfekti(false)
+      }, 520)
+    }, 340)
   }
 
   const toastGoster = (tip, metin) => {
@@ -1866,9 +1878,9 @@ function App() {
           </aside>
         )}
 
-        <div className={`icerik-alani ${aktifSayfa === 'merkez' ? 'merkez-icerik' : ''}`}>
+        <div className={`icerik-alani ${aktifSayfa === 'merkez' ? 'merkez-icerik' : ''} ${merkezeDonusAktif ? 'merkeze-donuyor' : ''}`}>
             {aktifSayfa === 'merkez' && (
-              <section className={`merkez-ekrani ${gecisBalonu ? 'gecis-aktif' : ''}`}>
+              <section className={`merkez-ekrani ${gecisBalonu ? 'gecis-aktif' : ''} ${merkezGirisEfekti ? 'geri-giris' : ''}`}>
                 <div className="merkez-sahne">
                   <div className="arka-plan-baloncuklari" aria-hidden="true">
                     <div className="arka-balon arka-balon-1">
@@ -1992,7 +2004,7 @@ function App() {
             )}
 
           {aktifSayfa !== 'merkez' && (
-            <button type="button" className="geri-buton" onClick={merkezeDon}>
+            <button type="button" className={`geri-buton ${merkezeDonusAktif ? 'aktif' : ''}`} onClick={merkezeDon}>
               ← Merkeze Dön
             </button>
           )}

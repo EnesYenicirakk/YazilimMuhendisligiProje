@@ -6,32 +6,111 @@ const DEFAULT_PASSWORD = 'admin123'
 const SAYFA_BASINA_URUN = 8
 const ODEME_SAYFA_BASINA = 10
 const MUSTERI_SAYFA_BASINA = 8
+const SIPARIS_SAYFA_BASINA = 8
+const STOK_LOG_SAYFA_BASINA = 8
+
+const envanterKategorileri = ['Tümü', 'Motor', 'Fren', 'Filtre', 'Elektrik', 'Şanzıman', 'Diğer']
+
+const avatarOlustur = (ad) =>
+  ad
+    .split(' ')
+    .slice(0, 2)
+    .map((parca) => parca[0]?.toUpperCase() || '')
+    .join('')
+    .slice(0, 2)
+
+const urunOlustur = (uid, urunId, kategori, ad, urunAdedi, magazaStok, minimumStok, alisFiyati, satisFiyati) => ({
+  uid,
+  urunId,
+  kategori,
+  ad,
+  avatar: avatarOlustur(ad),
+  urunAdedi,
+  magazaStok,
+  minimumStok,
+  alisFiyati,
+  satisFiyati,
+  favori: false,
+})
 
 const baslangicUrunleri = [
-  { uid: 1, urunId: 'FRN-1001', ad: 'Fren Balatası Ön Takım', avatar: 'FB', urunAdedi: 84, magazaStok: 126, alisFiyati: 1850, satisFiyati: 2480, favori: false },
-  { uid: 2, urunId: 'YGF-1002', ad: 'Yağ Filtresi', avatar: 'YF', urunAdedi: 145, magazaStok: 210, alisFiyati: 180, satisFiyati: 320, favori: false },
-  { uid: 3, urunId: 'HVF-1003', ad: 'Hava Filtresi', avatar: 'HF', urunAdedi: 112, magazaStok: 168, alisFiyati: 240, satisFiyati: 390, favori: false },
-  { uid: 4, urunId: 'BUJ-1004', ad: 'Buji Takımı', avatar: 'BT', urunAdedi: 63, magazaStok: 95, alisFiyati: 620, satisFiyati: 880, favori: false },
-  { uid: 5, urunId: 'AMR-1005', ad: 'Amortisör Ön Çift', avatar: 'AM', urunAdedi: 29, magazaStok: 44, alisFiyati: 3250, satisFiyati: 4520, favori: false },
-  { uid: 6, urunId: 'DBR-1006', ad: 'Debriyaj Seti', avatar: 'DS', urunAdedi: 38, magazaStok: 57, alisFiyati: 2780, satisFiyati: 3910, favori: false },
-  { uid: 7, urunId: 'AKU-1007', ad: 'Aku 72Ah', avatar: 'AK', urunAdedi: 21, magazaStok: 35, alisFiyati: 2150, satisFiyati: 3060, favori: false },
-  { uid: 8, urunId: 'TRM-1008', ad: 'Triger Kayışı Seti', avatar: 'TK', urunAdedi: 52, magazaStok: 73, alisFiyati: 1240, satisFiyati: 1760, favori: false },
-  { uid: 9, urunId: 'RAD-1009', ad: 'Radyatör Üst Hortum', avatar: 'RH', urunAdedi: 46, magazaStok: 70, alisFiyati: 310, satisFiyati: 520, favori: false },
-  { uid: 10, urunId: 'BLC-1010', ad: 'Balata Spreyi', avatar: 'BS', urunAdedi: 76, magazaStok: 120, alisFiyati: 95, satisFiyati: 165, favori: false },
-  { uid: 11, urunId: 'KLR-1011', ad: 'Klima Kompresörü', avatar: 'KK', urunAdedi: 18, magazaStok: 27, alisFiyati: 6900, satisFiyati: 8950, favori: false },
-  { uid: 12, urunId: 'MTR-1012', ad: 'Motor Takozu', avatar: 'MT', urunAdedi: 41, magazaStok: 62, alisFiyati: 540, satisFiyati: 760, favori: false },
-  { uid: 13, urunId: 'SRS-1013', ad: 'Şarj Dinamosu', avatar: 'SD', urunAdedi: 24, magazaStok: 36, alisFiyati: 3150, satisFiyati: 4280, favori: false },
-  { uid: 14, urunId: 'DST-1014', ad: 'Direksiyon Kutusu', avatar: 'DK', urunAdedi: 12, magazaStok: 19, alisFiyati: 7450, satisFiyati: 9380, favori: false },
-  { uid: 15, urunId: 'EKS-1015', ad: 'Eksantrik Sensörü', avatar: 'ES', urunAdedi: 58, magazaStok: 88, alisFiyati: 430, satisFiyati: 690, favori: false },
-  { uid: 16, urunId: 'ENJ-1016', ad: 'Enjektör Takımı', avatar: 'ET', urunAdedi: 35, magazaStok: 51, alisFiyati: 4820, satisFiyati: 6190, favori: false },
-  { uid: 17, urunId: 'ROL-1017', ad: 'Rölanti Motoru', avatar: 'RM', urunAdedi: 33, magazaStok: 47, alisFiyati: 860, satisFiyati: 1240, favori: false },
-  { uid: 18, urunId: 'YGR-1018', ad: 'Yağ Radyatörü', avatar: 'YR', urunAdedi: 17, magazaStok: 24, alisFiyati: 1710, satisFiyati: 2380, favori: false },
-  { uid: 19, urunId: 'KRN-1019', ad: 'Krank Kasnağı', avatar: 'KK', urunAdedi: 27, magazaStok: 39, alisFiyati: 920, satisFiyati: 1380, favori: false },
-  { uid: 20, urunId: 'TRB-1020', ad: 'Turbo Hortumu', avatar: 'TH', urunAdedi: 22, magazaStok: 31, alisFiyati: 380, satisFiyati: 610, favori: false },
-  { uid: 21, urunId: 'ABS-1021', ad: 'ABS Sensörü', avatar: 'AS', urunAdedi: 49, magazaStok: 74, alisFiyati: 690, satisFiyati: 960, favori: false },
-  { uid: 22, urunId: 'SUS-1022', ad: 'Susturucu Arka', avatar: 'SA', urunAdedi: 14, magazaStok: 20, alisFiyati: 1280, satisFiyati: 1820, favori: false },
-  { uid: 23, urunId: 'BIL-1023', ad: 'Bijon Somunu Seti', avatar: 'BS', urunAdedi: 90, magazaStok: 140, alisFiyati: 110, satisFiyati: 210, favori: false },
-  { uid: 24, urunId: 'FAR-1024', ad: 'Far Ampulü H7', avatar: 'FA', urunAdedi: 110, magazaStok: 165, alisFiyati: 75, satisFiyati: 145, favori: false },
+  urunOlustur(1, 'MTR-2001', 'Motor', 'Silindir Kapak Contası', 48, 22, 12, 740, 1090),
+  urunOlustur(2, 'MTR-2002', 'Motor', 'Piston Segman Takımı', 34, 18, 10, 1680, 2290),
+  urunOlustur(3, 'MTR-2003', 'Motor', 'Eksantrik Mili Sensörü', 52, 27, 12, 420, 690),
+  urunOlustur(4, 'MTR-2004', 'Motor', 'Krank Sensörü', 61, 31, 14, 390, 620),
+  urunOlustur(5, 'MTR-2005', 'Motor', 'Subap İtici Takımı', 28, 16, 8, 1320, 1840),
+  urunOlustur(6, 'MTR-2006', 'Motor', 'Yağ Pompası', 23, 11, 8, 1460, 1980),
+  urunOlustur(7, 'MTR-2007', 'Motor', 'Devirdaim Pompası', 39, 14, 10, 980, 1420),
+  urunOlustur(8, 'MTR-2008', 'Motor', 'Motor Takozu Sağ', 33, 19, 10, 560, 810),
+  urunOlustur(9, 'MTR-2009', 'Motor', 'Turbo Intercooler Hortumu', 44, 20, 12, 360, 590),
+  urunOlustur(10, 'MTR-2010', 'Motor', 'Gaz Kelebeği', 18, 9, 8, 2850, 3640),
+  urunOlustur(11, 'MTR-2011', 'Motor', 'Rölanti Valfi', 27, 12, 8, 790, 1180),
+  urunOlustur(12, 'MTR-2012', 'Motor', 'Motor Yağ Soğutucusu', 16, 7, 7, 1740, 2380),
+
+  urunOlustur(13, 'FRN-2101', 'Fren', 'Fren Balatası Ön Takım', 84, 7, 10, 1850, 2480),
+  urunOlustur(14, 'FRN-2102', 'Fren', 'Fren Balatası Arka Takım', 76, 24, 10, 1620, 2260),
+  urunOlustur(15, 'FRN-2103', 'Fren', 'Fren Diski Ön Çift', 31, 11, 8, 2740, 3580),
+  urunOlustur(16, 'FRN-2104', 'Fren', 'Fren Diski Arka Çift', 22, 9, 8, 2380, 3150),
+  urunOlustur(17, 'FRN-2105', 'Fren', 'ABS Sensörü Ön', 49, 18, 10, 690, 960),
+  urunOlustur(18, 'FRN-2106', 'Fren', 'El Fren Teli', 42, 15, 10, 430, 690),
+  urunOlustur(19, 'FRN-2107', 'Fren', 'Fren Hortumu Seti', 38, 17, 10, 360, 580),
+  urunOlustur(20, 'FRN-2108', 'Fren', 'Fren Merkezi', 14, 6, 6, 1940, 2590),
+  urunOlustur(21, 'FRN-2109', 'Fren', 'Balata Spreyi', 76, 34, 16, 95, 165),
+  urunOlustur(22, 'FRN-2110', 'Fren', 'Kampana Fren Yayı', 29, 13, 8, 210, 340),
+  urunOlustur(23, 'FRN-2111', 'Fren', 'Fren Müşürü', 35, 16, 8, 280, 450),
+  urunOlustur(24, 'FRN-2112', 'Fren', 'Vakum Pompası Fren', 11, 4, 5, 2160, 2920),
+
+  urunOlustur(25, 'FLT-2201', 'Filtre', 'Yağ Filtresi', 145, 72, 18, 180, 320),
+  urunOlustur(26, 'FLT-2202', 'Filtre', 'Hava Filtresi', 112, 61, 20, 240, 390),
+  urunOlustur(27, 'FLT-2203', 'Filtre', 'Polen Filtresi', 96, 55, 18, 210, 360),
+  urunOlustur(28, 'FLT-2204', 'Filtre', 'Yakıt Filtresi', 67, 28, 14, 260, 420),
+  urunOlustur(29, 'FLT-2205', 'Filtre', 'Şanzıman Yağ Filtresi', 34, 16, 10, 420, 670),
+  urunOlustur(30, 'FLT-2206', 'Filtre', 'Kabin Karbon Filtre', 88, 42, 16, 250, 410),
+  urunOlustur(31, 'FLT-2207', 'Filtre', 'Hava Kurutucu Filtresi', 22, 10, 8, 690, 960),
+  urunOlustur(32, 'FLT-2208', 'Filtre', 'Turbo Hava Filtre Elemanı', 18, 8, 8, 540, 780),
+  urunOlustur(33, 'FLT-2209', 'Filtre', 'Mazot Ön Filtre', 39, 17, 10, 230, 380),
+  urunOlustur(34, 'FLT-2210', 'Filtre', 'Partikül Filtre Sensörü', 14, 7, 6, 830, 1190),
+  urunOlustur(35, 'FLT-2211', 'Filtre', 'Krank Havalandırma Filtresi', 21, 9, 8, 190, 340),
+  urunOlustur(36, 'FLT-2212', 'Filtre', 'Yakıt Ayırıcı Filtre', 24, 11, 8, 310, 490),
+
+  urunOlustur(37, 'ELK-2301', 'Elektrik', 'Akü 72Ah', 21, 8, 12, 2150, 3060),
+  urunOlustur(38, 'ELK-2302', 'Elektrik', 'Şarj Dinamosu', 24, 7, 9, 3150, 4280),
+  urunOlustur(39, 'ELK-2303', 'Elektrik', 'Marş Motoru', 19, 8, 8, 2840, 3720),
+  urunOlustur(40, 'ELK-2304', 'Elektrik', 'Far Ampulü H7', 110, 44, 18, 75, 145),
+  urunOlustur(41, 'ELK-2305', 'Elektrik', 'Buji Takımı', 63, 25, 12, 620, 880),
+  urunOlustur(42, 'ELK-2306', 'Elektrik', 'Ateşleme Bobini', 28, 13, 8, 960, 1380),
+  urunOlustur(43, 'ELK-2307', 'Elektrik', 'Sigorta Kutusu', 16, 7, 6, 1240, 1710),
+  urunOlustur(44, 'ELK-2308', 'Elektrik', 'Cam Kriko Motoru', 22, 10, 8, 890, 1290),
+  urunOlustur(45, 'ELK-2309', 'Elektrik', 'Far Sensörü', 17, 9, 7, 470, 720),
+  urunOlustur(46, 'ELK-2310', 'Elektrik', 'Eksantrik Sensörü', 58, 21, 15, 430, 690),
+  urunOlustur(47, 'ELK-2311', 'Elektrik', 'ABS Sensörü Arka', 26, 11, 8, 650, 930),
+  urunOlustur(48, 'ELK-2312', 'Elektrik', 'Akü Şarj Regülatörü', 15, 6, 6, 520, 790),
+
+  urunOlustur(49, 'SAN-2401', 'Şanzıman', 'Debriyaj Seti', 38, 15, 10, 2780, 3910),
+  urunOlustur(50, 'SAN-2402', 'Şanzıman', 'Debriyaj Bilyası', 29, 12, 8, 740, 1090),
+  urunOlustur(51, 'SAN-2403', 'Şanzıman', 'Volan Dişlisi', 11, 5, 5, 2180, 2960),
+  urunOlustur(52, 'SAN-2404', 'Şanzıman', 'Vites Halatı', 26, 10, 8, 680, 980),
+  urunOlustur(53, 'SAN-2405', 'Şanzıman', 'Şanzıman Takozu', 24, 11, 8, 590, 860),
+  urunOlustur(54, 'SAN-2406', 'Şanzıman', 'Otomatik Şanzıman Filtre Kiti', 14, 7, 6, 1290, 1820),
+  urunOlustur(55, 'SAN-2407', 'Şanzıman', 'Şanzıman Yağ Soğutucu Hortumu', 18, 8, 7, 460, 710),
+  urunOlustur(56, 'SAN-2408', 'Şanzıman', 'Şanzıman Selenoidi', 13, 6, 6, 1540, 2140),
+  urunOlustur(57, 'SAN-2409', 'Şanzıman', 'Vites Topuzu Mekanizması', 21, 10, 8, 320, 520),
+  urunOlustur(58, 'SAN-2410', 'Şanzıman', 'Şanzıman Keçesi', 33, 14, 10, 150, 260),
+  urunOlustur(59, 'SAN-2411', 'Şanzıman', 'Baskı Balata Hidroliği', 19, 8, 7, 860, 1230),
+  urunOlustur(60, 'SAN-2412', 'Şanzıman', 'Diferansiyel Rulmanı', 12, 5, 5, 1360, 1890),
+
+  urunOlustur(61, 'DGR-2501', 'Diğer', 'Radyatör Üst Hortum', 46, 19, 15, 310, 520),
+  urunOlustur(62, 'DGR-2502', 'Diğer', 'Klima Kompresörü', 18, 7, 8, 6900, 8950),
+  urunOlustur(63, 'DGR-2503', 'Diğer', 'Direksiyon Kutusu', 12, 5, 6, 7450, 9380),
+  urunOlustur(64, 'DGR-2504', 'Diğer', 'Enjektör Takımı', 35, 16, 8, 4820, 6190),
+  urunOlustur(65, 'DGR-2505', 'Diğer', 'Turbo Hortumu', 22, 11, 12, 380, 610),
+  urunOlustur(66, 'DGR-2506', 'Diğer', 'Yağ Radyatörü', 17, 5, 7, 1710, 2380),
+  urunOlustur(67, 'DGR-2507', 'Diğer', 'Krank Kasnağı', 27, 12, 9, 920, 1380),
+  urunOlustur(68, 'DGR-2508', 'Diğer', 'Susturucu Arka', 14, 4, 6, 1280, 1820),
+  urunOlustur(69, 'DGR-2509', 'Diğer', 'Bijon Somunu Seti', 90, 41, 20, 110, 210),
+  urunOlustur(70, 'DGR-2510', 'Diğer', 'Triger Kayışı Seti', 52, 20, 14, 1240, 1760),
+  urunOlustur(71, 'DGR-2511', 'Diğer', 'Amortisör Ön Çift', 29, 9, 12, 3250, 4520),
+  urunOlustur(72, 'DGR-2512', 'Diğer', 'Direksiyon Rot Başı', 31, 13, 9, 410, 660),
 ]
 
 const dashboardOzetSablon = [
@@ -53,6 +132,9 @@ const baslangicSiparisleri = [
   { siparisNo: '#SP-2125', musteri: 'Kaya Oto Servis', urun: 'Turbo Hortumu', toplamTutar: 2860, siparisTarihi: '2026-03-01', odemeDurumu: 'Beklemede', urunHazirlik: 'Tedarik Bekleniyor', teslimatDurumu: 'Hazırlanıyor', teslimatSuresi: '5 iş günü' },
   { siparisNo: '#SP-2124', musteri: 'Yaman Yedek', urun: 'Far Ampulü H7', toplamTutar: 980, siparisTarihi: '2026-02-28', odemeDurumu: 'Ödendi', urunHazirlik: 'Toplandı', teslimatDurumu: 'Teslim Edildi', teslimatSuresi: '1 iş günü' },
   { siparisNo: '#SP-2123', musteri: 'Gürkan Oto', urun: 'Direksiyon Kutusu', toplamTutar: 15600, siparisTarihi: '2026-02-27', odemeDurumu: 'Beklemede', urunHazirlik: 'Hazırlanıyor', teslimatDurumu: 'Yolda', teslimatSuresi: '3 iş günü' },
+  { siparisNo: '#SP-2122', musteri: 'Doğan Oto', urun: 'Şarj Dinamosu', toplamTutar: 4720, siparisTarihi: '2026-02-26', odemeDurumu: 'Ödendi', urunHazirlik: 'Toplandı', teslimatDurumu: 'Teslim Edildi', teslimatSuresi: '1 iş günü' },
+  { siparisNo: '#SP-2121', musteri: 'Özen Servis', urun: 'Polen Filtresi', toplamTutar: 1240, siparisTarihi: '2026-02-25', odemeDurumu: 'Beklemede', urunHazirlik: 'Hazırlanıyor', teslimatDurumu: 'Hazırlanıyor', teslimatSuresi: '2 iş günü' },
+  { siparisNo: '#SP-2120', musteri: 'Başak Otomotiv', urun: 'Debriyaj Bilyası', toplamTutar: 3180, siparisTarihi: '2026-02-24', odemeDurumu: 'Ödendi', urunHazirlik: 'Toplandı', teslimatDurumu: 'Yolda', teslimatSuresi: '2 iş günü' },
 ]
 
 const gelenNakitKayitlari = [
@@ -120,6 +202,25 @@ const baslangicMusterileri = [
   { uid: 16, ad: 'Ece Bozkurt', telefon: '0549 318 90 42', sonAlim: '2026-03-01', toplamSiparis: 2, toplamHarcama: 4980, not: 'Yeni müşteri, geri arama beklentisi var.', favori: false },
 ]
 
+const stokDegisimLoglari = [
+  { id: 1, tarih: '2026-03-16 09:10', urun: 'Fren Balatası Ön Takım', urunId: 'FRN-2101', islem: 'Stok düşüşü', eskiStok: 12, yeniStok: 7, kullanici: 'Admin', aciklama: 'Servis siparişi için 5 adet çıkış yapıldı.' },
+  { id: 2, tarih: '2026-03-16 08:32', urun: 'Akü 72Ah', urunId: 'ELK-2301', islem: 'Stok düşüşü', eskiStok: 11, yeniStok: 8, kullanici: 'Admin', aciklama: '3 adet perakende satış işlendi.' },
+  { id: 3, tarih: '2026-03-15 18:05', urun: 'Debriyaj Seti', urunId: 'SAN-2401', islem: 'Stok artışı', eskiStok: 11, yeniStok: 15, kullanici: 'Admin', aciklama: 'Yeni tedarik girişinden 4 adet eklendi.' },
+  { id: 4, tarih: '2026-03-15 16:42', urun: 'Yağ Filtresi', urunId: 'FLT-2201', islem: 'Stok düşüşü', eskiStok: 77, yeniStok: 72, kullanici: 'Admin', aciklama: 'Toplu bakım siparişi için çıkış yapıldı.' },
+  { id: 5, tarih: '2026-03-15 13:27', urun: 'Şarj Dinamosu', urunId: 'ELK-2302', islem: 'Stok düşüşü', eskiStok: 9, yeniStok: 7, kullanici: 'Admin', aciklama: '2 adet servis sevkiyatına ayrıldı.' },
+  { id: 6, tarih: '2026-03-15 10:15', urun: 'Turbo Hortumu', urunId: 'DGR-2505', islem: 'Stok artışı', eskiStok: 8, yeniStok: 11, kullanici: 'Admin', aciklama: 'Tedarikçiden gelen 3 ürün depoya işlendi.' },
+  { id: 7, tarih: '2026-03-14 17:58', urun: 'Polen Filtresi', urunId: 'FLT-2203', islem: 'Stok düşüşü', eskiStok: 59, yeniStok: 55, kullanici: 'Admin', aciklama: '4 adet şehir içi siparişe gönderildi.' },
+  { id: 8, tarih: '2026-03-14 15:14', urun: 'Direksiyon Kutusu', urunId: 'DGR-2503', islem: 'Stok artışı', eskiStok: 3, yeniStok: 5, kullanici: 'Admin', aciklama: 'İki yeni ürün raf stoğuna eklendi.' },
+  { id: 9, tarih: '2026-03-14 11:36', urun: 'Fren Diski Ön Çift', urunId: 'FRN-2103', islem: 'Stok düşüşü', eskiStok: 14, yeniStok: 11, kullanici: 'Admin', aciklama: '3 adet servis montajına çıktı.' },
+  { id: 10, tarih: '2026-03-13 18:22', urun: 'Motor Yağ Soğutucusu', urunId: 'MTR-2012', islem: 'Stok düşüşü', eskiStok: 9, yeniStok: 7, kullanici: 'Admin', aciklama: '2 adet siparişe rezerv edildi.' },
+  { id: 11, tarih: '2026-03-13 14:48', urun: 'Buji Takımı', urunId: 'ELK-2305', islem: 'Stok artışı', eskiStok: 19, yeniStok: 25, kullanici: 'Admin', aciklama: '6 adet yeni ürün girişi yapıldı.' },
+  { id: 12, tarih: '2026-03-13 09:24', urun: 'Triger Kayışı Seti', urunId: 'DGR-2510', islem: 'Stok düşüşü', eskiStok: 24, yeniStok: 20, kullanici: 'Admin', aciklama: '4 adet müşteri siparişine ayrıldı.' },
+  { id: 13, tarih: '2026-03-12 17:17', urun: 'ABS Sensörü Arka', urunId: 'ELK-2311', islem: 'Stok artışı', eskiStok: 8, yeniStok: 11, kullanici: 'Admin', aciklama: 'Eksik sayılan 3 ürün sayımla geri işlendi.' },
+  { id: 14, tarih: '2026-03-12 13:40', urun: 'Şanzıman Takozu', urunId: 'SAN-2405', islem: 'Stok düşüşü', eskiStok: 13, yeniStok: 11, kullanici: 'Admin', aciklama: '2 adet servis çıkışı yapıldı.' },
+  { id: 15, tarih: '2026-03-12 10:11', urun: 'Klima Kompresörü', urunId: 'DGR-2502', islem: 'Stok artışı', eskiStok: 5, yeniStok: 7, kullanici: 'Admin', aciklama: 'Yeni tedarik sevkiyatından 2 adet eklendi.' },
+  { id: 16, tarih: '2026-03-11 16:52', urun: 'Debriyaj Bilyası', urunId: 'SAN-2402', islem: 'Stok düşüşü', eskiStok: 15, yeniStok: 12, kullanici: 'Admin', aciklama: '3 adet satış sonrası stok güncellendi.' },
+]
+
 const tarihFormatla = (isoTarih) => {
   const tarih = new Date(isoTarih)
   return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(tarih)
@@ -155,11 +256,17 @@ const durumSinifi = (durum) => {
   return ''
 }
 
+const teslimatGununuCoz = (metin) => {
+  const eslesme = String(metin).match(/(\d+)/)
+  return eslesme ? Number(eslesme[1]) : 0
+}
+
 const bosForm = {
   urunId: '',
   ad: '',
   urunAdedi: '',
   magazaStok: '',
+  minimumStok: '',
 }
 
 const bosUrunDuzenlemeFormu = {
@@ -208,6 +315,15 @@ const metniNormalizeEt = (metin) =>
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[?.!,;:]/g, '')
     .trim()
+
+const favorileriOneTasi = (liste, tarihAl) =>
+  [...liste].sort((a, b) => {
+    if (Boolean(a.favori) !== Boolean(b.favori)) return a.favori ? -1 : 1
+    if (tarihAl) return tarihAl(b) - tarihAl(a)
+    return 0
+  })
+
+const kritikStoktaMi = (urun) => urun.magazaStok <= (urun.minimumStok ?? 10)
 
 function SayfaIkonu({ sayfa, className = 'menu-ikon' }) {
   if (sayfa === 'dashboard') {
@@ -336,6 +452,10 @@ function App() {
   const [error, setError] = useState('')
 
   const [aktifSayfa, setAktifSayfa] = useState('merkez')
+  const [mobilMenuAcik, setMobilMenuAcik] = useState(false)
+  const [toastlar, setToastlar] = useState([])
+  const [gizlenenOzetKartlari, setGizlenenOzetKartlari] = useState([])
+  const [acikOzetMenusu, setAcikOzetMenusu] = useState('')
   const [urunler, setUrunler] = useState(baslangicUrunleri)
   const [musteriler, setMusteriler] = useState(baslangicMusterileri)
   const [siparisler] = useState(baslangicSiparisleri)
@@ -343,6 +463,7 @@ function App() {
   const [gidenNakitListesi, setGidenNakitListesi] = useState(() => gidenNakitKayitlari.map((k) => ({ ...k, favori: false })))
   const [siparisArama, setSiparisArama] = useState('')
   const [siparisOdemeFiltresi, setSiparisOdemeFiltresi] = useState('Tüm Siparişler')
+  const [siparisSayfa, setSiparisSayfa] = useState(1)
   const [odemeSekmesi, setOdemeSekmesi] = useState('gelen')
   const [gelenSayfa, setGelenSayfa] = useState(1)
   const [gidenSayfa, setGidenSayfa] = useState(1)
@@ -351,9 +472,12 @@ function App() {
   const [silinecekOdeme, setSilinecekOdeme] = useState(null)
   const [gecisBalonu, setGecisBalonu] = useState('')
   const [aramaMetni, setAramaMetni] = useState('')
+  const [envanterKategori, setEnvanterKategori] = useState('Tümü')
   const [envanterSayfa, setEnvanterSayfa] = useState(1)
   const [urunDuzenlemeArama, setUrunDuzenlemeArama] = useState('')
   const [urunDuzenlemeSayfa, setUrunDuzenlemeSayfa] = useState(1)
+  const [urunDuzenlemeSekmesi, setUrunDuzenlemeSekmesi] = useState('urunler')
+  const [stokLogSayfa, setStokLogSayfa] = useState(1)
   const [musteriArama, setMusteriArama] = useState('')
   const [musteriSayfa, setMusteriSayfa] = useState(1)
 
@@ -366,7 +490,6 @@ function App() {
   const [aiPanelKucuk, setAiPanelKucuk] = useState(false)
   const [aiPanelKapaniyor, setAiPanelKapaniyor] = useState(false)
   const [aiTemaMenuAcik, setAiTemaMenuAcik] = useState(false)
-  const [aiTema, setAiTema] = useState('acik')
   const [aiMesajMetni, setAiMesajMetni] = useState('')
   const [aiHizliKonularAcik, setAiHizliKonularAcik] = useState(true)
   const [aiMesajlar, setAiMesajlar] = useState([
@@ -392,10 +515,15 @@ function App() {
 
   const filtreliUrunler = useMemo(() => {
     const metin = aramaMetni.trim().toLowerCase()
-    if (!metin) return urunler
+    const kategoriyeGore = envanterKategori === 'Tümü'
+      ? urunler
+      : urunler.filter((urun) => urun.kategori === envanterKategori)
+    const sonuc = !metin
+      ? kategoriyeGore
+      : kategoriyeGore.filter((urun) => urun.ad.toLowerCase().includes(metin) || urun.urunId.toLowerCase().includes(metin))
 
-    return urunler.filter((urun) => urun.ad.toLowerCase().includes(metin) || urun.urunId.toLowerCase().includes(metin))
-  }, [aramaMetni, urunler])
+    return favorileriOneTasi(sonuc)
+  }, [aramaMetni, urunler, envanterKategori])
 
   const toplamEnvanterSayfa = Math.max(1, Math.ceil(filtreliUrunler.length / SAYFA_BASINA_URUN))
   const sayfaBaslangic = (envanterSayfa - 1) * SAYFA_BASINA_URUN
@@ -403,12 +531,14 @@ function App() {
 
   const filtreliDuzenlemeUrunleri = useMemo(() => {
     const metin = urunDuzenlemeArama.trim().toLowerCase()
-    if (!metin) return urunler
+    const sonuc = !metin
+      ? urunler
+      : urunler.filter((urun) =>
+          urun.ad.toLowerCase().includes(metin) ||
+          urun.urunId.toLowerCase().includes(metin),
+        )
 
-    return urunler.filter((urun) =>
-      urun.ad.toLowerCase().includes(metin) ||
-      urun.urunId.toLowerCase().includes(metin),
-    )
+    return favorileriOneTasi(sonuc)
   }, [urunDuzenlemeArama, urunler])
 
   const toplamUrunDuzenlemeSayfa = Math.max(1, Math.ceil(filtreliDuzenlemeUrunleri.length / SAYFA_BASINA_URUN))
@@ -418,14 +548,20 @@ function App() {
     urunDuzenlemeBaslangic + SAYFA_BASINA_URUN,
   )
 
+  const toplamStokLogSayfa = Math.max(1, Math.ceil(stokDegisimLoglari.length / STOK_LOG_SAYFA_BASINA))
+  const stokLogBaslangic = (stokLogSayfa - 1) * STOK_LOG_SAYFA_BASINA
+  const sayfadakiStokLoglari = stokDegisimLoglari.slice(stokLogBaslangic, stokLogBaslangic + STOK_LOG_SAYFA_BASINA)
+
   const filtreliMusteriler = useMemo(() => {
     const metin = musteriArama.trim().toLowerCase()
-    if (!metin) return musteriler
+    const sonuc = !metin
+      ? musteriler
+      : musteriler.filter((musteri) =>
+          musteri.ad.toLowerCase().includes(metin) ||
+          musteri.telefon.toLowerCase().includes(metin),
+        )
 
-    return musteriler.filter((musteri) =>
-      musteri.ad.toLowerCase().includes(metin) ||
-      musteri.telefon.toLowerCase().includes(metin),
-    )
+    return favorileriOneTasi(sonuc, (musteri) => new Date(`${musteri.sonAlim}T00:00:00`).getTime())
   }, [musteriArama, musteriler])
 
   const toplamMusteriSayfa = Math.max(1, Math.ceil(filtreliMusteriler.length / MUSTERI_SAYFA_BASINA))
@@ -450,6 +586,10 @@ function App() {
     })
   }, [siparisArama, siparisOdemeFiltresi, siraliSiparisler])
 
+  const toplamSiparisSayfa = Math.max(1, Math.ceil(filtreliSiparisler.length / SIPARIS_SAYFA_BASINA))
+  const siparisBaslangic = (siparisSayfa - 1) * SIPARIS_SAYFA_BASINA
+  const sayfadakiSiparisler = filtreliSiparisler.slice(siparisBaslangic, siparisBaslangic + SIPARIS_SAYFA_BASINA)
+
   const dashboardYakinSatislar = useMemo(() => {
     return siraliSiparisler.slice(0, 4).map((siparis) => ({
       siparis: siparis.siparisNo,
@@ -471,12 +611,45 @@ function App() {
     return { paketlenecek, sevkEdilecek, teslimEdilecek }
   }, [filtreliSiparisler])
 
+  const dashboardCanliOzetler = useMemo(() => {
+    const referansSiparis = siraliSiparisler[0]
+    const bugun = referansSiparis ? new Date(`${referansSiparis.siparisTarihi}T00:00:00`) : new Date()
+
+    const bugunkuSiparisler = siraliSiparisler.filter((siparis) => {
+      const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
+      return tarih.toDateString() === bugun.toDateString()
+    })
+
+    const bekleyenTahsilatlar = siraliSiparisler.filter((siparis) => siparis.odemeDurumu === 'Beklemede')
+    const kritikStokluUrunler = [...urunler]
+      .filter((urun) => kritikStoktaMi(urun))
+      .sort((a, b) => a.magazaStok - b.magazaStok)
+
+    const gecikenSiparisler = siraliSiparisler.filter((siparis) => {
+      const siparisTarihi = new Date(`${siparis.siparisTarihi}T00:00:00`)
+      const teslimatGunu = teslimatGununuCoz(siparis.teslimatSuresi)
+      const gunFarki = Math.floor((bugun.getTime() - siparisTarihi.getTime()) / 86400000)
+      return siparis.teslimatDurumu !== 'Teslim Edildi' && teslimatGunu > 0 && gunFarki > teslimatGunu
+    })
+
+    return {
+      bugunkuSiparisAdedi: bugunkuSiparisler.length,
+      bugunkuSiparisTutari: bugunkuSiparisler.reduce((toplam, siparis) => toplam + siparis.toplamTutar, 0),
+      bekleyenTahsilatAdedi: bekleyenTahsilatlar.length,
+      bekleyenTahsilatTutari: bekleyenTahsilatlar.reduce((toplam, siparis) => toplam + siparis.toplamTutar, 0),
+      kritikStokAdedi: kritikStokluUrunler.length,
+      kritikStokluUrunler,
+      gecikenSiparisAdedi: gecikenSiparisler.length,
+      gecikenSiparisler,
+    }
+  }, [siraliSiparisler, urunler])
+
   const siraliGelenNakit = useMemo(() => {
-    return [...gelenNakitListesi].sort((a, b) => new Date(b.tarih).getTime() - new Date(a.tarih).getTime())
+    return favorileriOneTasi(gelenNakitListesi, (kayit) => new Date(kayit.tarih).getTime())
   }, [gelenNakitListesi])
 
   const siraliGidenNakit = useMemo(() => {
-    return [...gidenNakitListesi].sort((a, b) => new Date(b.tarih).getTime() - new Date(a.tarih).getTime())
+    return favorileriOneTasi(gidenNakitListesi, (kayit) => new Date(kayit.tarih).getTime())
   }, [gidenNakitListesi])
 
   const toplamGelenNakit = useMemo(() => siraliGelenNakit.reduce((toplam, kayit) => toplam + kayit.tutar, 0), [siraliGelenNakit])
@@ -487,8 +660,8 @@ function App() {
     return [
       { baslik: 'Toplam Gelir', deger: paraFormatla(aySonuKari), degisim: '+%14', ikon: '₺' },
       ...dashboardOzetSablon,
-    ]
-  }, [aySonuKari])
+    ].filter((kart) => !gizlenenOzetKartlari.includes(kart.baslik))
+  }, [aySonuKari, gizlenenOzetKartlari])
 
   const aiHazirCevaplar = useMemo(() => {
     const enSonSiparis = siraliSiparisler[0]
@@ -502,7 +675,7 @@ function App() {
     const enYuksekAylikSiparis = [...buAySiparisleri].sort((a, b) => b.toplamTutar - a.toplamTutar)[0]
 
     const dusukStokluUrunler = [...urunler]
-      .filter((urun) => urun.magazaStok <= 40)
+      .filter((urun) => kritikStoktaMi(urun))
       .sort((a, b) => a.magazaStok - b.magazaStok)
       .slice(0, 4)
 
@@ -534,7 +707,7 @@ function App() {
         `Bu ay toplam ${buAySiparisleri.length} siparişten ${paraFormatla(buAyToplamSatis)} ciro oluştu. En yüksek tutarlı sipariş ${enYuksekAylikSiparis?.siparisNo ?? '-'} numaralı kayıtta, ${enYuksekAylikSiparis?.musteri ?? '-'} için ${paraFormatla(enYuksekAylikSiparis?.toplamTutar ?? 0)} olarak görünüyor.`,
       [metniNormalizeEt('Bana stokları azalan ürünlerimiz hakkında bilgi ver.')]:
         dusukStokluUrunler.length > 0
-          ? `Stokları en hızlı izlenmesi gereken ürünler: ${dusukStokluUrunler.map((urun) => `${urun.ad} (${urun.magazaStok} adet)`).join(', ')}. Bu ürünlerde yeniden sipariş planı açmak mantıklı görünüyor.`
+          ? `Kritik stok seviyesine düşen ürünler: ${dusukStokluUrunler.map((urun) => `${urun.ad} (minimum ${urun.minimumStok} / mevcut ${urun.magazaStok})`).join(', ')}. Bu ürünler için yeniden sipariş açılması gerekiyor.`
           : 'Şu an kritik eşik altında görünen bir ürün yok. Envanter genel olarak dengeli görünüyor.',
       [metniNormalizeEt('Kargolanan siparişlerin teslimi yapıldı mı?')]:
         `Toplam ${kargolananSiparisler.length} sipariş kargoya çıktı. Bunların ${teslimEdilenler.length} adedi teslim edildi, ${yoldakiler.length} adedi ise hâlâ yolda. En yakın teslimat beklenen kayıtlar dashboarddaki son siparişler tablosunda da görünüyor.`,
@@ -574,6 +747,18 @@ function App() {
     if (musteriSayfa > toplamMusteriSayfa) setMusteriSayfa(toplamMusteriSayfa)
   }, [musteriSayfa, toplamMusteriSayfa])
 
+  useEffect(() => {
+    if (siparisSayfa > toplamSiparisSayfa) setSiparisSayfa(toplamSiparisSayfa)
+  }, [siparisSayfa, toplamSiparisSayfa])
+
+  useEffect(() => {
+    if (stokLogSayfa > toplamStokLogSayfa) setStokLogSayfa(toplamStokLogSayfa)
+  }, [stokLogSayfa, toplamStokLogSayfa])
+
+  useEffect(() => {
+    setSiparisSayfa(1)
+  }, [siparisArama, siparisOdemeFiltresi])
+
   const handleLogin = (event) => {
     event.preventDefault()
 
@@ -602,12 +787,16 @@ function App() {
     setMusteriDuzenlemeAcik(false)
     setMusteriNotAcik(false)
     setSilinecekMusteri(null)
+    setAcikOzetMenusu('')
     setAiTemaMenuAcik(false)
+    setMobilMenuAcik(false)
     setDuzenlenenOdeme(null)
     setSilinecekOdeme(null)
     if (sayfa === 'envanter') setEnvanterSayfa(1)
     if (sayfa === 'urun-duzenleme') setUrunDuzenlemeSayfa(1)
+    if (sayfa === 'urun-duzenleme') setStokLogSayfa(1)
     if (sayfa === 'musteriler') setMusteriSayfa(1)
+    if (sayfa === 'siparisler') setSiparisSayfa(1)
     if (sayfa === 'odemeler') {
       setOdemeSekmesi('gelen')
       setGelenSayfa(1)
@@ -617,6 +806,15 @@ function App() {
 
   const merkezeDon = () => {
     sayfaDegistir('merkez')
+  }
+
+  const toastGoster = (tip, metin) => {
+    const id = Date.now() + Math.random()
+    setToastlar((onceki) => [...onceki, { id, tip, metin }])
+
+    window.setTimeout(() => {
+      setToastlar((onceki) => onceki.filter((toast) => toast.id !== id))
+    }, 3200)
   }
 
   const merkezdenSayfayaGit = (sayfa) => {
@@ -648,6 +846,7 @@ function App() {
       ad: urun.ad,
       urunAdedi: String(urun.urunAdedi),
       magazaStok: String(urun.magazaStok),
+      minimumStok: String(urun.minimumStok ?? 10),
     })
     setDuzenlemeAcik(true)
   }
@@ -657,17 +856,23 @@ function App() {
     const ad = form.ad.trim()
     const urunAdedi = Number(form.urunAdedi)
     const magazaStok = Number(form.magazaStok)
+    const minimumStok = Number(form.minimumStok)
 
-    if (!urunId || !ad || Number.isNaN(urunAdedi) || Number.isNaN(magazaStok)) return
+    if (!urunId || !ad || Number.isNaN(urunAdedi) || Number.isNaN(magazaStok) || Number.isNaN(minimumStok)) {
+      toastGoster('hata', 'Ürün bilgileri eksik veya hatalı görünüyor.')
+      return
+    }
 
     if (mod === 'ekle') {
         const yeniUrun = {
           uid: Date.now(),
           urunId,
+          kategori: 'Diğer',
           ad,
           avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
           urunAdedi,
           magazaStok,
+          minimumStok,
           alisFiyati: 0,
           satisFiyati: 0,
           favori: false,
@@ -677,6 +882,7 @@ function App() {
       setEklemeAcik(false)
       formuTemizle()
       setEnvanterSayfa(1)
+      toastGoster('basari', `${ad} envantere eklendi.`)
       return
     }
 
@@ -689,6 +895,7 @@ function App() {
           ad,
           urunAdedi,
           magazaStok,
+          minimumStok,
           avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
         }
       }),
@@ -696,12 +903,15 @@ function App() {
 
     setDuzenlemeAcik(false)
     formuTemizle()
+    toastGoster('basari', `${ad} bilgileri güncellendi.`)
   }
 
   const urunSil = () => {
     if (!silinecekUrun) return
+    const silinenAd = silinecekUrun.ad
     setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinecekUrun.uid))
     setSilinecekUrun(null)
+    toastGoster('basari', `${silinenAd} envanterden silindi.`)
   }
 
   const urunDuzenlemeModaliniAc = (urun) => {
@@ -725,7 +935,10 @@ function App() {
     const alisFiyati = Number(urunDuzenlemeFormu.alisFiyati)
     const satisFiyati = Number(urunDuzenlemeFormu.satisFiyati)
 
-    if (!urunId || !ad || [urunAdedi, magazaStok, alisFiyati, satisFiyati].some((deger) => Number.isNaN(deger))) return
+    if (!urunId || !ad || [urunAdedi, magazaStok, alisFiyati, satisFiyati].some((deger) => Number.isNaN(deger))) {
+      toastGoster('hata', 'Ürün düzenleme alanlarında eksik veya hatalı veri var.')
+      return
+    }
 
     setUrunler((onceki) =>
       onceki.map((urun) =>
@@ -733,6 +946,7 @@ function App() {
           ? {
               ...urun,
               urunId,
+              kategori: urun.kategori ?? 'Diğer',
               ad,
               urunAdedi,
               magazaStok,
@@ -747,12 +961,15 @@ function App() {
     setUrunDuzenlemeModalAcik(false)
     setUrunDuzenlemeUid(null)
     setUrunDuzenlemeFormu(bosUrunDuzenlemeFormu)
+    toastGoster('basari', `${ad} fiyat ve stok bilgileri kaydedildi.`)
   }
 
   const urunDuzenlemeSil = () => {
     if (!silinecekDuzenlemeUrunu) return
+    const silinenAd = silinecekDuzenlemeUrunu.ad
     setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinecekDuzenlemeUrunu.uid))
     setSilinecekDuzenlemeUrunu(null)
+    toastGoster('basari', `${silinenAd} ürün düzenleme listesinden kaldırıldı.`)
   }
 
   const favoriDegistir = (uid) => {
@@ -892,7 +1109,10 @@ function App() {
     const toplamHarcama = Number(musteriFormu.toplamHarcama)
     const not = musteriFormu.not.trim()
 
-    if (!ad || !telefon || !sonAlim || Number.isNaN(toplamSiparis) || Number.isNaN(toplamHarcama)) return
+    if (!ad || !telefon || !sonAlim || Number.isNaN(toplamSiparis) || Number.isNaN(toplamHarcama)) {
+      toastGoster('hata', 'Müşteri formunda eksik veya hatalı alan var.')
+      return
+    }
 
     if (mod === 'ekle') {
       setMusteriler((onceki) => [
@@ -910,6 +1130,7 @@ function App() {
       ])
       setMusteriEklemeAcik(false)
       setMusteriSayfa(1)
+      toastGoster('basari', `${ad} müşteri listesine eklendi.`)
     } else {
       setMusteriler((onceki) =>
         onceki.map((musteri) =>
@@ -919,12 +1140,14 @@ function App() {
         ),
       )
       setMusteriDuzenlemeAcik(false)
+      toastGoster('basari', `${ad} müşteri kaydı güncellendi.`)
     }
 
     musteriFormuTemizle()
   }
 
   const musteriNotKaydet = () => {
+    const seciliMusteri = musteriler.find((musteri) => musteri.uid === seciliMusteriUid)
     setMusteriler((onceki) =>
       onceki.map((musteri) =>
         musteri.uid === seciliMusteriUid
@@ -935,11 +1158,20 @@ function App() {
     setMusteriNotAcik(false)
     setSeciliMusteriUid(null)
     setMusteriNotMetni('')
+    toastGoster('basari', `${seciliMusteri?.ad ?? 'Müşteri'} notu kaydedildi.`)
   }
 
   const musteriSil = () => {
+    const silinenAd = silinecekMusteri.ad
     setMusteriler((onceki) => onceki.filter((musteri) => musteri.uid !== silinecekMusteri.uid))
     setSilinecekMusteri(null)
+    toastGoster('basari', `${silinenAd} müşteri listesinden silindi.`)
+  }
+
+  const ozetKartiniSil = (baslik) => {
+    setGizlenenOzetKartlari((onceki) => [...onceki, baslik])
+    setAcikOzetMenusu('')
+    toastGoster('basari', `${baslik} kartı dashboarddan kaldırıldı.`)
   }
 
   const odemeListesiGuncelle = (sekme, guncelleyici) => {
@@ -969,7 +1201,10 @@ function App() {
   const odemeDuzenlemeKaydet = () => {
     if (!duzenlenenOdeme) return
     const tutar = Number(String(odemeFormu.tutar).replace(/[^\d.-]/g, ''))
-    if (!odemeFormu.taraf.trim() || !odemeFormu.tarih.trim() || !odemeFormu.durum.trim() || Number.isNaN(tutar)) return
+    if (!odemeFormu.taraf.trim() || !odemeFormu.tarih.trim() || !odemeFormu.durum.trim() || Number.isNaN(tutar)) {
+      toastGoster('hata', 'Finansal akış kaydında eksik veya hatalı bilgi var.')
+      return
+    }
 
     odemeListesiGuncelle(duzenlenenOdeme.sekme, (onceki) =>
       onceki.map((kayit) =>
@@ -979,12 +1214,15 @@ function App() {
       ),
     )
     setDuzenlenenOdeme(null)
+    toastGoster('basari', `${odemeFormu.taraf.trim()} kaydı güncellendi.`)
   }
 
   const odemeSil = () => {
     if (!silinecekOdeme) return
+    const silinenTaraf = silinecekOdeme.taraf
     odemeListesiGuncelle(silinecekOdeme.sekme, (onceki) => onceki.filter((k) => k.odemeNo !== silinecekOdeme.odemeNo))
     setSilinecekOdeme(null)
+    toastGoster('basari', `${silinenTaraf} kaydı silindi.`)
   }
 
   const haftalikSatisVerisi = useMemo(() => {
@@ -1114,7 +1352,35 @@ function App() {
     <main className="dashboard-page">
       <section className={`dashboard-shell ${aktifSayfa === 'merkez' ? 'merkez-modu' : ''}`}>
           {aktifSayfa !== 'merkez' && (
-            <aside className="yan-menu">
+            <button
+              type="button"
+              className="mobil-menu-dugmesi"
+              onClick={() => setMobilMenuAcik(true)}
+              aria-label="Menüyü Aç"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          )}
+
+          {aktifSayfa !== 'merkez' && mobilMenuAcik && (
+            <button
+              type="button"
+              className="mobil-menu-arka-plan"
+              aria-label="Menüyü Kapat"
+              onClick={() => setMobilMenuAcik(false)}
+            />
+          )}
+
+          {aktifSayfa !== 'merkez' && (
+            <aside className={`yan-menu ${mobilMenuAcik ? 'mobil-acik' : ''}`}>
+              <div className="mobil-menu-ust">
+                <h2>Menü</h2>
+                <button type="button" className="mobil-menu-kapat" onClick={() => setMobilMenuAcik(false)} aria-label="Menüyü Kapat">
+                  ×
+                </button>
+              </div>
               <img
                 src="/ytu-logo.png"
                 alt="Üniversite Logosu"
@@ -1124,7 +1390,6 @@ function App() {
                   event.currentTarget.src = '/ytu-logo.svg'
                 }}
               />
-              <h2>Menü</h2>
               <nav>
                 <button type="button" className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('dashboard')}>
                   <SayfaIkonu sayfa="dashboard" />
@@ -1309,7 +1574,21 @@ function App() {
                   <article key={kart.baslik} className="ozet-kartcik">
                     <div className="ozet-ust">
                       <span className="ozet-ikon">{kart.ikon}</span>
-                      <button type="button" className="ozet-menu" aria-label="Kart Menüsü">⋮</button>
+                      <div className="ozet-menu-sarmal">
+                        <button
+                          type="button"
+                          className="ozet-menu"
+                          aria-label="Kart Menüsü"
+                          onClick={() => setAcikOzetMenusu((onceki) => (onceki === kart.baslik ? '' : kart.baslik))}
+                        >
+                          ⋮
+                        </button>
+                        {acikOzetMenusu === kart.baslik && (
+                          <div className="ozet-menu-acilir">
+                            <button type="button" onClick={() => ozetKartiniSil(kart.baslik)}>Grafiği Sil</button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <p>{kart.baslik}</p>
                     <div className="ozet-alt">
@@ -1319,6 +1598,42 @@ function App() {
                   </article>
                 ))}
               </div>
+
+              <section className="dashboard-canli-grid">
+                <article className="panel-kart canli-ozet-karti">
+                  <div className="panel-baslik">
+                    <h2>Bugünkü Siparişler</h2>
+                    <small>Canlı özet</small>
+                  </div>
+                  <strong className="canli-ozet-deger">{dashboardCanliOzetler.bugunkuSiparisAdedi}</strong>
+                  <p className="canli-ozet-aciklama">Bugün açılan sipariş sayısı</p>
+                  <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bugunkuSiparisTutari)} toplam hacim</span>
+                </article>
+
+                <article className="panel-kart canli-ozet-karti">
+                  <div className="panel-baslik">
+                    <h2>Bekleyen Tahsilatlar</h2>
+                    <small>Ödeme takibi</small>
+                  </div>
+                  <strong className="canli-ozet-deger">{dashboardCanliOzetler.bekleyenTahsilatAdedi}</strong>
+                  <p className="canli-ozet-aciklama">Tahsil edilmesi gereken sipariş</p>
+                  <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bekleyenTahsilatTutari)} bekleyen tutar</span>
+                </article>
+
+                <article className="panel-kart canli-ozet-karti">
+                  <div className="panel-baslik">
+                    <h2>Geciken Siparişler</h2>
+                    <small>Teslimat uyarısı</small>
+                  </div>
+                  <strong className="canli-ozet-deger">{dashboardCanliOzetler.gecikenSiparisAdedi}</strong>
+                  <p className="canli-ozet-aciklama">Tahmini süresi aşılmış sipariş</p>
+                  <span className="canli-ozet-alt">
+                    {dashboardCanliOzetler.gecikenSiparisAdedi > 0
+                      ? dashboardCanliOzetler.gecikenSiparisler.slice(0, 2).map((siparis) => siparis.siparisNo).join(', ')
+                      : 'Şu an gecikme görünmüyor'}
+                  </span>
+                </article>
+              </section>
 
               <section className="dashboard-orta-grid">
                 <article className="panel-kart">
@@ -1377,12 +1692,42 @@ function App() {
                 </article>
               </section>
 
+              <article className="panel-kart kritik-stok-paneli">
+                <div className="panel-baslik">
+                  <h2>Kritik Stok Uyarısı</h2>
+                  <small>{dashboardCanliOzetler.kritikStokAdedi} ürün eşik altında</small>
+                </div>
+
+                <div className="kritik-stok-ozet">
+                  <strong>{dashboardCanliOzetler.kritikStokAdedi}</strong>
+                  <span>Minimum stok değerinin altına düşen ürünler</span>
+                </div>
+
+                <div className="kritik-stok-liste">
+                  {dashboardCanliOzetler.kritikStokluUrunler.slice(0, 4).map((urun) => (
+                    <article key={`kritik-${urun.uid}`} className="kritik-stok-karti">
+                      <div className="kritik-stok-baslik">
+                        <strong className="urun-ad-satiri">
+                          <span>{urun.ad}</span>
+                          <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır.">!</span>
+                        </strong>
+                        <span>{urun.urunId}</span>
+                      </div>
+                      <div className="kritik-stok-detay">
+                        <span>Minimum stok: <strong>{urun.minimumStok}</strong></span>
+                        <span>Mevcut: <strong>{urun.magazaStok}</strong></span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </article>
+
               <article className="panel-kart">
                 <div className="panel-baslik">
                   <h2>Yakın Zamanda Satılan Ürünler</h2>
                   <small>Şehir içi siparişler</small>
                 </div>
-                <div className="tablo-sarmal">
+                <div className="tablo-sarmal masaustu-tablo">
                   <table>
                     <thead>
                       <tr>
@@ -1503,7 +1848,7 @@ function App() {
                   </select>
                 </div>
 
-                <div className="tablo-sarmal">
+                <div className="tablo-sarmal masaustu-tablo">
                   <table>
                     <thead>
                       <tr>
@@ -1517,7 +1862,7 @@ function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filtreliSiparisler.map((siparis) => (
+                      {sayfadakiSiparisler.map((siparis) => (
                         <tr key={siparis.siparisNo}>
                           <td>{siparis.siparisNo}</td>
                           <td>{siparis.musteri}</td>
@@ -1536,6 +1881,47 @@ function App() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                <div className="mobil-kart-listesi">
+                  {sayfadakiSiparisler.map((siparis) => (
+                    <article key={`mobil-${siparis.siparisNo}`} className="mobil-kart siparis-mobil-kart">
+                      <div className="mobil-kart-ust">
+                        <strong>{siparis.siparisNo}</strong>
+                        <span className={`durum-baloncuk ${durumSinifi(siparis.teslimatDurumu)}`}>{siparis.teslimatDurumu}</span>
+                      </div>
+                      <div className="mobil-kart-govde">
+                        <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Müşteri</span><strong>{siparis.musteri}</strong></div>
+                        <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Ürün</span><strong>{siparis.urun}</strong></div>
+                        <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Tutar</span><strong>{paraFormatla(siparis.toplamTutar)}</strong></div>
+                        <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Tarih</span><strong>{tarihFormatla(siparis.siparisTarihi)}</strong></div>
+                        <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Ödeme</span><strong><span className={`odeme-durumu ${siparis.odemeDurumu === 'Ödendi' ? 'odendi' : 'beklemede'}`}>{siparis.odemeDurumu}</span></strong></div>
+                        <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Hazırlık</span><strong>{siparis.urunHazirlik}</strong></div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                <div className="sayfalama">
+                  <button type="button" className="sayfa-ok" onClick={() => setSiparisSayfa(siparisSayfa - 1)} disabled={siparisSayfa === 1}>‹</button>
+                  {Array.from({ length: toplamSiparisSayfa }, (_, i) => i + 1).map((sayfaNo) => (
+                    <button
+                      key={sayfaNo}
+                      type="button"
+                      className={`sayfa-buton ${siparisSayfa === sayfaNo ? 'aktif' : ''}`}
+                      onClick={() => setSiparisSayfa(sayfaNo)}
+                    >
+                      {sayfaNo}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="sayfa-ok"
+                    onClick={() => setSiparisSayfa(siparisSayfa + 1)}
+                    disabled={siparisSayfa === toplamSiparisSayfa}
+                  >
+                    ›
+                  </button>
                 </div>
               </section>
             </section>
@@ -1557,18 +1943,18 @@ function App() {
                     className={`odeme-sekme ${odemeSekmesi === 'gelen' ? 'aktif' : ''}`}
                     onClick={() => setOdemeSekmesi('gelen')}
                   >
-                    Gelen Nakit
+                    Tahsilatlar
                   </button>
                   <button
                     type="button"
                     className={`odeme-sekme ${odemeSekmesi === 'giden' ? 'aktif' : ''}`}
                     onClick={() => setOdemeSekmesi('giden')}
                   >
-                    Giden Nakit
+                    Ödemeler
                   </button>
                 </div>
 
-                <div className="tablo-sarmal">
+                <div className="tablo-sarmal masaustu-tablo">
                   <table>
                     <thead>
                       <tr>
@@ -1624,6 +2010,50 @@ function App() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                <div className="mobil-kart-listesi">
+                  {(odemeSekmesi === 'gelen' ? gelenSayfadakiKayitlar : gidenSayfadakiKayitlar).map((kayit) => (
+                    <article key={`mobil-${kayit.odemeNo}`} className="mobil-kart">
+                      <div className="mobil-kart-ust">
+                        <strong>{kayit.odemeNo}</strong>
+                        <span className={`nakit-tutar-baloncuk ${odemeSekmesi === 'gelen' ? 'gelen' : 'giden'}`}>{paraFormatla(kayit.tutar)}</span>
+                      </div>
+                      <div className="mobil-kart-govde">
+                        <div className="mobil-bilgi-satiri"><span>Cari / Tedarikçi</span><strong>{kayit.taraf}</strong></div>
+                        <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(kayit.tarih)}</strong></div>
+                        <div className="mobil-bilgi-satiri"><span>Durum</span><strong>{kayit.durum}</strong></div>
+                      </div>
+                      <div className="mobil-kart-aksiyon">
+                        <div className="odeme-islemler">
+                          <button
+                            type="button"
+                            className={`odeme-ikon yildiz ${kayit.favori ? 'aktif' : ''}`}
+                            onClick={() => finansFavoriDegistir(odemeSekmesi, kayit.odemeNo)}
+                            title="Favori"
+                          >
+                            ★
+                          </button>
+                          <button
+                            type="button"
+                            className="odeme-ikon kalem"
+                            onClick={() => odemeDuzenlemeAc(odemeSekmesi, kayit)}
+                            title="Düzenle"
+                          >
+                            ✎
+                          </button>
+                          <button
+                            type="button"
+                            className="odeme-ikon cop"
+                            onClick={() => setSilinecekOdeme({ sekme: odemeSekmesi, odemeNo: kayit.odemeNo, taraf: kayit.taraf })}
+                            title="Sil"
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
                 </div>
 
                 <div className="sayfalama">
@@ -1691,7 +2121,7 @@ function App() {
                   />
                 </div>
 
-                <div className="tablo-sarmal">
+                <div className="tablo-sarmal masaustu-tablo">
                   <table>
                     <thead>
                       <tr>
@@ -1739,6 +2169,42 @@ function App() {
                   </table>
                 </div>
 
+                <div className="mobil-kart-listesi">
+                  {sayfadakiMusteriler.map((musteri, index) => (
+                    <article key={`mobil-musteri-${musteri.uid}`} className="mobil-kart">
+                      <div className="mobil-kart-ust">
+                        <strong>{String(musteriBaslangic + index + 1).padStart(2, '0')} - {musteri.ad}</strong>
+                        <span>{tarihFormatla(musteri.sonAlim)}</span>
+                      </div>
+                      <div className="mobil-kart-govde">
+                        <div className="mobil-kart-kisi">
+                          <span className="musteri-avatar" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                              <circle cx="12" cy="8.1" r="4.05" />
+                              <path d="M4.8 19.8a8.1 8.1 0 0 1 14.4 0A11.2 11.2 0 0 1 12 22a11.2 11.2 0 0 1-7.2-2.2Z" />
+                            </svg>
+                          </span>
+                          <div className="mobil-kisi-metin">
+                            <strong>{musteri.ad}</strong>
+                            <span>{musteri.telefon}</span>
+                          </div>
+                        </div>
+                        <div className="mobil-bilgi-satiri"><span>Sipariş Sayısı</span><strong>{musteri.toplamSiparis}</strong></div>
+                        <div className="mobil-bilgi-satiri"><span>Toplam Harcama</span><strong>{paraFormatla(musteri.toplamHarcama)}</strong></div>
+                        <div className="mobil-bilgi-satiri tam"><span>Not</span><strong>{musteri.not}</strong></div>
+                      </div>
+                      <div className="mobil-kart-aksiyon">
+                        <div className="islem-dugmeleri">
+                          <button type="button" className={`ikon-dugme favori ${musteri.favori ? 'aktif' : ''}`} title="Favori" onClick={() => musteriFavoriDegistir(musteri.uid)}>★</button>
+                          <button type="button" className="ikon-dugme not" title="Not Ekle" onClick={() => musteriNotAc(musteri)}>📝</button>
+                          <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => musteriDuzenlemeAc(musteri)}>✎</button>
+                          <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekMusteri(musteri)}>🗑</button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
                 <div className="sayfalama">
                   <button type="button" className="sayfa-ok" onClick={() => musteriSayfayaGit(musteriSayfa - 1)} disabled={musteriSayfa === 1}>‹</button>
                   {Array.from({ length: toplamMusteriSayfa }, (_, i) => i + 1).map((sayfaNo) => (
@@ -1782,82 +2248,240 @@ function App() {
               </header>
 
               <section className="panel-kart envanter-kart">
-                <div className="panel-ust-cizgi">
-                  <h2>Ürün Fiyat Listesi</h2>
-                  <input
-                    type="text"
-                    placeholder="Ürün veya ID ara"
-                    value={urunDuzenlemeArama}
-                    onChange={(event) => {
-                      setUrunDuzenlemeArama(event.target.value)
-                      setUrunDuzenlemeSayfa(1)
-                    }}
-                  />
+                <div className="odeme-sekme-alani">
+                  <button
+                    type="button"
+                    className={`odeme-sekme ${urunDuzenlemeSekmesi === 'urunler' ? 'aktif' : ''}`}
+                    onClick={() => setUrunDuzenlemeSekmesi('urunler')}
+                  >
+                    Ürün Listesi
+                  </button>
+                  <button
+                    type="button"
+                    className={`odeme-sekme ${urunDuzenlemeSekmesi === 'stok-loglari' ? 'aktif' : ''}`}
+                    onClick={() => setUrunDuzenlemeSekmesi('stok-loglari')}
+                  >
+                    Stok Geçmişi
+                  </button>
                 </div>
 
-                <div className="tablo-sarmal">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>No</th>
-                        <th>Ürün</th>
-                        <th>Ürün ID</th>
-                        <th>Ürün Adedi</th>
-                        <th>Alış Fiyatı</th>
-                        <th>Satış Fiyatı</th>
-                        <th>Mağaza Stok</th>
-                        <th>İşlem</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                {urunDuzenlemeSekmesi === 'urunler' && (
+                  <>
+                    <div className="panel-ust-cizgi">
+                      <h2>Ürün Fiyat Listesi</h2>
+                      <input
+                        type="text"
+                        placeholder="Ürün veya ID ara"
+                        value={urunDuzenlemeArama}
+                        onChange={(event) => {
+                          setUrunDuzenlemeArama(event.target.value)
+                          setUrunDuzenlemeSayfa(1)
+                        }}
+                      />
+                    </div>
+
+                    <div className="tablo-sarmal masaustu-tablo">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>No</th>
+                            <th>Ürün</th>
+                            <th>Ürün ID</th>
+                            <th>Ürün Adedi</th>
+                            <th>Alış Fiyatı</th>
+                            <th>Satış Fiyatı</th>
+                            <th>Mağaza Stok</th>
+                            <th>İşlem</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sayfadakiDuzenlemeUrunleri.map((urun, index) => (
+                            <tr key={`duzenleme-${urun.uid}`}>
+                              <td>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')}</td>
+                              <td>
+                                <div className="urun-bilgi">
+                                  <span className="urun-avatar">{urun.avatar}</span>
+                                  <span className="urun-ad-satiri">
+                                    <span>{urun.ad}</span>
+                                    {kritikStoktaMi(urun) && (
+                                      <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
+                                        !
+                                      </span>
+                                    )}
+                                  </span>
+                                </div>
+                              </td>
+                              <td>{urun.urunId}</td>
+                              <td>{urun.urunAdedi}</td>
+                              <td>{paraFormatla(urun.alisFiyati ?? 0)}</td>
+                              <td>{paraFormatla(urun.satisFiyati ?? 0)}</td>
+                              <td>{urun.magazaStok}</td>
+                              <td>
+                                <div className="islem-dugmeleri">
+                                  <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}>★</button>
+                                  <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => urunDuzenlemeModaliniAc(urun)}>✎</button>
+                                  <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekDuzenlemeUrunu(urun)}>🗑</button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="mobil-kart-listesi">
                       {sayfadakiDuzenlemeUrunleri.map((urun, index) => (
-                        <tr key={`duzenleme-${urun.uid}`}>
-                          <td>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')}</td>
-                          <td>
-                            <div className="urun-bilgi">
+                        <article key={`mobil-duzenleme-${urun.uid}`} className="mobil-kart">
+                          <div className="mobil-kart-ust">
+                            <strong>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')} - {urun.ad}</strong>
+                            <span>{urun.urunId}</span>
+                          </div>
+                          <div className="mobil-kart-govde">
+                            <div className="mobil-kart-kisi">
                               <span className="urun-avatar">{urun.avatar}</span>
-                              <span>{urun.ad}</span>
+                              <div className="mobil-kisi-metin">
+                                <strong className="urun-ad-satiri">
+                                  <span>{urun.ad}</span>
+                                  {kritikStoktaMi(urun) && (
+                                    <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
+                                      !
+                                    </span>
+                                  )}
+                                </strong>
+                                <span>{urun.urunId}</span>
+                              </div>
                             </div>
-                          </td>
-                          <td>{urun.urunId}</td>
-                          <td>{urun.urunAdedi}</td>
-                          <td>{paraFormatla(urun.alisFiyati ?? 0)}</td>
-                          <td>{paraFormatla(urun.satisFiyati ?? 0)}</td>
-                          <td>{urun.magazaStok}</td>
-                          <td>
+                            <div className="mobil-bilgi-satiri"><span>Ürün Adedi</span><strong>{urun.urunAdedi}</strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Minimum Stok</span><strong>{urun.minimumStok}</strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Alış Fiyatı</span><strong>{paraFormatla(urun.alisFiyati ?? 0)}</strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Satış Fiyatı</span><strong>{paraFormatla(urun.satisFiyati ?? 0)}</strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Mağaza Stok</span><strong>{urun.magazaStok}</strong></div>
+                          </div>
+                          <div className="mobil-kart-aksiyon">
                             <div className="islem-dugmeleri">
                               <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}>★</button>
                               <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => urunDuzenlemeModaliniAc(urun)}>✎</button>
                               <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekDuzenlemeUrunu(urun)}>🗑</button>
                             </div>
-                          </td>
-                        </tr>
+                          </div>
+                        </article>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </div>
 
-                <div className="sayfalama">
-                  <button type="button" className="sayfa-ok" onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa - 1)} disabled={urunDuzenlemeSayfa === 1}>‹</button>
-                  {Array.from({ length: toplamUrunDuzenlemeSayfa }, (_, i) => i + 1).map((sayfaNo) => (
-                    <button
-                      key={`duzenleme-sayfa-${sayfaNo}`}
-                      type="button"
-                      className={`sayfa-buton ${urunDuzenlemeSayfa === sayfaNo ? 'aktif' : ''}`}
-                      onClick={() => urunDuzenlemeSayfayaGit(sayfaNo)}
-                    >
-                      {sayfaNo}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    className="sayfa-ok"
-                    onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa + 1)}
-                    disabled={urunDuzenlemeSayfa === toplamUrunDuzenlemeSayfa}
-                  >
-                    ›
-                  </button>
-                </div>
+                    <div className="sayfalama">
+                      <button type="button" className="sayfa-ok" onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa - 1)} disabled={urunDuzenlemeSayfa === 1}>‹</button>
+                      {Array.from({ length: toplamUrunDuzenlemeSayfa }, (_, i) => i + 1).map((sayfaNo) => (
+                        <button
+                          key={`duzenleme-sayfa-${sayfaNo}`}
+                          type="button"
+                          className={`sayfa-buton ${urunDuzenlemeSayfa === sayfaNo ? 'aktif' : ''}`}
+                          onClick={() => urunDuzenlemeSayfayaGit(sayfaNo)}
+                        >
+                          {sayfaNo}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        className="sayfa-ok"
+                        onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa + 1)}
+                        disabled={urunDuzenlemeSayfa === toplamUrunDuzenlemeSayfa}
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {urunDuzenlemeSekmesi === 'stok-loglari' && (
+                  <>
+                    <div className="panel-ust-cizgi">
+                      <h2>Son Stok Değişiklikleri</h2>
+                      <span className="panel-bilgi-rozet">Son 16 hareket</span>
+                    </div>
+
+                    <div className="tablo-sarmal masaustu-tablo">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>No</th>
+                            <th>Tarih</th>
+                            <th>Ürün</th>
+                            <th>Ürün ID</th>
+                            <th>İşlem</th>
+                            <th>Eski Stok</th>
+                            <th>Yeni Stok</th>
+                            <th>Kullanıcı</th>
+                            <th>Açıklama</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sayfadakiStokLoglari.map((log, index) => (
+                            <tr key={`stok-log-${log.id}`}>
+                              <td>{String(stokLogBaslangic + index + 1).padStart(2, '0')}</td>
+                              <td>{log.tarih}</td>
+                              <td>{log.urun}</td>
+                              <td>{log.urunId}</td>
+                              <td><span className="stok-log-rozet">{log.islem}</span></td>
+                              <td>
+                                <span className={`stok-log-deger-baloncuk ${log.eskiStok > log.yeniStok ? 'yuksek' : 'dusuk'}`}>
+                                  {log.eskiStok}
+                                </span>
+                              </td>
+                              <td>
+                                <span className={`stok-log-deger-baloncuk ${log.yeniStok > log.eskiStok ? 'yuksek' : 'dusuk'}`}>
+                                  {log.yeniStok}
+                                </span>
+                              </td>
+                              <td>{log.kullanici}</td>
+                              <td>{log.aciklama}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="mobil-kart-listesi">
+                      {sayfadakiStokLoglari.map((log, index) => (
+                        <article key={`mobil-stok-log-${log.id}`} className="mobil-kart">
+                          <div className="mobil-kart-ust">
+                            <strong>{String(stokLogBaslangic + index + 1).padStart(2, '0')} - {log.urun}</strong>
+                            <span className="stok-log-rozet">{log.islem}</span>
+                          </div>
+                          <div className="mobil-kart-govde">
+                            <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{log.tarih}</strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Ürün ID</span><strong>{log.urunId}</strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Eski Stok</span><strong><span className={`stok-log-deger-baloncuk ${log.eskiStok > log.yeniStok ? 'yuksek' : 'dusuk'}`}>{log.eskiStok}</span></strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Yeni Stok</span><strong><span className={`stok-log-deger-baloncuk ${log.yeniStok > log.eskiStok ? 'yuksek' : 'dusuk'}`}>{log.yeniStok}</span></strong></div>
+                            <div className="mobil-bilgi-satiri"><span>Kullanıcı</span><strong>{log.kullanici}</strong></div>
+                            <div className="mobil-bilgi-satiri tam"><span>Açıklama</span><strong>{log.aciklama}</strong></div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+
+                    <div className="sayfalama">
+                      <button type="button" className="sayfa-ok" onClick={() => setStokLogSayfa(stokLogSayfa - 1)} disabled={stokLogSayfa === 1}>‹</button>
+                      {Array.from({ length: toplamStokLogSayfa }, (_, i) => i + 1).map((sayfaNo) => (
+                        <button
+                          key={`stok-log-sayfa-${sayfaNo}`}
+                          type="button"
+                          className={`sayfa-buton ${stokLogSayfa === sayfaNo ? 'aktif' : ''}`}
+                          onClick={() => setStokLogSayfa(sayfaNo)}
+                        >
+                          {sayfaNo}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        className="sayfa-ok"
+                        onClick={() => setStokLogSayfa(stokLogSayfa + 1)}
+                        disabled={stokLogSayfa === toplamStokLogSayfa}
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </>
+                )}
               </section>
             </section>
           )}
@@ -1891,6 +2515,22 @@ function App() {
               </header>
 
               <section className="panel-kart envanter-kart">
+                <div className="odeme-sekme-alani kategori-sekme-alani">
+                  {envanterKategorileri.map((kategori) => (
+                    <button
+                      key={kategori}
+                      type="button"
+                      className={`odeme-sekme ${envanterKategori === kategori ? 'aktif' : ''}`}
+                      onClick={() => {
+                        setEnvanterKategori(kategori)
+                        setEnvanterSayfa(1)
+                      }}
+                    >
+                      {kategori}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="panel-ust-cizgi">
                   <h2>Parça Listesi</h2>
                   <input
@@ -1904,13 +2544,14 @@ function App() {
                   />
                 </div>
 
-                <div className="tablo-sarmal">
+                <div className="tablo-sarmal masaustu-tablo">
                   <table>
                     <thead>
                       <tr>
                         <th>No</th>
                         <th>Ürün</th>
                         <th>Ürün ID</th>
+                        <th>Kategori</th>
                         <th>Ürün Adedi</th>
                         <th>Mağaza Stok</th>
                         <th>İşlem</th>
@@ -1923,10 +2564,18 @@ function App() {
                           <td>
                             <div className="urun-hucre">
                               <span className="urun-avatar">{urun.avatar}</span>
-                              <strong>{urun.ad}</strong>
+                              <strong className="urun-ad-satiri">
+                                <span>{urun.ad}</span>
+                                {kritikStoktaMi(urun) && (
+                                  <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
+                                    !
+                                  </span>
+                                )}
+                              </strong>
                             </div>
                           </td>
                           <td>{urun.urunId}</td>
+                          <td>{urun.kategori}</td>
                           <td>{urun.urunAdedi}</td>
                           <td>{urun.magazaStok}</td>
                           <td>
@@ -1940,6 +2589,44 @@ function App() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                <div className="mobil-kart-listesi">
+                  {sayfadakiUrunler.map((urun, index) => (
+                    <article key={`mobil-envanter-${urun.uid}`} className="mobil-kart">
+                      <div className="mobil-kart-ust">
+                        <strong>{String(sayfaBaslangic + index + 1).padStart(2, '0')} - {urun.ad}</strong>
+                        <span>{urun.kategori}</span>
+                      </div>
+                      <div className="mobil-kart-govde">
+                        <div className="mobil-kart-kisi">
+                          <span className="urun-avatar">{urun.avatar}</span>
+                          <div className="mobil-kisi-metin">
+                            <strong className="urun-ad-satiri">
+                              <span>{urun.ad}</span>
+                              {kritikStoktaMi(urun) && (
+                                <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
+                                  !
+                                </span>
+                              )}
+                            </strong>
+                            <span>{urun.urunId}</span>
+                          </div>
+                        </div>
+                        <div className="mobil-bilgi-satiri"><span>Kategori</span><strong>{urun.kategori}</strong></div>
+                        <div className="mobil-bilgi-satiri"><span>Ürün Adedi</span><strong>{urun.urunAdedi}</strong></div>
+                        <div className="mobil-bilgi-satiri"><span>Minimum Stok</span><strong>{urun.minimumStok}</strong></div>
+                        <div className="mobil-bilgi-satiri"><span>Mağaza Stok</span><strong>{urun.magazaStok}</strong></div>
+                      </div>
+                      <div className="mobil-kart-aksiyon">
+                        <div className="islem-dugmeleri">
+                          <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}>★</button>
+                          <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => duzenlemePenceresiniAc(urun)}>✎</button>
+                          <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekUrun(urun)}>🗑</button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
                 </div>
 
                 <div className="sayfalama">
@@ -1984,7 +2671,7 @@ function App() {
         )}
 
         {aktifSayfa !== 'merkez' && aiPanelAcik && !aiPanelKucuk && (
-          <section className={`ai-panel ai-tema-${aiTema} ${aiPanelKapaniyor ? 'kapaniyor' : 'aciliyor'}`}>
+          <section className={`ai-panel ai-tema-acik ${aiPanelKapaniyor ? 'kapaniyor' : 'aciliyor'}`}>
             <header className="ai-panel-ust">
               <div className="ai-panel-kontroller">
                 <button
@@ -1999,25 +2686,13 @@ function App() {
                   <div className="ai-tema-menu">
                     <button
                       type="button"
-                      className={aiTema === 'acik' ? 'aktif' : ''}
+                      className="aktif"
                       onClick={() => {
-                        setAiTema('acik')
                         setAiTemaMenuAcik(false)
                       }}
                     >
                       <TemaIkonu tema="acik" />
                       <span>Açık Tema</span>
-                    </button>
-                    <button
-                      type="button"
-                      className={aiTema === 'koyu' ? 'aktif' : ''}
-                      onClick={() => {
-                        setAiTema('koyu')
-                        setAiTemaMenuAcik(false)
-                      }}
-                    >
-                      <TemaIkonu tema="koyu" />
-                      <span>Koyu Tema</span>
                     </button>
                   </div>
                 )}
@@ -2103,6 +2778,30 @@ function App() {
               </button>
             </div>
           </section>
+        )}
+
+        {toastlar.length > 0 && (
+          <div className="toast-kapsayici" aria-live="polite" aria-atomic="true">
+            {toastlar.map((toast) => (
+              <article key={toast.id} className={`toast-bildirim ${toast.tip}`}>
+                <span className="toast-ikon" aria-hidden="true">
+                  {toast.tip === 'basari' ? '✓' : '!'}
+                </span>
+                <div className="toast-metin">
+                  <strong>{toast.tip === 'basari' ? 'Başarılı' : 'Uyarı'}</strong>
+                  <span>{toast.metin}</span>
+                </div>
+                <button
+                  type="button"
+                  className="toast-kapat"
+                  aria-label="Bildirimi kapat"
+                  onClick={() => setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))}
+                >
+                  ×
+                </button>
+              </article>
+            ))}
+          </div>
         )}
 
         {duzenlenenOdeme && (
@@ -2248,6 +2947,9 @@ function App() {
               <label>Ürün Adedi</label>
               <input type="number" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
 
+              <label>Minimum Stok</label>
+              <input type="number" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />
+
               <label>Mağazadaki Ürün Sayısı</label>
               <input type="number" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />
             </div>
@@ -2272,6 +2974,9 @@ function App() {
 
               <label>Ürün Adedi</label>
               <input type="number" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
+
+              <label>Minimum Stok</label>
+              <input type="number" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />
 
               <label>Mağazadaki Ürün Sayısı</label>
               <input type="number" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />

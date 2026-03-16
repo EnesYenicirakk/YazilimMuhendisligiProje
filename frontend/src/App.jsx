@@ -137,6 +137,24 @@ const baslangicSiparisleri = [
   { siparisNo: '#SP-2120', musteri: 'Başak Otomotiv', urun: 'Debriyaj Bilyası', toplamTutar: 3180, siparisTarihi: '2026-02-24', odemeDurumu: 'Ödendi', urunHazirlik: 'Toplandı', teslimatDurumu: 'Yolda', teslimatSuresi: '2 iş günü' },
 ]
 
+const siparisMusteriTelefonlari = {
+  'Yıldız Oto': '0532 410 22 10',
+  'Tekin Otomotiv': '0533 812 14 32',
+  'Mert Motor': '0541 632 41 18',
+  'Hızlı Servis': '0537 228 76 90',
+  'Akın Oto': '0542 611 70 91',
+  'Bora Yedek Parça': '0505 338 14 62',
+  'Demir Oto': '0536 304 88 41',
+  'Asil Sanayi': '0549 210 53 72',
+  'Nehir Otomotiv': '0531 902 16 20',
+  'Kaya Oto Servis': '0544 781 32 08',
+  'Yaman Yedek': '0507 624 90 14',
+  'Gürkan Oto': '0538 470 19 35',
+  'Doğan Oto': '0543 613 27 44',
+  'Özen Servis': '0539 115 64 77',
+  'Başak Otomotiv': '0506 841 28 63',
+}
+
 const gelenNakitKayitlari = [
   { odemeNo: 'GN-5001', taraf: 'Yıldız Oto', tarih: '2026-03-11', durum: 'Tahsil Edildi', tutar: 94500 },
   { odemeNo: 'GN-5002', taraf: 'Tekin Otomotiv', tarih: '2026-03-10', durum: 'Tahsil Edildi', tutar: 88200 },
@@ -261,6 +279,15 @@ const teslimatGununuCoz = (metin) => {
   return eslesme ? Number(eslesme[1]) : 0
 }
 
+const telefonuNormalizeEt = (telefon) => telefon.replace(/\D/g, '')
+
+const telefonGecerliMi = (telefon) => {
+  const rakamlar = telefonuNormalizeEt(telefon)
+  return /^0\d{10}$/.test(rakamlar)
+}
+
+const negatifSayiVarMi = (...degerler) => degerler.some((deger) => Number(deger) < 0)
+
 const bosForm = {
   urunId: '',
   ad: '',
@@ -285,6 +312,17 @@ const bosMusteriFormu = {
   toplamSiparis: '',
   toplamHarcama: '',
   not: '',
+}
+
+const bosSiparisFormu = {
+  musteri: '',
+  urun: '',
+  toplamTutar: '',
+  siparisTarihi: '',
+  odemeDurumu: 'Beklemede',
+  urunHazirlik: 'Hazırlanıyor',
+  teslimatDurumu: 'Hazırlanıyor',
+  teslimatSuresi: '',
 }
 
 const merkezMenusu = [
@@ -458,12 +496,24 @@ function App() {
   const [acikOzetMenusu, setAcikOzetMenusu] = useState('')
   const [urunler, setUrunler] = useState(baslangicUrunleri)
   const [musteriler, setMusteriler] = useState(baslangicMusterileri)
-  const [siparisler] = useState(baslangicSiparisleri)
+  const [siparisler, setSiparisler] = useState(baslangicSiparisleri)
   const [gelenNakitListesi, setGelenNakitListesi] = useState(() => gelenNakitKayitlari.map((k) => ({ ...k, favori: false })))
   const [gidenNakitListesi, setGidenNakitListesi] = useState(() => gidenNakitKayitlari.map((k) => ({ ...k, favori: false })))
   const [siparisArama, setSiparisArama] = useState('')
   const [siparisOdemeFiltresi, setSiparisOdemeFiltresi] = useState('Tüm Siparişler')
   const [siparisSayfa, setSiparisSayfa] = useState(1)
+  const [yeniSiparisAcik, setYeniSiparisAcik] = useState(false)
+  const [detaySiparis, setDetaySiparis] = useState(null)
+  const [duzenlenenSiparisNo, setDuzenlenenSiparisNo] = useState(null)
+  const [durumGuncellenenSiparisNo, setDurumGuncellenenSiparisNo] = useState(null)
+  const [silinecekSiparis, setSilinecekSiparis] = useState(null)
+  const [siparisFormu, setSiparisFormu] = useState(bosSiparisFormu)
+  const [siparisDurumFormu, setSiparisDurumFormu] = useState({
+    odemeDurumu: 'Beklemede',
+    urunHazirlik: 'Hazırlanıyor',
+    teslimatDurumu: 'Hazırlanıyor',
+    teslimatSuresi: '',
+  })
   const [odemeSekmesi, setOdemeSekmesi] = useState('gelen')
   const [gelenSayfa, setGelenSayfa] = useState(1)
   const [gidenSayfa, setGidenSayfa] = useState(1)
@@ -489,6 +539,11 @@ function App() {
   const [aiPanelAcik, setAiPanelAcik] = useState(false)
   const [aiPanelKucuk, setAiPanelKucuk] = useState(false)
   const [aiPanelKapaniyor, setAiPanelKapaniyor] = useState(false)
+  const [bildirimPanelAcik, setBildirimPanelAcik] = useState(false)
+  const [bildirimPanelKapaniyor, setBildirimPanelKapaniyor] = useState(false)
+  const [okunanBildirimler, setOkunanBildirimler] = useState([])
+  const [temizlenenBildirimler, setTemizlenenBildirimler] = useState([])
+  const [sifreGorunur, setSifreGorunur] = useState(false)
   const [aiTemaMenuAcik, setAiTemaMenuAcik] = useState(false)
   const [aiMesajMetni, setAiMesajMetni] = useState('')
   const [aiHizliKonularAcik, setAiHizliKonularAcik] = useState(true)
@@ -644,6 +699,64 @@ function App() {
     }
   }, [siraliSiparisler, urunler])
 
+  const tumBildirimler = useMemo(() => {
+    const kritikStokBildirimleri = dashboardCanliOzetler.kritikStokluUrunler.slice(0, 3).map((urun) => ({
+      id: `kritik-${urun.uid}`,
+      tur: 'kritik',
+      baslik: `${urun.ad} kritik stokta`,
+      detay: `Minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}. Yeniden sipariş planlanmalı.`,
+      zaman: 'Az önce',
+      sayfa: 'envanter',
+    }))
+
+    const stokLogBildirimleri = stokDegisimLoglari.slice(0, 3).map((log) => ({
+      id: `stok-log-${log.id}`,
+      tur: 'stok',
+      baslik: `${log.urun} için ${log.islem.toLocaleLowerCase('tr-TR')}`,
+      detay: `${log.eskiStok} adetten ${log.yeniStok} adede güncellendi. ${log.aciklama}`,
+      zaman: log.tarih,
+      sayfa: 'urun-duzenleme',
+      sekme: 'stok-gecmisi',
+    }))
+
+    const sonSatisBildirimleri = siraliSiparisler.slice(0, 3).map((siparis) => ({
+      id: `satis-${siparis.siparisNo}`,
+      tur: 'satis',
+      baslik: `${siparis.siparisNo} numaralı sipariş kaydedildi`,
+      detay: `${siparis.musteri} için ${siparis.urun} satıldı. Tutar ${paraFormatla(siparis.toplamTutar)}.`,
+      zaman: tarihFormatla(siparis.siparisTarihi),
+      sayfa: 'siparisler',
+    }))
+
+    const bekleyenTahsilatBildirimleri = siraliSiparisler
+      .filter((siparis) => siparis.odemeDurumu === 'Beklemede')
+      .slice(0, 2)
+      .map((siparis) => ({
+        id: `bekleyen-${siparis.siparisNo}`,
+        tur: 'tahsilat',
+        baslik: `${siparis.siparisNo} tahsilat bekliyor`,
+        detay: `${siparis.musteri} için ${paraFormatla(siparis.toplamTutar)} tutarında ödeme bekleniyor.`,
+        zaman: tarihFormatla(siparis.siparisTarihi),
+        sayfa: 'odemeler',
+        sekme: 'gelen',
+      }))
+
+    return [
+      ...kritikStokBildirimleri,
+      ...stokLogBildirimleri,
+      ...sonSatisBildirimleri,
+      ...bekleyenTahsilatBildirimleri,
+    ].slice(0, 8)
+  }, [dashboardCanliOzetler.kritikStokluUrunler, siraliSiparisler])
+
+  const bildirimler = useMemo(() => {
+    return tumBildirimler.filter((bildirim) => !temizlenenBildirimler.includes(bildirim.id))
+  }, [temizlenenBildirimler, tumBildirimler])
+
+  const okunmamisBildirimSayisi = useMemo(() => {
+    return bildirimler.filter((bildirim) => !okunanBildirimler.includes(bildirim.id)).length
+  }, [bildirimler, okunanBildirimler])
+
   const siraliGelenNakit = useMemo(() => {
     return favorileriOneTasi(gelenNakitListesi, (kayit) => new Date(kayit.tarih).getTime())
   }, [gelenNakitListesi])
@@ -769,7 +882,7 @@ function App() {
         setIsLoggedIn(true)
         setAktifSayfa('merkez')
         setLoginGecisiAktif(false)
-      }, 920)
+      }, 1180)
       return
     }
 
@@ -790,6 +903,11 @@ function App() {
     setAcikOzetMenusu('')
     setAiTemaMenuAcik(false)
     setMobilMenuAcik(false)
+    setYeniSiparisAcik(false)
+    setDetaySiparis(null)
+    setDuzenlenenSiparisNo(null)
+    setDurumGuncellenenSiparisNo(null)
+    setSilinecekSiparis(null)
     setDuzenlenenOdeme(null)
     setSilinecekOdeme(null)
     if (sayfa === 'envanter') setEnvanterSayfa(1)
@@ -860,6 +978,17 @@ function App() {
 
     if (!urunId || !ad || Number.isNaN(urunAdedi) || Number.isNaN(magazaStok) || Number.isNaN(minimumStok)) {
       toastGoster('hata', 'Ürün bilgileri eksik veya hatalı görünüyor.')
+      return
+    }
+
+    if (negatifSayiVarMi(urunAdedi, magazaStok, minimumStok)) {
+      toastGoster('hata', 'Ürün adedi ve stok alanları negatif olamaz.')
+      return
+    }
+
+    const tekrarEdenUrunId = urunler.some((urun) => urun.urunId.toLowerCase() === urunId.toLowerCase() && (mod === 'ekle' || urun.uid !== seciliUid))
+    if (tekrarEdenUrunId) {
+      toastGoster('hata', `${urunId} ürün ID’si zaten kullanılıyor.`)
       return
     }
 
@@ -940,6 +1069,17 @@ function App() {
       return
     }
 
+    if (negatifSayiVarMi(urunAdedi, magazaStok, alisFiyati, satisFiyati)) {
+      toastGoster('hata', 'Adet, stok ve fiyat alanları negatif olamaz.')
+      return
+    }
+
+    const tekrarEdenUrunId = urunler.some((urun) => urun.urunId.toLowerCase() === urunId.toLowerCase() && urun.uid !== urunDuzenlemeUid)
+    if (tekrarEdenUrunId) {
+      toastGoster('hata', `${urunId} ürün ID’si zaten kullanılıyor.`)
+      return
+    }
+
     setUrunler((onceki) =>
       onceki.map((urun) =>
         urun.uid === urunDuzenlemeUid
@@ -989,6 +1129,186 @@ function App() {
   const musteriSayfayaGit = (sayfa) => {
     if (sayfa < 1 || sayfa > toplamMusteriSayfa) return
     setMusteriSayfa(sayfa)
+  }
+
+  const siparisDuzenlemeAc = (siparis) => {
+    setDuzenlenenSiparisNo(siparis.siparisNo)
+    setSiparisFormu({
+      musteri: siparis.musteri,
+      urun: siparis.urun,
+      toplamTutar: String(siparis.toplamTutar),
+      siparisTarihi: siparis.siparisTarihi,
+      odemeDurumu: siparis.odemeDurumu,
+      urunHazirlik: siparis.urunHazirlik,
+      teslimatDurumu: siparis.teslimatDurumu,
+      teslimatSuresi: siparis.teslimatSuresi,
+    })
+  }
+
+  const siparisDurumGuncellemeAc = (siparis) => {
+    setDurumGuncellenenSiparisNo(siparis.siparisNo)
+    setSiparisDurumFormu({
+      odemeDurumu: siparis.odemeDurumu,
+      urunHazirlik: siparis.urunHazirlik,
+      teslimatDurumu: siparis.teslimatDurumu,
+      teslimatSuresi: siparis.teslimatSuresi,
+    })
+  }
+
+  const siparisFormuGuncelle = (alan, deger) => {
+    setSiparisFormu((onceki) => ({ ...onceki, [alan]: deger }))
+  }
+
+  const siparisDurumFormuGuncelle = (alan, deger) => {
+    setSiparisDurumFormu((onceki) => ({ ...onceki, [alan]: deger }))
+  }
+
+  const yeniSiparisPenceresiniAc = () => {
+    setSiparisFormu({
+      ...bosSiparisFormu,
+      siparisTarihi: new Date().toISOString().slice(0, 10),
+      teslimatSuresi: '2 iş günü',
+    })
+    setYeniSiparisAcik(true)
+  }
+
+  const yeniSiparisKaydet = () => {
+    const musteri = siparisFormu.musteri.trim()
+    const urun = siparisFormu.urun.trim()
+    const siparisTarihi = siparisFormu.siparisTarihi
+    const toplamTutar = Number(siparisFormu.toplamTutar)
+    const odemeDurumu = siparisFormu.odemeDurumu.trim()
+    const urunHazirlik = siparisFormu.urunHazirlik.trim()
+    const teslimatDurumu = siparisFormu.teslimatDurumu.trim()
+    const teslimatSuresi = siparisFormu.teslimatSuresi.trim()
+
+    if (!musteri || !urun || !siparisTarihi || !odemeDurumu || !urunHazirlik || !teslimatDurumu || !teslimatSuresi || Number.isNaN(toplamTutar)) {
+      toastGoster('hata', 'Yeni sipariş formunda eksik veya hatalı bilgi var.')
+      return
+    }
+
+    if (negatifSayiVarMi(toplamTutar)) {
+      toastGoster('hata', 'Sipariş tutarı negatif olamaz.')
+      return
+    }
+
+    const enYuksekNo = siparisler.reduce((maksimum, siparis) => {
+      const sayi = Number(String(siparis.siparisNo).replace(/[^\d]/g, ''))
+      return Number.isNaN(sayi) ? maksimum : Math.max(maksimum, sayi)
+    }, 0)
+
+    const yeniSiparisNo = `#SP-${enYuksekNo + 1}`
+
+    setSiparisler((onceki) => [
+      {
+        siparisNo: yeniSiparisNo,
+        musteri,
+        urun,
+        toplamTutar,
+        siparisTarihi,
+        odemeDurumu,
+        urunHazirlik,
+        teslimatDurumu,
+        teslimatSuresi,
+      },
+      ...onceki,
+    ])
+
+    setYeniSiparisAcik(false)
+    setSiparisSayfa(1)
+    setSiparisFormu(bosSiparisFormu)
+    toastGoster('basari', `${yeniSiparisNo} numaralı yeni sipariş oluşturuldu.`)
+  }
+
+  const siparisDuzenlemeKaydet = () => {
+    const musteri = siparisFormu.musteri.trim()
+    const urun = siparisFormu.urun.trim()
+    const siparisTarihi = siparisFormu.siparisTarihi
+    const toplamTutar = Number(siparisFormu.toplamTutar)
+    const odemeDurumu = siparisFormu.odemeDurumu.trim()
+    const urunHazirlik = siparisFormu.urunHazirlik.trim()
+    const teslimatDurumu = siparisFormu.teslimatDurumu.trim()
+    const teslimatSuresi = siparisFormu.teslimatSuresi.trim()
+
+    if (!musteri || !urun || !siparisTarihi || !odemeDurumu || !urunHazirlik || !teslimatDurumu || !teslimatSuresi || Number.isNaN(toplamTutar)) {
+      toastGoster('hata', 'Sipariş düzenleme alanlarında eksik veya hatalı bilgi var.')
+      return
+    }
+
+    if (negatifSayiVarMi(toplamTutar)) {
+      toastGoster('hata', 'Sipariş tutarı negatif olamaz.')
+      return
+    }
+
+    setSiparisler((onceki) =>
+      onceki.map((siparis) =>
+        siparis.siparisNo === duzenlenenSiparisNo
+          ? {
+              ...siparis,
+              musteri,
+              urun,
+              toplamTutar,
+              siparisTarihi,
+              odemeDurumu,
+              urunHazirlik,
+              teslimatDurumu,
+              teslimatSuresi,
+            }
+          : siparis,
+      ),
+    )
+
+    setDuzenlenenSiparisNo(null)
+    setSiparisFormu(bosSiparisFormu)
+    toastGoster('basari', `${musteri} için sipariş kaydı güncellendi.`)
+  }
+
+  const siparisDurumKaydet = () => {
+    if (!durumGuncellenenSiparisNo) return
+    const odemeDurumu = siparisDurumFormu.odemeDurumu.trim()
+    const urunHazirlik = siparisDurumFormu.urunHazirlik.trim()
+    const teslimatDurumu = siparisDurumFormu.teslimatDurumu.trim()
+    const teslimatSuresi = siparisDurumFormu.teslimatSuresi.trim()
+
+    if (!odemeDurumu || !urunHazirlik || !teslimatDurumu || !teslimatSuresi) {
+      toastGoster('hata', 'Durum güncelleme alanlarında boşluk bırakılamaz.')
+      return
+    }
+
+    setSiparisler((onceki) =>
+      onceki.map((siparis) =>
+        siparis.siparisNo === durumGuncellenenSiparisNo
+          ? {
+              ...siparis,
+              odemeDurumu,
+              urunHazirlik,
+              teslimatDurumu,
+              teslimatSuresi,
+            }
+          : siparis,
+      ),
+    )
+
+    setDurumGuncellenenSiparisNo(null)
+    toastGoster('basari', `${durumGuncellenenSiparisNo} durumu güncellendi.`)
+  }
+
+  const siparisSil = () => {
+    if (!silinecekSiparis) return
+    const silinenNo = silinecekSiparis.siparisNo
+    setSiparisler((onceki) => onceki.filter((siparis) => siparis.siparisNo !== silinenNo))
+    setSilinecekSiparis(null)
+    toastGoster('basari', `${silinenNo} siparişi silindi.`)
+  }
+
+  const siparisMusteriAra = (siparis) => {
+    const telefon = siparisMusteriTelefonlari[siparis.musteri]
+    if (!telefon) {
+      toastGoster('hata', `${siparis.musteri} için telefon bilgisi bulunamadı.`)
+      return
+    }
+
+    window.location.href = `tel:${telefon.replace(/\s+/g, '')}`
   }
 
   const aiMesajGonder = (hazirMetin) => {
@@ -1041,6 +1361,23 @@ function App() {
     return () => window.clearTimeout(zamanlayici)
   }, [aiPanelKapaniyor])
 
+  useEffect(() => {
+    if (!bildirimPanelKapaniyor) return undefined
+
+    const zamanlayici = window.setTimeout(() => {
+      setBildirimPanelAcik(false)
+      setBildirimPanelKapaniyor(false)
+    }, 240)
+
+    return () => window.clearTimeout(zamanlayici)
+  }, [bildirimPanelKapaniyor])
+
+  useEffect(() => {
+    const aktifBildirimIdleri = tumBildirimler.map((bildirim) => bildirim.id)
+    setOkunanBildirimler((onceki) => onceki.filter((id) => aktifBildirimIdleri.includes(id)))
+    setTemizlenenBildirimler((onceki) => onceki.filter((id) => aktifBildirimIdleri.includes(id)))
+  }, [tumBildirimler])
+
   const aiPaneliAc = () => {
     setAiTemaMenuAcik(false)
     setAiPanelKapaniyor(false)
@@ -1061,6 +1398,54 @@ function App() {
     }
 
     aiPaneliAc()
+  }
+
+  const bildirimPaneliKapat = () => {
+    setBildirimPanelKapaniyor(true)
+  }
+
+  const bildirimPaneliAc = () => {
+    setBildirimPanelKapaniyor(false)
+    setBildirimPanelAcik(true)
+  }
+
+  const bildirimDugmesiTikla = () => {
+    if (bildirimPanelAcik && !bildirimPanelKapaniyor) {
+      bildirimPaneliKapat()
+      return
+    }
+
+    bildirimPaneliAc()
+  }
+
+  const bildirimiOkunduYap = (bildirimId) => {
+    setOkunanBildirimler((onceki) => (onceki.includes(bildirimId) ? onceki : [...onceki, bildirimId]))
+  }
+
+  const bildirimiOkunmadiYap = (bildirimId) => {
+    setOkunanBildirimler((onceki) => onceki.filter((id) => id !== bildirimId))
+  }
+
+  const bildirimiTemizle = (bildirimId) => {
+    setTemizlenenBildirimler((onceki) => (onceki.includes(bildirimId) ? onceki : [...onceki, bildirimId]))
+    setOkunanBildirimler((onceki) => onceki.filter((id) => id !== bildirimId))
+  }
+
+  const tumBildirimleriTemizle = () => {
+    setTemizlenenBildirimler(bildirimler.map((bildirim) => bildirim.id))
+    toastGoster('basari', 'Tum bildirimler temizlendi.')
+  }
+
+  const bildirimdenSayfayaGit = (bildirim) => {
+    bildirimiOkunduYap(bildirim.id)
+    bildirimPaneliKapat()
+    if (bildirim.sayfa === 'urun-duzenleme' && bildirim.sekme) {
+      setUrunDuzenlemeSekmesi(bildirim.sekme)
+    }
+    if (bildirim.sayfa === 'odemeler' && bildirim.sekme) {
+      setOdemeSekmesi(bildirim.sekme)
+    }
+    sayfaDegistir(bildirim.sayfa)
   }
 
   const musteriFormuTemizle = () => {
@@ -1109,8 +1494,18 @@ function App() {
     const toplamHarcama = Number(musteriFormu.toplamHarcama)
     const not = musteriFormu.not.trim()
 
-    if (!ad || !telefon || !sonAlim || Number.isNaN(toplamSiparis) || Number.isNaN(toplamHarcama)) {
+    if (!ad || !telefon || !sonAlim || !not || Number.isNaN(toplamSiparis) || Number.isNaN(toplamHarcama)) {
       toastGoster('hata', 'Müşteri formunda eksik veya hatalı alan var.')
+      return
+    }
+
+    if (!telefonGecerliMi(telefon)) {
+      toastGoster('hata', 'Telefon numarası 0 ile başlamalı ve 11 haneli olmalı.')
+      return
+    }
+
+    if (negatifSayiVarMi(toplamSiparis, toplamHarcama)) {
+      toastGoster('hata', 'Sipariş sayısı ve harcama negatif olamaz.')
       return
     }
 
@@ -1147,11 +1542,17 @@ function App() {
   }
 
   const musteriNotKaydet = () => {
+    const temizNot = musteriNotMetni.trim()
+    if (!temizNot) {
+      toastGoster('hata', 'Müşteri notu boş bırakılamaz.')
+      return
+    }
+
     const seciliMusteri = musteriler.find((musteri) => musteri.uid === seciliMusteriUid)
     setMusteriler((onceki) =>
       onceki.map((musteri) =>
         musteri.uid === seciliMusteriUid
-          ? { ...musteri, not: musteriNotMetni.trim() }
+          ? { ...musteri, not: temizNot }
           : musteri,
       ),
     )
@@ -1201,20 +1602,29 @@ function App() {
   const odemeDuzenlemeKaydet = () => {
     if (!duzenlenenOdeme) return
     const tutar = Number(String(odemeFormu.tutar).replace(/[^\d.-]/g, ''))
-    if (!odemeFormu.taraf.trim() || !odemeFormu.tarih.trim() || !odemeFormu.durum.trim() || Number.isNaN(tutar)) {
+    const taraf = odemeFormu.taraf.trim()
+    const tarih = odemeFormu.tarih.trim()
+    const durum = odemeFormu.durum.trim()
+
+    if (!taraf || !tarih || !durum || Number.isNaN(tutar)) {
       toastGoster('hata', 'Finansal akış kaydında eksik veya hatalı bilgi var.')
+      return
+    }
+
+    if (negatifSayiVarMi(tutar)) {
+      toastGoster('hata', 'Ödeme veya tahsilat tutarı negatif olamaz.')
       return
     }
 
     odemeListesiGuncelle(duzenlenenOdeme.sekme, (onceki) =>
       onceki.map((kayit) =>
         kayit.odemeNo === duzenlenenOdeme.odemeNo
-          ? { ...kayit, taraf: odemeFormu.taraf.trim(), tarih: odemeFormu.tarih, durum: odemeFormu.durum.trim(), tutar }
+          ? { ...kayit, taraf, tarih, durum, tutar }
           : kayit,
       ),
     )
     setDuzenlenenOdeme(null)
-    toastGoster('basari', `${odemeFormu.taraf.trim()} kaydı güncellendi.`)
+    toastGoster('basari', `${taraf} kaydı güncellendi.`)
   }
 
   const odemeSil = () => {
@@ -1278,6 +1688,23 @@ function App() {
             </div>
           ))}
         </div>
+        {loginGecisiAktif && (
+          <div className="login-gecis-mercek" aria-hidden="true">
+            <div className="login-gecis-flash" />
+            <div className="login-gecis-isik" />
+            <span className="login-gecis-ripple ripple-bir" />
+            <span className="login-gecis-ripple ripple-iki" />
+            <img
+              src="/ytu-logo.png"
+              alt=""
+              className="login-gecis-logo"
+              onError={(event) => {
+                event.currentTarget.onerror = null
+                event.currentTarget.src = '/ytu-logo.svg'
+              }}
+            />
+          </div>
+        )}
         <section className={`login-shell ${loginGecisiAktif ? 'gecis-aktif' : ''}`} aria-label="Giriş Ekranı">
           <div className="panel left-panel">
             <img
@@ -1304,16 +1731,28 @@ function App() {
               />
 
               <label htmlFor="password">Şifre</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Şifrenizi girin"
-                autoComplete="current-password"
-              />
+              <div className="sifre-alani">
+                <input
+                  id="password"
+                  type={sifreGorunur ? 'text' : 'password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Şifrenizi girin"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="sifre-goster-buton"
+                  onClick={() => setSifreGorunur((onceki) => !onceki)}
+                  aria-label={sifreGorunur ? 'Şifreyi gizle' : 'Şifreyi göster'}
+                >
+                  {sifreGorunur ? 'Gizle' : 'Göster'}
+                </button>
+              </div>
 
-              <button type="submit" disabled={loginGecisiAktif}>{loginGecisiAktif ? 'Yönlendiriliyor...' : 'Giriş yap'}</button>
+              <button type="submit" className="login-giris-buton" disabled={loginGecisiAktif}>
+                {loginGecisiAktif ? 'Yönlendiriliyor...' : 'Giriş yap'}
+              </button>
             </form>
 
             {error && <p className="message error">{error}</p>}
@@ -1812,7 +2251,7 @@ function App() {
                   <h1>Siparişler</h1>
                   <p>En yeni siparişten en eski siparişe doğru listelenir.</p>
                 </div>
-                <button type="button" className="siparis-yeni-buton">Yeni Sipariş</button>
+                <button type="button" className="siparis-yeni-buton" onClick={yeniSiparisPenceresiniAc}>Yeni Sipariş</button>
               </header>
 
               <section className="siparis-aktivite-kartlari" aria-label="Sipariş Aktivitesi">
@@ -1859,6 +2298,7 @@ function App() {
                         <th>Ödeme</th>
                         <th>Ürün Hazırlık</th>
                         <th>Teslimat</th>
+                        <th>İşlemler</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1876,6 +2316,14 @@ function App() {
                           <td>{siparis.urunHazirlik}</td>
                           <td>
                             <span className={`durum-baloncuk ${durumSinifi(siparis.teslimatDurumu)}`}>{siparis.teslimatDurumu}</span>
+                          </td>
+                          <td>
+                            <div className="islem-dugmeleri siparis-islemleri">
+                              <button type="button" className="ikon-dugme not" title="Detay" onClick={() => setDetaySiparis(siparis)}>≡</button>
+                              <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => siparisDuzenlemeAc(siparis)}>✎</button>
+                              <button type="button" className="ikon-dugme favori" title="Durum Güncelle" onClick={() => siparisDurumGuncellemeAc(siparis)}>↺</button>
+                              <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekSiparis(siparis)}>🗑</button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1897,6 +2345,15 @@ function App() {
                         <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Tarih</span><strong>{tarihFormatla(siparis.siparisTarihi)}</strong></div>
                         <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Ödeme</span><strong><span className={`odeme-durumu ${siparis.odemeDurumu === 'Ödendi' ? 'odendi' : 'beklemede'}`}>{siparis.odemeDurumu}</span></strong></div>
                         <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Hazırlık</span><strong>{siparis.urunHazirlik}</strong></div>
+                      </div>
+                      <div className="mobil-kart-aksiyon">
+                        <div className="siparis-mobil-aksiyonlari">
+                          <button type="button" className="siparis-aksiyon-buton" onClick={() => setDetaySiparis(siparis)}>Detay</button>
+                          <button type="button" className="siparis-aksiyon-buton" onClick={() => siparisDurumGuncellemeAc(siparis)}>Durum Güncelle</button>
+                          <button type="button" className="siparis-aksiyon-buton ikincil" onClick={() => siparisMusteriAra(siparis)}>Müşteriyi Ara</button>
+                          <button type="button" className="siparis-aksiyon-buton ikincil" onClick={() => siparisDuzenlemeAc(siparis)}>Düzenle</button>
+                          <button type="button" className="siparis-aksiyon-buton tehlike" onClick={() => setSilinecekSiparis(siparis)}>Sil</button>
+                        </div>
                       </div>
                     </article>
                   ))}
@@ -2659,6 +3116,112 @@ function App() {
         {aktifSayfa !== 'merkez' && (
           <button
             type="button"
+            className="bildirim-dugmesi"
+            aria-label="Bildirimler"
+            onClick={bildirimDugmesiTikla}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 17H5l2-2v-4a5 5 0 1 1 10 0v4l2 2h-4" />
+              <path d="M10 17a2 2 0 0 0 4 0" />
+            </svg>
+            {okunmamisBildirimSayisi > 0 && <span className="bildirim-sayisi">{okunmamisBildirimSayisi}</span>}
+          </button>
+        )}
+
+        {aktifSayfa !== 'merkez' && bildirimPanelAcik && (
+          <section className={`bildirim-paneli ${bildirimPanelKapaniyor ? 'kapaniyor' : 'aciliyor'}`}>
+            <header className="bildirim-panel-ust">
+              <div>
+                <strong>Bildirimler</strong>
+                <small>Yakın zamanda gerçekleşen gelişmeler</small>
+              </div>
+              <div className="bildirim-panel-aksiyonlari">
+                <button
+                  type="button"
+                  className="bildirim-hepsini-temizle"
+                  onClick={tumBildirimleriTemizle}
+                  disabled={bildirimler.length === 0}
+                >
+                  Hepsini Temizle
+                </button>
+                <button type="button" className="bildirim-panel-kapat" onClick={bildirimPaneliKapat} aria-label="Bildirimleri Kapat">
+                  ×
+                </button>
+              </div>
+            </header>
+
+            <div className="bildirim-listesi">
+              {bildirimler.length === 0 ? (
+                <div className="bildirim-bos">
+                  <strong>Görüntülenecek bildirim kalmadı.</strong>
+                  <p>Yeni kritik stok, satis veya stok hareketleri burada belirecek.</p>
+                </div>
+              ) : (
+                bildirimler.map((bildirim) => {
+                  const okundu = okunanBildirimler.includes(bildirim.id)
+
+                  return (
+                    <article
+                      key={bildirim.id}
+                      className={`bildirim-oge ${bildirim.tur} ${okundu ? 'okundu' : 'okunmadi'}`}
+                      onClick={() => bildirimdenSayfayaGit(bildirim)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          bildirimdenSayfayaGit(bildirim)
+                        }
+                      }}
+                    >
+                      <span className="bildirim-ikon" aria-hidden="true">
+                        {bildirim.tur === 'kritik' ? '!' : bildirim.tur === 'stok' ? '↺' : bildirim.tur === 'tahsilat' ? '₺' : '✓'}
+                      </span>
+                      <div className="bildirim-icerik">
+                        <div className="bildirim-etiket-satiri">
+                          <strong>{bildirim.baslik}</strong>
+                          <span className={`bildirim-durum-rozeti ${okundu ? 'okundu' : 'okunmadi'}`}>
+                            {okundu ? 'Okundu' : 'Yeni'}
+                          </span>
+                        </div>
+                        <p>{bildirim.detay}</p>
+                        <div className="bildirim-alt-satir">
+                          <small>{bildirim.zaman}</small>
+                          <div className="bildirim-kart-aksiyonlari">
+                            <button
+                              type="button"
+                              className="bildirim-mini-buton"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                okundu ? bildirimiOkunmadiYap(bildirim.id) : bildirimiOkunduYap(bildirim.id)
+                              }}
+                            >
+                              {okundu ? 'Okunmadı Yap' : 'Okundu Yap'}
+                            </button>
+                            <button
+                              type="button"
+                              className="bildirim-mini-buton vurgulu"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                bildirimiTemizle(bildirim.id)
+                              }}
+                            >
+                              Temizle
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })
+              )}
+            </div>
+          </section>
+        )}
+
+        {aktifSayfa !== 'merkez' && (
+          <button
+            type="button"
             className="ai-yardim-buton"
             aria-label="Yapay zeka yardımı"
             onClick={aiPanelDugmeTikla}
@@ -2801,6 +3364,141 @@ function App() {
                 </button>
               </article>
             ))}
+          </div>
+        )}
+
+        {yeniSiparisAcik && (
+          <div className="modal-kaplama">
+            <div className="modal-kutu">
+              <h3>Yeni Sipariş Oluştur</h3>
+              <div className="modal-form">
+                <label>Müşteri</label>
+                <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
+
+                <label>Ürün</label>
+                <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
+
+                <label>Toplam Tutar</label>
+                <input type="number" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
+
+                <label>Sipariş Tarihi</label>
+                <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
+
+                <label>Ödeme Durumu</label>
+                <input value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)} />
+
+                <label>Ürün Hazırlık</label>
+                <input value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)} />
+
+                <label>Teslimat Durumu</label>
+                <input value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)} />
+
+                <label>Teslimat Süresi</label>
+                <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
+              </div>
+              <div className="modal-aksiyon">
+                <button type="button" className="ikinci" onClick={() => setYeniSiparisAcik(false)}>İptal</button>
+                <button type="button" onClick={yeniSiparisKaydet}>Siparişi Oluştur</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {detaySiparis && (
+          <div className="modal-kaplama">
+            <div className="modal-kutu">
+              <h3>Sipariş Detayı</h3>
+              <div className="modal-form siparis-detay-icerik">
+                <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detaySiparis.siparisNo}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{detaySiparis.musteri}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Telefon</span><strong>{siparisMusteriTelefonlari[detaySiparis.musteri] ?? 'Bilinmiyor'}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Ürün</span><strong>{detaySiparis.urun}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(detaySiparis.toplamTutar)}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(detaySiparis.siparisTarihi)}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Ödeme</span><strong>{detaySiparis.odemeDurumu}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Hazırlık</span><strong>{detaySiparis.urunHazirlik}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Teslimat</span><strong>{detaySiparis.teslimatDurumu}</strong></div>
+                <div className="mobil-bilgi-satiri"><span>Tahmini Süre</span><strong>{detaySiparis.teslimatSuresi}</strong></div>
+              </div>
+              <div className="modal-aksiyon">
+                <button type="button" onClick={() => setDetaySiparis(null)}>Kapat</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {duzenlenenSiparisNo && (
+          <div className="modal-kaplama">
+            <div className="modal-kutu">
+              <h3>Siparişi Düzenle</h3>
+              <div className="modal-form">
+                <label>Müşteri</label>
+                <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
+
+                <label>Ürün</label>
+                <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
+
+                <label>Toplam Tutar</label>
+                <input type="number" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
+
+                <label>Sipariş Tarihi</label>
+                <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
+
+                <label>Ödeme Durumu</label>
+                <input value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)} />
+
+                <label>Ürün Hazırlık</label>
+                <input value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)} />
+
+                <label>Teslimat Durumu</label>
+                <input value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)} />
+
+                <label>Teslimat Süresi</label>
+                <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
+              </div>
+              <div className="modal-aksiyon">
+                <button type="button" className="ikinci" onClick={() => setDuzenlenenSiparisNo(null)}>İptal</button>
+                <button type="button" onClick={siparisDuzenlemeKaydet}>Kaydet</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {durumGuncellenenSiparisNo && (
+          <div className="modal-kaplama">
+            <div className="modal-kutu">
+              <h3>Sipariş Durumu Güncelle</h3>
+              <div className="modal-form">
+                <label>Ödeme Durumu</label>
+                <input value={siparisDurumFormu.odemeDurumu} onChange={(event) => siparisDurumFormuGuncelle('odemeDurumu', event.target.value)} />
+
+                <label>Ürün Hazırlık</label>
+                <input value={siparisDurumFormu.urunHazirlik} onChange={(event) => siparisDurumFormuGuncelle('urunHazirlik', event.target.value)} />
+
+                <label>Teslimat Durumu</label>
+                <input value={siparisDurumFormu.teslimatDurumu} onChange={(event) => siparisDurumFormuGuncelle('teslimatDurumu', event.target.value)} />
+
+                <label>Teslimat Süresi</label>
+                <input value={siparisDurumFormu.teslimatSuresi} onChange={(event) => siparisDurumFormuGuncelle('teslimatSuresi', event.target.value)} />
+              </div>
+              <div className="modal-aksiyon">
+                <button type="button" className="ikinci" onClick={() => setDurumGuncellenenSiparisNo(null)}>İptal</button>
+                <button type="button" onClick={siparisDurumKaydet}>Kaydet</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {silinecekSiparis && (
+          <div className="modal-kaplama">
+            <div className="modal-kutu kucuk">
+              <h3>Silmek istediğinizden emin misiniz?</h3>
+              <p><strong>{silinecekSiparis.siparisNo}</strong> siparişi kaldırılacak.</p>
+              <div className="modal-aksiyon">
+                <button type="button" className="ikinci" onClick={() => setSilinecekSiparis(null)}>Hayır</button>
+                <button type="button" className="tehlike" onClick={siparisSil}>Evet</button>
+              </div>
+            </div>
           </div>
         )}
 

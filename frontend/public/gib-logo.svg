@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420">
+  <circle cx="210" cy="210" r="192" fill="white" stroke="#083b8c" stroke-width="10"/>
+  <circle cx="210" cy="210" r="168" fill="none" stroke="#083b8c" stroke-width="3"/>
+  <path d="M180 90h110c-42 20-70 57-88 103-14 37-24 75-37 112h-62c12-76 37-154 77-215z" fill="#ef2029"/>
+  <path d="M201 160h67l-18 28h-37l-10 45h31l-7 31h-31l-9 41h-40l31-145z" fill="#ef2029"/>
+  <circle cx="266" cy="138" r="21" fill="#ef2029"/>
+  <defs>
+    <path id="ustYazi" d="M58 210a152 152 0 1 1 304 0"/>
+    <path id="altYazi" d="M362 210a152 152 0 1 1-304 0"/>
+  </defs>
+  <text font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#083b8c">
+    <textPath href="#ustYazi" startOffset="12%">T.C. Hazine ve Maliye Bakanligi</textPath>
+  </text>
+  <text font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#ef2029">
+    <textPath href="#altYazi" startOffset="16%">Gelir Idaresi Baskanligi</textPath>
+  </text>
+</svg>

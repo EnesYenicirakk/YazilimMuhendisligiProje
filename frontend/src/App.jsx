@@ -1,7 +1,10 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
+﻿import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import './App.css'
+
+const FaturalamaPanel = lazy(() => import('./FaturalamaPanel'))
+const BildirimPaneli = lazy(() => import('./BildirimPaneli'))
+const AiPanel = lazy(() => import('./AiPanel'))
+const FaturaModallari = lazy(() => import('./FaturaModallari'))
 
 const DEFAULT_USERNAME = 'admin'
 const DEFAULT_PASSWORD = 'admin123'
@@ -121,6 +124,14 @@ const dashboardOzetSablon = [
   { baslik: 'Acil Sipariş', deger: '17', degisim: '-%6', ikon: 'kutu' },
   { baslik: 'Toplam Sipariş', deger: '1865', degisim: '+%12', ikon: 'liste' },
   { baslik: 'Ortalama Teslimat', deger: '2,6 Gün', degisim: '+%8', ikon: 'saat' },
+]
+
+const dashboardBolumSablonu = [
+  { anahtar: 'canli', etiket: 'Canlı Özetler' },
+  { anahtar: 'haftalik', etiket: 'Haftalık Grafik ve En Çok Satanlar' },
+  { anahtar: 'kritik', etiket: 'Kritik Stok Uyarısı' },
+  { anahtar: 'yakin', etiket: 'Yakın Zamanda Satılan Ürünler' },
+  { anahtar: 'altGrafikler', etiket: 'Alt Grafikler' },
 ]
 
 function KucukIkon({ tip }) {
@@ -954,6 +965,45 @@ const faturaBelgeHtmlOlustur = (fatura, karsiTaraf) => {
   `
 }
 
+const faturaBelgeTamHtmlOlustur = (fatura, karsiTaraf) => `
+  <html lang="tr">
+    <head>
+      <meta charset="utf-8" />
+      <title>${htmlGuvenliMetin(fatura.faturaNo)}</title>
+      <style>
+        html, body { margin: 0; padding: 0; background: #ffffff; }
+        body { font-family: Arial, sans-serif; color: #17314d; }
+        .yazdir-sayfa { width: 794px; margin: 0 auto; padding: 28px 0; box-sizing: border-box; }
+        img { max-width: 100%; }
+        @page { size: A4; margin: 10mm; }
+        @media print {
+          body { background: #ffffff; }
+          .yazdir-sayfa { margin: 0 auto; padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="yazdir-sayfa">${faturaBelgeHtmlOlustur(fatura, karsiTaraf)}</div>
+    </body>
+  </html>
+`
+
+let pdfKutuphaneleriPromise = null
+
+const pdfKutuphaneleriniYukle = async () => {
+  if (!pdfKutuphaneleriPromise) {
+    pdfKutuphaneleriPromise = Promise.all([
+      import('html2canvas'),
+      import('jspdf'),
+    ]).then(([html2canvasModulu, jsPdfModulu]) => ({
+      html2canvas: html2canvasModulu.default,
+      jsPDF: jsPdfModulu.default,
+    }))
+  }
+
+  return pdfKutuphaneleriPromise
+}
+
 function SayfaIkonu({ sayfa, className = 'menu-ikon' }) {
   if (sayfa === 'dashboard') {
     return (
@@ -1083,8 +1133,13 @@ function App() {
   const [aktifSayfa, setAktifSayfa] = useState('merkez')
   const [mobilMenuAcik, setMobilMenuAcik] = useState(false)
   const [toastlar, setToastlar] = useState([])
+  const [sonGeriAlma, setSonGeriAlma] = useState(null)
   const [gizlenenOzetKartlari, setGizlenenOzetKartlari] = useState([])
   const [acikOzetMenusu, setAcikOzetMenusu] = useState('')
+  const [dashboardBolumMenusuAcik, setDashboardBolumMenusuAcik] = useState(false)
+  const [gorunenDashboardBolumleri, setGorunenDashboardBolumleri] = useState(
+    dashboardBolumSablonu.reduce((acc, bolum) => ({ ...acc, [bolum.anahtar]: true }), {}),
+  )
   const [urunler, setUrunler] = useState(baslangicUrunleri)
   const [musteriler, setMusteriler] = useState(baslangicMusterileri)
   const [siparisler, setSiparisler] = useState(baslangicSiparisleri)
@@ -1151,6 +1206,8 @@ function App() {
   const [aiTemaMenuAcik, setAiTemaMenuAcik] = useState(false)
   const [aiMesajMetni, setAiMesajMetni] = useState('')
   const [aiHizliKonularAcik, setAiHizliKonularAcik] = useState(true)
+  const [globalAramaMetni, setGlobalAramaMetni] = useState('')
+  const [globalAramaMobilAcik, setGlobalAramaMobilAcik] = useState(false)
   const [aiMesajlar, setAiMesajlar] = useState([
     {
       id: 1,
@@ -1388,6 +1445,116 @@ function App() {
     }))
   }, [siraliSiparisler])
 
+  const globalAramaSonuclari = useMemo(() => {
+    const metin = globalAramaMetni.trim().toLowerCase()
+    if (!metin) return []
+
+    const urunSonuclari = urunler
+      .filter((urun) => urun.ad.toLowerCase().includes(metin) || urun.urunId.toLowerCase().includes(metin) || urun.kategori.toLowerCase().includes(metin))
+      .slice(0, 4)
+      .map((urun) => ({
+        id: `urun-${urun.uid}`,
+        tur: 'Ürünler',
+        baslik: urun.ad,
+        alt: `${urun.urunId} • ${urun.kategori} • Stok: ${urun.magazaStok}`,
+        hedef: 'envanter',
+        deger: urun.ad,
+      }))
+
+    const aktifSiparisSonuclari = siraliSiparisler
+      .filter((siparis) =>
+        siparis.siparisNo.toLowerCase().includes(metin) ||
+        siparis.musteri.toLowerCase().includes(metin) ||
+        siparis.urun.toLowerCase().includes(metin),
+      )
+      .slice(0, 4)
+      .map((siparis) => ({
+        id: `aktif-siparis-${siparis.siparisNo}`,
+        tur: 'Aktif Siparişler',
+        baslik: siparis.siparisNo,
+        alt: `${siparis.musteri} • ${siparis.urun} • ${paraFormatla(siparis.toplamTutar)}`,
+        hedef: 'siparisler-aktif',
+        deger: siparis.siparisNo,
+      }))
+
+    const gecmisSiparisSonuclari = gecmisSiparisler
+      .filter((siparis) =>
+        siparis.siparisNo.toLowerCase().includes(metin) ||
+        siparis.logNo.toLowerCase().includes(metin) ||
+        siparis.musteri.toLowerCase().includes(metin) ||
+        siparis.urun.toLowerCase().includes(metin),
+      )
+      .slice(0, 3)
+      .map((siparis) => ({
+        id: `gecmis-siparis-${siparis.logNo}`,
+        tur: 'Geçmiş Siparişler',
+        baslik: siparis.siparisNo,
+        alt: `${siparis.musteri} • ${siparis.durum} • ${paraFormatla(siparis.tutar)}`,
+        hedef: 'siparisler-gecmis',
+        deger: siparis.siparisNo,
+      }))
+
+    const rakamArama = metin.replace(/\D/g, '')
+
+    const musteriSonuclari = musteriler
+      .filter((musteri) =>
+        musteri.ad.toLowerCase().includes(metin) ||
+        (rakamArama && musteri.telefon.replace(/\D/g, '').includes(rakamArama)),
+      )
+      .slice(0, 4)
+      .map((musteri) => ({
+        id: `musteri-${musteri.uid}`,
+        tur: 'Müşteriler',
+        baslik: musteri.ad,
+        alt: `${musteri.telefon} • ${paraFormatla(musteri.toplamHarcama)}`,
+        hedef: 'musteriler',
+        deger: musteri.ad,
+      }))
+
+    const tedarikciSonuclari = tedarikciler
+      .filter((tedarikci) =>
+        tedarikci.firmaAdi.toLowerCase().includes(metin) ||
+        tedarikci.yetkiliKisi.toLowerCase().includes(metin) ||
+        tedarikci.urunGrubu.toLowerCase().includes(metin),
+      )
+      .slice(0, 4)
+      .map((tedarikci) => ({
+        id: `tedarikci-${tedarikci.uid}`,
+        tur: 'Tedarikçiler',
+        baslik: tedarikci.firmaAdi,
+        alt: `${tedarikci.yetkiliKisi} • ${tedarikci.urunGrubu}`,
+        hedef: 'alicilar',
+        uid: tedarikci.uid,
+        deger: tedarikci.firmaAdi,
+      }))
+
+    const faturaSonuclari = faturalar
+      .filter((fatura) =>
+        fatura.faturaNo.toLowerCase().includes(metin) ||
+        fatura.karsiTarafAdi.toLowerCase().includes(metin) ||
+        fatura.tur.toLowerCase().includes(metin),
+      )
+      .slice(0, 3)
+      .map((fatura) => ({
+        id: `fatura-${fatura.id}`,
+        tur: 'Faturalar',
+        baslik: fatura.faturaNo,
+        alt: `${fatura.karsiTarafAdi} • ${paraFormatla(fatura.toplam)}`,
+        hedef: 'faturalama',
+        uid: fatura.id,
+        deger: fatura.faturaNo,
+      }))
+
+    return [
+      ...urunSonuclari,
+      ...aktifSiparisSonuclari,
+      ...gecmisSiparisSonuclari,
+      ...musteriSonuclari,
+      ...tedarikciSonuclari,
+      ...faturaSonuclari,
+    ].slice(0, 14)
+  }, [faturalar, gecmisSiparisler, globalAramaMetni, musteriler, paraFormatla, siraliSiparisler, tedarikciler, urunler])
+
   const siparisAktivitesi = useMemo(() => {
     const paketlenecek = filtreliSiparisler.filter(
       (siparis) => siparis.urunHazirlik === 'Hazırlanıyor' || siparis.urunHazirlik === 'Tedarik Bekleniyor',
@@ -1620,6 +1787,31 @@ function App() {
     if (tedarikciSiparisSayfa > toplamTedarikSiparisSayfa) setTedarikciSiparisSayfa(toplamTedarikSiparisSayfa)
   }, [tedarikciSiparisSayfa, toplamTedarikSiparisSayfa])
 
+  useEffect(() => {
+    if (!sonGeriAlma) return undefined
+
+    const duzenlenebilirAlanAcikMi = () => {
+      const aktif = document.activeElement
+      if (!aktif) return false
+      const tag = aktif.tagName
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || aktif.isContentEditable
+    }
+
+    const tusYakala = (event) => {
+      const geriAlTuslandi = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z'
+      if (!geriAlTuslandi || duzenlenebilirAlanAcikMi()) return
+
+      event.preventDefault()
+      const calisacakEylem = sonGeriAlma.eylem
+      setToastlar((onceki) => onceki.filter((toast) => toast.id !== sonGeriAlma.toastId))
+      setSonGeriAlma(null)
+      if (typeof calisacakEylem === 'function') calisacakEylem()
+    }
+
+    window.addEventListener('keydown', tusYakala)
+    return () => window.removeEventListener('keydown', tusYakala)
+  }, [sonGeriAlma])
+
   const handleLogin = (event) => {
     event.preventDefault()
 
@@ -1658,10 +1850,14 @@ function App() {
     setFaturaDetayAcik(false)
     setPdfOnizlemeAcik(false)
     setAcikOzetMenusu('')
+    setDashboardBolumMenusuAcik(false)
     setAiTemaMenuAcik(false)
+    setGlobalAramaMetni('')
+    setGlobalAramaMobilAcik(false)
     setMobilMenuAcik(false)
     setYeniSiparisAcik(false)
     setDetaySiparis(null)
+    setDetayGecmisSiparis(null)
     setDuzenlenenSiparisNo(null)
     setDurumGuncellenenSiparisNo(null)
     setSilinecekSiparis(null)
@@ -1701,13 +1897,20 @@ function App() {
     }, 340)
   }
 
-  const toastGoster = (tip, metin) => {
+  const toastGoster = (tip, metin, secenekler = {}) => {
     const id = Date.now() + Math.random()
-    setToastlar((onceki) => [...onceki, { id, tip, metin }])
+    setToastlar((onceki) => [...onceki, { id, tip, metin, ...secenekler }])
+    if (secenekler.eylemEtiketi && typeof secenekler.eylem === 'function') {
+      setSonGeriAlma({
+        toastId: id,
+        eylem: secenekler.eylem,
+      })
+    }
 
     window.setTimeout(() => {
       setToastlar((onceki) => onceki.filter((toast) => toast.id !== id))
-    }, 3200)
+      setSonGeriAlma((onceki) => (onceki?.toastId === id ? null : onceki))
+    }, secenekler.sure ?? 3200)
   }
 
   const merkezdenSayfayaGit = (sayfa) => {
@@ -1812,10 +2015,24 @@ function App() {
 
   const urunSil = () => {
     if (!silinecekUrun) return
-    const silinenAd = silinecekUrun.ad
-    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinecekUrun.uid))
+    const silinenUrun = { ...silinecekUrun }
+    const silinenAd = silinenUrun.ad
+    const silinenIndex = urunler.findIndex((urun) => urun.uid === silinenUrun.uid)
+    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinenUrun.uid))
     setSilinecekUrun(null)
-    toastGoster('basari', `${silinenAd} envanterden silindi.`)
+    toastGoster('basari', `${silinenAd} envanterden silindi.`, {
+      eylemEtiketi: 'Geri Al',
+      sure: 5000,
+      eylem: () => {
+        setUrunler((onceki) => {
+          if (onceki.some((urun) => urun.uid === silinenUrun.uid)) return onceki
+          const yeni = [...onceki]
+          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenUrun)
+          return yeni
+        })
+        toastGoster('basari', `${silinenAd} geri alındı.`)
+      },
+    })
   }
 
   const urunDuzenlemeModaliniAc = (urun) => {
@@ -1881,10 +2098,24 @@ function App() {
 
   const urunDuzenlemeSil = () => {
     if (!silinecekDuzenlemeUrunu) return
-    const silinenAd = silinecekDuzenlemeUrunu.ad
-    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinecekDuzenlemeUrunu.uid))
+    const silinenUrun = { ...silinecekDuzenlemeUrunu }
+    const silinenAd = silinenUrun.ad
+    const silinenIndex = urunler.findIndex((urun) => urun.uid === silinenUrun.uid)
+    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinenUrun.uid))
     setSilinecekDuzenlemeUrunu(null)
-    toastGoster('basari', `${silinenAd} ürün düzenleme listesinden kaldırıldı.`)
+    toastGoster('basari', `${silinenAd} ürün düzenleme listesinden kaldırıldı.`, {
+      eylemEtiketi: 'Geri Al',
+      sure: 5000,
+      eylem: () => {
+        setUrunler((onceki) => {
+          if (onceki.some((urun) => urun.uid === silinenUrun.uid)) return onceki
+          const yeni = [...onceki]
+          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenUrun)
+          return yeni
+        })
+        toastGoster('basari', `${silinenAd} geri alındı.`)
+      },
+    })
   }
 
   const favoriDegistir = (uid) => {
@@ -2070,14 +2301,31 @@ function App() {
 
   const siparisSil = () => {
     if (!silinecekSiparis) return
-    const silinenNo = silinecekSiparis.siparisNo
+    const silinenSiparis = { ...silinecekSiparis }
+    const silinenNo = silinenSiparis.siparisNo
+    const silinenIndex = siparisler.findIndex((siparis) => siparis.siparisNo === silinenNo)
     setSiparisler((onceki) => onceki.filter((siparis) => siparis.siparisNo !== silinenNo))
     setSilinecekSiparis(null)
-    toastGoster('basari', `${silinenNo} siparişi silindi.`)
+    toastGoster('basari', `${silinenNo} siparişi silindi.`, {
+      eylemEtiketi: 'Geri Al',
+      sure: 5000,
+      eylem: () => {
+        setSiparisler((onceki) => {
+          if (onceki.some((siparis) => siparis.siparisNo === silinenNo)) return onceki
+          const yeni = [...onceki]
+          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenSiparis)
+          return yeni
+        })
+        toastGoster('basari', `${silinenNo} geri alındı.`)
+      },
+    })
   }
 
   const siparisMusteriAra = (siparis) => {
-    const telefon = siparisMusteriTelefonlari[siparis.musteri]
+    const musteriKaydi = musteriler.find(
+      (musteri) => metniNormalizeEt(musteri.ad) === metniNormalizeEt(siparis.musteri),
+    )
+    const telefon = musteriKaydi?.telefon ?? siparisMusteriTelefonlari[siparis.musteri]
     if (!telefon) {
       toastGoster('hata', `${siparis.musteri} için telefon bilgisi bulunamadı.`)
       return
@@ -2208,7 +2456,7 @@ function App() {
 
   const tumBildirimleriTemizle = () => {
     setTemizlenenBildirimler(bildirimler.map((bildirim) => bildirim.id))
-    toastGoster('basari', 'Tum bildirimler temizlendi.')
+    toastGoster('basari', 'Tüm bildirimler temizlendi.')
   }
 
   const bildirimdenSayfayaGit = (bildirim) => {
@@ -2221,6 +2469,60 @@ function App() {
       setOdemeSekmesi(bildirim.sekme)
     }
     sayfaDegistir(bildirim.sayfa)
+  }
+
+  const globalAramaSonucunuAc = (sonuc) => {
+    if (sonuc.hedef === 'envanter') {
+      sayfaDegistir('envanter')
+      setEnvanterKategori('Tümü')
+      setAramaMetni(sonuc.deger)
+      setEnvanterSayfa(1)
+    }
+
+    if (sonuc.hedef === 'siparisler-aktif') {
+      sayfaDegistir('siparisler')
+      setSiparisSekmesi('aktif')
+      setSiparisArama(sonuc.deger)
+      setSiparisSayfa(1)
+    }
+
+    if (sonuc.hedef === 'siparisler-gecmis') {
+      sayfaDegistir('siparisler')
+      setSiparisSekmesi('gecmis')
+      setGecmisSiparisArama(sonuc.deger)
+      setGecmisSiparisSayfa(1)
+    }
+
+    if (sonuc.hedef === 'musteriler') {
+      sayfaDegistir('musteriler')
+      setMusteriArama(sonuc.deger)
+      setMusteriSayfa(1)
+    }
+
+    if (sonuc.hedef === 'alicilar') {
+      sayfaDegistir('alicilar')
+      setTedarikciSekmesi('liste')
+      setTedarikciArama(sonuc.deger)
+      setTedarikciSayfa(1)
+      if (sonuc.uid) {
+        setSeciliTedarikciUid(sonuc.uid)
+        setTedarikciDetaySekmesi('genel')
+        setTedarikciDetayAcik(true)
+      }
+    }
+
+    if (sonuc.hedef === 'faturalama') {
+      sayfaDegistir('faturalama')
+      setFaturaSekmesi('gecmis')
+      setFaturaArama(sonuc.deger)
+      if (sonuc.uid) {
+        setSeciliFaturaId(sonuc.uid)
+        setFaturaDetayAcik(true)
+      }
+    }
+
+    setGlobalAramaMetni('')
+    setGlobalAramaMobilAcik(false)
   }
 
   const musteriFormuTemizle = () => {
@@ -2338,10 +2640,24 @@ function App() {
   }
 
   const musteriSil = () => {
-    const silinenAd = silinecekMusteri.ad
-    setMusteriler((onceki) => onceki.filter((musteri) => musteri.uid !== silinecekMusteri.uid))
+    const silinenMusteri = { ...silinecekMusteri }
+    const silinenAd = silinenMusteri.ad
+    const silinenIndex = musteriler.findIndex((musteri) => musteri.uid === silinenMusteri.uid)
+    setMusteriler((onceki) => onceki.filter((musteri) => musteri.uid !== silinenMusteri.uid))
     setSilinecekMusteri(null)
-    toastGoster('basari', `${silinenAd} müşteri listesinden silindi.`)
+    toastGoster('basari', `${silinenAd} müşteri listesinden silindi.`, {
+      eylemEtiketi: 'Geri Al',
+      sure: 5000,
+      eylem: () => {
+        setMusteriler((onceki) => {
+          if (onceki.some((musteri) => musteri.uid === silinenMusteri.uid)) return onceki
+          const yeni = [...onceki]
+          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenMusteri)
+          return yeni
+        })
+        toastGoster('basari', `${silinenAd} geri alındı.`)
+      },
+    })
   }
 
   const tedarikciFormuTemizle = () => {
@@ -2646,13 +2962,27 @@ function App() {
 
   const tedarikciSil = () => {
     const silinenAd = silinecekTedarikci.firmaAdi
-    setTedarikciler((onceki) => onceki.filter((tedarikci) => tedarikci.uid !== silinecekTedarikci.uid))
+    const silinenTedarikci = { ...silinecekTedarikci }
+    const silinenIndex = tedarikciler.findIndex((tedarikci) => tedarikci.uid === silinenTedarikci.uid)
+    setTedarikciler((onceki) => onceki.filter((tedarikci) => tedarikci.uid !== silinenTedarikci.uid))
     setSilinecekTedarikci(null)
-    if (seciliTedarikciUid === silinecekTedarikci.uid) {
+    if (seciliTedarikciUid === silinenTedarikci.uid) {
       setTedarikciDetayAcik(false)
       setSeciliTedarikciUid(null)
     }
-    toastGoster('basari', `${silinenAd} tedarikçi listesinden silindi.`)
+    toastGoster('basari', `${silinenAd} tedarikçi listesinden silindi.`, {
+      eylemEtiketi: 'Geri Al',
+      sure: 5000,
+      eylem: () => {
+        setTedarikciler((onceki) => {
+          if (onceki.some((tedarikci) => tedarikci.uid === silinenTedarikci.uid)) return onceki
+          const yeni = [...onceki]
+          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenTedarikci)
+          return yeni
+        })
+        toastGoster('basari', `${silinenAd} geri alındı.`)
+      },
+    })
   }
 
   const faturaNumarasiOlustur = () => `FTR-${new Date().getFullYear()}-${String(faturalar.length + 1).padStart(3, '0')}`
@@ -2736,127 +3066,39 @@ function App() {
     const karsiTaraf = fatura.tur === 'Satış Faturası'
       ? musteriler.find((musteri) => String(musteri.uid) === String(fatura.karsiTarafUid))
       : tedarikciler.find((tedarikci) => String(tedarikci.uid) === String(fatura.karsiTarafUid))
-    const guvenliFaturaTuru = htmlGuvenliMetin(fatura.tur)
-    const guvenliFaturaNo = htmlGuvenliMetin(fatura.faturaNo)
-    const guvenliTarih = htmlGuvenliMetin(tarihFormatla(fatura.tarih))
-    const guvenliOdemeTarihi = htmlGuvenliMetin(tarihFormatla(fatura.odemeTarihi))
-    const guvenliKarsiTarafAdi = htmlGuvenliMetin(fatura.karsiTarafAdi)
-    const guvenliTelefon = htmlGuvenliMetin(karsiTaraf?.telefon ?? '0532 000 00 00')
-    const guvenliAdres = htmlGuvenliMetin(karsiTaraf?.adres ?? 'Malatya Yeşilyurt / Malatya')
-    const guvenliVergiNo = htmlGuvenliMetin(karsiTaraf?.vergiNumarasi ?? karsiTaraf?.vergiNo ?? '1111111111')
-    const guvenliDurum = htmlGuvenliMetin(fatura.durum)
-    const guvenliNot = htmlGuvenliMetin(fatura.not || 'Standart ödeme ve teslimat koşulları geçerlidir.')
-    const satirlarHtml = fatura.satirlar
-      .map(
-        (satir, index) => `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${htmlGuvenliMetin(satir.urun)}</td>
-            <td>${satir.miktar}</td>
-            <td>${paraFormatla(satir.birimFiyat)}</td>
-            <td>%${Math.round((satir.kdvOrani ?? FATURA_KDV_ORANI) * 100)}</td>
-            <td>${paraFormatla(Number(satir.miktar) * Number(satir.birimFiyat))}</td>
-          </tr>`,
-      )
-      .join('')
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'fixed'
+    iframe.style.right = '0'
+    iframe.style.bottom = '0'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = '0'
+    iframe.style.visibility = 'hidden'
 
-    const pencere = window.open('', '_blank', 'width=980,height=820')
-
-    if (!pencere) {
-      setPdfOnizlemeAcik(true)
-      if (fatura.id !== 'onizleme') setSeciliFaturaId(fatura.id)
-      toastGoster('uyari', 'Tarayıcı yeni pencereyi engelledi. PDF önizleme açıldı.')
-      return
+    const temizle = () => {
+      window.setTimeout(() => {
+        iframe.remove()
+      }, 400)
     }
 
-    const html = `
-      <html lang="tr">
-        <head>
-          <title>${fatura.faturaNo}</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 0; padding: 28px; color: #17314d; }
-            .ust { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; }
-            .logo { width:86px; height:86px; border-radius:50%; border:4px solid #1f61b8; display:grid; place-items:center; background:#fff; overflow:hidden; }
-            .logo img { width:100%; height:100%; object-fit:cover; }
-            .baslik { color:#1f61b8; font-size:28px; font-weight:800; margin:0 0 8px; }
-            .alt-baslik { color:#637892; font-size:14px; margin:0; }
-            .blok { margin-top:24px; border:1px solid #dbe7f4; border-radius:16px; padding:18px; }
-            .grid { display:grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap:16px; }
-            table { width:100%; border-collapse:collapse; margin-top:18px; }
-            th, td { border-bottom:1px solid #e7eef8; padding:10px 8px; text-align:left; font-size:14px; }
-            th { color:#58708a; }
-            .ozet { margin-left:auto; width:320px; display:grid; gap:8px; margin-top:16px; }
-            .satir { display:flex; justify-content:space-between; }
-            .toplam { font-weight:800; font-size:18px; color:#1f61b8; }
-            .not { margin-top:16px; color:#52677f; font-size:13px; }
-            .alt { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-top:18px; }
-            .gib { width:92px; height:92px; object-fit:contain; }
-          </style>
-        </head>
-        <body>
-          <div class="ust">
-            <div>
-              <div class="baslik">MTÜ Sanayi</div>
-              <p class="alt-baslik">Malatya Yeşilyurt, Ankara Yolu 5. Km No:42</p>
-              <p class="alt-baslik">Vergi No: 4481237781 | Tel: 0422 456 12 77</p>
-              <p class="alt-baslik">info@mtusanayi.com</p>
-            </div>
-            <div class="logo"><img src="/ytu-logo.png" onerror="this.onerror=null;this.src='/ytu-logo.svg';" alt="MTU Logo" /></div>
-            <div>
-              <div class="baslik">${guvenliFaturaTuru}</div>
-              <p class="alt-baslik">Fatura No: ${guvenliFaturaNo}</p>
-              <p class="alt-baslik">Tarih: ${guvenliTarih}</p>
-              <p class="alt-baslik">Ödeme Tarihi: ${guvenliOdemeTarihi}</p>
-            </div>
-          </div>
-          <div class="blok grid">
-            <div>
-              <strong>${fatura.tur === 'Satış Faturası' ? 'Müşteri Bilgileri' : 'Tedarikçi Bilgileri'}</strong>
-              <p>${guvenliKarsiTarafAdi}</p>
-              <p>${guvenliTelefon}</p>
-              <p>${guvenliAdres}</p>
-              <p>Vergi No: ${guvenliVergiNo}</p>
-            </div>
-            <div>
-              <strong>Fatura Özeti</strong>
-              <p>Durum: ${guvenliDurum}</p>
-              <p>Satır Sayısı: ${fatura.satirlar.length}</p>
-              <p>Toplam Kalem: ${fatura.satirlar.reduce((toplam, satir) => toplam + Number(satir.miktar), 0)}</p>
-            </div>
-          </div>
-          <div class="blok">
-            <strong>Ürünler</strong>
-            <table>
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Hizmet / Ürün</th>
-                  <th>Miktar</th>
-                  <th>Birim Fiyat</th>
-                  <th>KDV Oranı</th>
-                  <th>Toplam</th>
-                </tr>
-              </thead>
-              <tbody>${satirlarHtml}</tbody>
-            </table>
-            <div class="ozet">
-              <div class="satir"><span>Ara Toplam</span><strong>${paraFormatla(fatura.araToplam)}</strong></div>
-              <div class="satir"><span>KDV</span><strong>${paraFormatla(fatura.kdv)}</strong></div>
-              <div class="satir toplam"><span>Toplam</span><strong>${paraFormatla(fatura.toplam)}</strong></div>
-            </div>
-            <div class="alt">
-              <p class="not">${guvenliNot}</p>
-              <img class="gib" src="/gib-logo.png" onerror="this.onerror=null;this.src='/gib-logo.svg';" alt="Gelir Idaresi Baskanligi" />
-            </div>
-          </div>
-        </body>
-      </html>
-    `
+    iframe.onload = () => {
+      window.setTimeout(() => {
+        try {
+          iframe.contentWindow?.focus()
+          iframe.contentWindow?.print()
+          iframe.contentWindow?.addEventListener('afterprint', temizle, { once: true })
+          window.setTimeout(temizle, 1500)
+        } catch {
+          temizle()
+          setPdfOnizlemeAcik(true)
+          if (fatura.id !== 'onizleme') setSeciliFaturaId(fatura.id)
+          toastGoster('uyari', 'Yazdırma başlatılamadı. Önizleme açıldı.')
+        }
+      }, 180)
+    }
 
-    pencere.document.write(html)
-    pencere.document.close()
-    pencere.focus()
-    pencere.print()
+    document.body.appendChild(iframe)
+    iframe.srcdoc = faturaBelgeTamHtmlOlustur(fatura, karsiTaraf)
   }
 
   const faturayiPdfIndir = (fatura) => {
@@ -2891,6 +3133,7 @@ function App() {
     Promise.all(bekleyenler)
       .then(() => new Promise((resolve) => window.setTimeout(resolve, 120)))
       .then(async () => {
+        const { html2canvas, jsPDF } = await pdfKutuphaneleriniYukle()
         const canvas = await html2canvas(kap, {
           backgroundColor: '#ffffff',
           scale: 2,
@@ -2983,7 +3226,21 @@ function App() {
   const ozetKartiniSil = (baslik) => {
     setGizlenenOzetKartlari((onceki) => [...onceki, baslik])
     setAcikOzetMenusu('')
-    toastGoster('basari', `${baslik} kartı dashboarddan kaldırıldı.`)
+    toastGoster('basari', `${baslik} kartı dashboard'dan kaldırıldı.`, {
+      eylemEtiketi: 'Geri Al',
+      sure: 5000,
+      eylem: () => {
+        setGizlenenOzetKartlari((onceki) => onceki.filter((oge) => oge !== baslik))
+        toastGoster('basari', `${baslik} kartı geri alındı.`)
+      },
+    })
+  }
+
+  const dashboardBolumGorunurlukDegistir = (anahtar) => {
+    setGorunenDashboardBolumleri((onceki) => ({
+      ...onceki,
+      [anahtar]: !onceki[anahtar],
+    }))
   }
 
   const odemeListesiGuncelle = (sekme, guncelleyici) => {
@@ -3040,10 +3297,27 @@ function App() {
 
   const odemeSil = () => {
     if (!silinecekOdeme) return
-    const silinenTaraf = silinecekOdeme.taraf
-    odemeListesiGuncelle(silinecekOdeme.sekme, (onceki) => onceki.filter((k) => k.odemeNo !== silinecekOdeme.odemeNo))
+    const silinenOdeme = { ...silinecekOdeme }
+    const kaynakListe = silinenOdeme.sekme === 'gelen' ? gelenNakitListesi : gidenNakitListesi
+    const silinenKayit = kaynakListe.find((k) => k.odemeNo === silinenOdeme.odemeNo)
+    const silinenIndex = kaynakListe.findIndex((k) => k.odemeNo === silinenOdeme.odemeNo)
+    const silinenTaraf = silinenOdeme.taraf
+    odemeListesiGuncelle(silinenOdeme.sekme, (onceki) => onceki.filter((k) => k.odemeNo !== silinenOdeme.odemeNo))
     setSilinecekOdeme(null)
-    toastGoster('basari', `${silinenTaraf} kaydı silindi.`)
+    toastGoster('basari', `${silinenTaraf} kaydı silindi.`, {
+      eylemEtiketi: 'Geri Al',
+      sure: 5000,
+      eylem: () => {
+        if (!silinenKayit) return
+        odemeListesiGuncelle(silinenOdeme.sekme, (onceki) => {
+          if (onceki.some((kayit) => kayit.odemeNo === silinenKayit.odemeNo)) return onceki
+          const yeni = [...onceki]
+          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenKayit)
+          return yeni
+        })
+        toastGoster('basari', `${silinenTaraf} kaydı geri alındı.`)
+      },
+    })
   }
 
   const haftalikSatisVerisi = useMemo(() => {
@@ -3120,7 +3394,7 @@ function App() {
           <div className="panel left-panel">
             <img
               src="/ytu-logo.png"
-              alt="Üniversite Logosu"
+              alt="MTÜ Sanayi logosu"
               className="sayfa-logo login-logo"
               onError={(event) => {
                 event.currentTarget.onerror = null
@@ -3137,7 +3411,7 @@ function App() {
                 type="text"
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
-                placeholder="Kullanıcı adınizi girin"
+                placeholder="Kullanıcı adınızı girin"
                 autoComplete="username"
               />
 
@@ -3174,7 +3448,7 @@ function App() {
               <div className="chart-card">
                 <div className="chart-header">
                   <span>Analiz</span>
-                  <small>Haftalik</small>
+                  <small>Haftalık</small>
                 </div>
                 <div className="chart-lines">
                   <span className="line one" />
@@ -3233,7 +3507,7 @@ function App() {
               </div>
               <img
                 src="/ytu-logo.png"
-                alt="Üniversite Logosu"
+                alt="MTÜ Sanayi logosu"
                 className="sayfa-logo menu-logo"
                 onError={(event) => {
                   event.currentTarget.onerror = null
@@ -3414,9 +3688,34 @@ function App() {
                   <h1>Dashboard</h1>
                   <p>Genel stok ve sipariş özeti</p>
                 </div>
-                <button type="button" onClick={() => sayfaDegistir('envanter')}>
-                  Envantere Git
-                </button>
+                <div className="dashboard-ust-aksiyonlar">
+                  <div className="dashboard-bolum-menu-sarmal">
+                    <button
+                      type="button"
+                      className="ikinci dashboard-bolum-buton"
+                      onClick={() => setDashboardBolumMenusuAcik((onceki) => !onceki)}
+                    >
+                      Tabloları Gizle/Göster
+                    </button>
+                    {dashboardBolumMenusuAcik && (
+                      <div className="dashboard-bolum-menu">
+                        {dashboardBolumSablonu.map((bolum) => (
+                          <label key={bolum.anahtar} className="dashboard-bolum-secenek">
+                            <input
+                              type="checkbox"
+                              checked={gorunenDashboardBolumleri[bolum.anahtar]}
+                              onChange={() => dashboardBolumGorunurlukDegistir(bolum.anahtar)}
+                            />
+                            <span>{bolum.etiket}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <button type="button" onClick={() => sayfaDegistir('envanter')}>
+                    Envantere Git
+                  </button>
+                </div>
               </header>
 
               <div className="ozet-grid">
@@ -3449,209 +3748,223 @@ function App() {
                 ))}
               </div>
 
-              <section className="dashboard-canli-grid">
-                <article className="panel-kart canli-ozet-karti">
-                  <div className="panel-baslik">
-                    <h2>Bugünkü Siparişler</h2>
-                    <small>Canlı özet</small>
-                  </div>
-                  <strong className="canli-ozet-deger">{dashboardCanliOzetler.bugunkuSiparisAdedi}</strong>
-                  <p className="canli-ozet-aciklama">Bugün açılan sipariş sayısı</p>
-                  <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bugunkuSiparisTutari)} toplam hacim</span>
-                </article>
+              {gorunenDashboardBolumleri.canli && (
+                <section className="dashboard-canli-grid">
+                  <article className="panel-kart canli-ozet-karti">
+                    <div className="panel-baslik">
+                      <h2>Bugünkü Siparişler</h2>
+                      <small>Canlı özet</small>
+                    </div>
+                    <strong className="canli-ozet-deger">{dashboardCanliOzetler.bugunkuSiparisAdedi}</strong>
+                    <p className="canli-ozet-aciklama">Bugün açılan sipariş sayısı</p>
+                    <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bugunkuSiparisTutari)} toplam hacim</span>
+                  </article>
 
-                <article className="panel-kart canli-ozet-karti">
-                  <div className="panel-baslik">
-                    <h2>Bekleyen Tahsilatlar</h2>
-                    <small>Ödeme takibi</small>
-                  </div>
-                  <strong className="canli-ozet-deger">{dashboardCanliOzetler.bekleyenTahsilatAdedi}</strong>
-                  <p className="canli-ozet-aciklama">Tahsil edilmesi gereken sipariş</p>
-                  <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bekleyenTahsilatTutari)} bekleyen tutar</span>
-                </article>
+                  <article className="panel-kart canli-ozet-karti">
+                    <div className="panel-baslik">
+                      <h2>Bekleyen Tahsilatlar</h2>
+                      <small>Ödeme takibi</small>
+                    </div>
+                    <strong className="canli-ozet-deger">{dashboardCanliOzetler.bekleyenTahsilatAdedi}</strong>
+                    <p className="canli-ozet-aciklama">Tahsil edilmesi gereken sipariş</p>
+                    <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bekleyenTahsilatTutari)} bekleyen tutar</span>
+                  </article>
 
-                <article className="panel-kart canli-ozet-karti">
-                  <div className="panel-baslik">
-                    <h2>Geciken Siparişler</h2>
-                    <small>Teslimat uyarısı</small>
-                  </div>
-                  <strong className="canli-ozet-deger">{dashboardCanliOzetler.gecikenSiparisAdedi}</strong>
-                  <p className="canli-ozet-aciklama">Tahmini süresi aşılmış sipariş</p>
-                  <span className="canli-ozet-alt">
-                    {dashboardCanliOzetler.gecikenSiparisAdedi > 0
-                      ? dashboardCanliOzetler.gecikenSiparisler.slice(0, 2).map((siparis) => siparis.siparisNo).join(', ')
-                      : 'Şu an gecikme görünmüyor'}
-                  </span>
-                </article>
-              </section>
+                  <article className="panel-kart canli-ozet-karti">
+                    <div className="panel-baslik">
+                      <h2>Geciken Siparişler</h2>
+                      <small>Teslimat uyarısı</small>
+                    </div>
+                    <strong className="canli-ozet-deger">{dashboardCanliOzetler.gecikenSiparisAdedi}</strong>
+                    <p className="canli-ozet-aciklama">Tahmini süresi aşılmış sipariş</p>
+                    <span className="canli-ozet-alt">
+                      {dashboardCanliOzetler.gecikenSiparisAdedi > 0
+                        ? dashboardCanliOzetler.gecikenSiparisler.slice(0, 2).map((siparis) => siparis.siparisNo).join(', ')
+                        : 'Şu an gecikme görünmüyor'}
+                    </span>
+                  </article>
+                </section>
+              )}
 
-              <section className="dashboard-orta-grid">
+              {(gorunenDashboardBolumleri.haftalik || gorunenDashboardBolumleri.kritik) && (
+                <section className="dashboard-orta-grid">
+                  {gorunenDashboardBolumleri.haftalik && (
+                    <>
+                      <article className="panel-kart">
+                        <div className="panel-baslik">
+                          <h2>Haftalık Satış Grafiği</h2>
+                          <small>Son 7 gün</small>
+                        </div>
+                        <div className="haftalik-grafik-kapsayici">
+                          <div className="satis-olcek">
+                            {[haftalikSatisGrafikUstSinir, haftalikSatisGrafikUstSinir * 0.75, haftalikSatisGrafikUstSinir * 0.5, haftalikSatisGrafikUstSinir * 0.25, 0].map((deger) => (
+                              <span key={deger}>{deger === 0 ? '0' : `₺${Math.round(deger / 1000)}B`}</span>
+                            ))}
+                          </div>
+                          <div className="satis-grafik">
+                            {[1, 0.75, 0.5, 0.25, 0].map((cizgi) => (
+                              <div key={cizgi} className="yatay-cizgi" style={{ bottom: `${cizgi * 100}%` }} />
+                            ))}
+                            {haftalikSatisVerisi.map((gun) => (
+                              <div key={gun.etiket} className="bar-wrap">
+                                <div className="bar-katman">
+                                  <div className="bar-ust" style={{ height: `${gun.ustOran}%` }} />
+                                  <div className="bar-alt" style={{ height: `${gun.altOran}%` }} />
+                                </div>
+                                <span className="bar-nokta" />
+                                <span>{gun.etiket}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </article>
+
+                      <article className="panel-kart">
+                        <div className="panel-baslik">
+                          <h2>En Çok Satılan Ürünler</h2>
+                          <small>Aylık</small>
+                        </div>
+                        <ul className="dashboard-liste grafikli-liste">
+                          {urunler.slice(0, 6).map((urun) => {
+                            const maksimum = Math.max(...urunler.map((u) => u.urunAdedi), 1)
+                            const oran = Math.max((urun.urunAdedi / maksimum) * 100, 8)
+                            return (
+                              <li key={urun.uid}>
+                                <div className="urun-grafik-satiri">
+                                  <div className="urun-grafik-ust">
+                                    <span>{urun.ad}</span>
+                                    <strong>{urun.urunAdedi} adet</strong>
+                                  </div>
+                                  <div className="urun-grafik-zemin">
+                                    <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
+                                  </div>
+                                </div>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </article>
+                    </>
+                  )}
+
+                  {gorunenDashboardBolumleri.kritik && (
+                    <article className="panel-kart kritik-stok-paneli">
+                      <div className="panel-baslik">
+                        <h2>Kritik Stok Uyarısı</h2>
+                        <small>{dashboardCanliOzetler.kritikStokAdedi} ürün eşik altında</small>
+                      </div>
+
+                      <div className="kritik-stok-ozet">
+                        <strong>{dashboardCanliOzetler.kritikStokAdedi}</strong>
+                        <span>Minimum stok değerinin altına düşen ürünler</span>
+                      </div>
+
+                      <div className="kritik-stok-liste">
+                        {dashboardCanliOzetler.kritikStokluUrunler.slice(0, 4).map((urun) => (
+                          <article key={`kritik-${urun.uid}`} className="kritik-stok-karti">
+                            <div className="kritik-stok-baslik">
+                              <strong className="urun-ad-satiri">
+                                <span>{urun.ad}</span>
+                                <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır.">!</span>
+                              </strong>
+                              <span>{urun.urunId}</span>
+                            </div>
+                            <div className="kritik-stok-detay">
+                              <span>Minimum stok: <strong>{urun.minimumStok}</strong></span>
+                              <span>Mevcut: <strong>{urun.magazaStok}</strong></span>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    </article>
+                  )}
+                </section>
+              )}
+
+              {gorunenDashboardBolumleri.yakin && (
                 <article className="panel-kart">
                   <div className="panel-baslik">
-                    <h2>Haftalık Satış Grafiği</h2>
-                    <small>Son 7 gün</small>
+                    <h2>Yakın Zamanda Satılan Ürünler</h2>
+                    <small>Şehir içi siparişler</small>
                   </div>
-                  <div className="haftalik-grafik-kapsayici">
-                    <div className="satis-olcek">
-                      {[haftalikSatisGrafikUstSinir, haftalikSatisGrafikUstSinir * 0.75, haftalikSatisGrafikUstSinir * 0.5, haftalikSatisGrafikUstSinir * 0.25, 0].map((deger) => (
-                        <span key={deger}>{deger === 0 ? '0' : `₺${Math.round(deger / 1000)}B`}</span>
-                      ))}
+                  <div className="tablo-sarmal masaustu-tablo">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Sipariş No</th>
+                          <th>Ürün</th>
+                          <th>Müşteri</th>
+                          <th>Teslimat</th>
+                          <th>Tutar</th>
+                          <th>Durum</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dashboardYakinSatislar.map((satis) => (
+                          <tr key={satis.siparis}>
+                            <td>{satis.siparis}</td>
+                            <td>{satis.urun}</td>
+                            <td>{satis.musteri}</td>
+                            <td>{satis.teslimat}</td>
+                            <td>{satis.tutar}</td>
+                            <td><span className={`durum-baloncuk ${durumSinifi(satis.durum)}`}>{satis.durum}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </article>
+              )}
+
+              {gorunenDashboardBolumleri.altGrafikler && (
+                <section className="dashboard-alt-grafikler">
+                  <article className="panel-kart grafik-kart">
+                    <div className="panel-baslik">
+                      <h2>Harcanan Tutar ve Elde Edilen Gelir</h2>
+                      <small>Son 6 ay</small>
                     </div>
-                    <div className="satis-grafik">
-                      {[1, 0.75, 0.5, 0.25, 0].map((cizgi) => (
-                        <div key={cizgi} className="yatay-cizgi" style={{ bottom: `${cizgi * 100}%` }} />
-                      ))}
-                      {haftalikSatisVerisi.map((gun) => (
-                        <div key={gun.etiket} className="bar-wrap">
-                          <div className="bar-katman">
-                            <div className="bar-ust" style={{ height: `${gun.ustOran}%` }} />
-                            <div className="bar-alt" style={{ height: `${gun.altOran}%` }} />
-                          </div>
-                          <span className="bar-nokta" />
-                          <span>{gun.etiket}</span>
+                    <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Gelir ve gider grafiği">
+                      <line x1="10" y1="100" x2="310" y2="100" />
+                      <polyline points={cizgiNoktalari(gelirSerisi)} className="mavi-cizgi" />
+                      <polyline points={cizgiNoktalari(giderSerisi)} className="kirmizi-cizgi" />
+                    </svg>
+                    <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
+                    <div className="grafik-lejant">
+                      <span><i className="lejant-kutu mavi" /> Toplam Gelir</span>
+                      <span><i className="lejant-kutu kirmizi" /> Toplam Gider</span>
+                    </div>
+                  </article>
+
+                  <article className="panel-kart grafik-kart">
+                    <div className="panel-baslik">
+                      <h2>Aylara Göre Satılan Toplam Ürün</h2>
+                      <small>Adet bazlı</small>
+                    </div>
+                    <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Aylık satılan ürün grafiği">
+                      <line x1="10" y1="100" x2="310" y2="100" />
+                      <polyline points={cizgiNoktalari(aylikSatilanUrun)} className="kirmizi-cizgi" />
+                    </svg>
+                    <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
+                    <div className="grafik-lejant"><span><i className="lejant-kutu kirmizi" /> Satılan Ürün (Adet)</span></div>
+                  </article>
+
+                  <article className="panel-kart grafik-kart">
+                    <div className="panel-baslik">
+                      <h2>Satılan Ürünlerin Sütun Grafiği</h2>
+                      <small>Aynı verinin sütun görünümü</small>
+                    </div>
+                    <div className="sutun-grafik" aria-label="Satılan ürünlerin sütun grafiği">
+                      {aylikSatilanUrun.map((deger, index) => (
+                        <div key={`${aylar[index]}-${deger}`} className="sutun-ogesi">
+                          <span className="sutun-deger">{deger}</span>
+                          <div className="sutun" style={{ height: `${Math.max((deger / Math.max(...aylikSatilanUrun)) * 100, 8)}%` }} />
+                          <small>{aylar[index]}</small>
                         </div>
                       ))}
                     </div>
-                  </div>
-                </article>
-
-                <article className="panel-kart">
-                  <div className="panel-baslik">
-                    <h2>En Çok Satılan Ürünler</h2>
-                    <small>Aylık</small>
-                  </div>
-                  <ul className="dashboard-liste grafikli-liste">
-                    {urunler.slice(0, 6).map((urun) => {
-                      const maksimum = Math.max(...urunler.map((u) => u.urunAdedi), 1)
-                      const oran = Math.max((urun.urunAdedi / maksimum) * 100, 8)
-                      return (
-                        <li key={urun.uid}>
-                          <div className="urun-grafik-satiri">
-                            <div className="urun-grafik-ust">
-                              <span>{urun.ad}</span>
-                              <strong>{urun.urunAdedi} adet</strong>
-                            </div>
-                            <div className="urun-grafik-zemin">
-                              <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
-                            </div>
-                          </div>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </article>
-              </section>
-
-              <article className="panel-kart kritik-stok-paneli">
-                <div className="panel-baslik">
-                  <h2>Kritik Stok Uyarısı</h2>
-                  <small>{dashboardCanliOzetler.kritikStokAdedi} ürün eşik altında</small>
-                </div>
-
-                <div className="kritik-stok-ozet">
-                  <strong>{dashboardCanliOzetler.kritikStokAdedi}</strong>
-                  <span>Minimum stok değerinin altına düşen ürünler</span>
-                </div>
-
-                <div className="kritik-stok-liste">
-                  {dashboardCanliOzetler.kritikStokluUrunler.slice(0, 4).map((urun) => (
-                    <article key={`kritik-${urun.uid}`} className="kritik-stok-karti">
-                      <div className="kritik-stok-baslik">
-                        <strong className="urun-ad-satiri">
-                          <span>{urun.ad}</span>
-                          <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır.">!</span>
-                        </strong>
-                        <span>{urun.urunId}</span>
-                      </div>
-                      <div className="kritik-stok-detay">
-                        <span>Minimum stok: <strong>{urun.minimumStok}</strong></span>
-                        <span>Mevcut: <strong>{urun.magazaStok}</strong></span>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </article>
-
-              <article className="panel-kart">
-                <div className="panel-baslik">
-                  <h2>Yakın Zamanda Satılan Ürünler</h2>
-                  <small>Şehir içi siparişler</small>
-                </div>
-                <div className="tablo-sarmal masaustu-tablo">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Sipariş No</th>
-                        <th>Ürün</th>
-                        <th>Müşteri</th>
-                        <th>Teslimat</th>
-                        <th>Tutar</th>
-                        <th>Durum</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dashboardYakinSatislar.map((satis) => (
-                        <tr key={satis.siparis}>
-                          <td>{satis.siparis}</td>
-                          <td>{satis.urun}</td>
-                          <td>{satis.musteri}</td>
-                          <td>{satis.teslimat}</td>
-                          <td>{satis.tutar}</td>
-                          <td><span className={`durum-baloncuk ${durumSinifi(satis.durum)}`}>{satis.durum}</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-
-              <section className="dashboard-alt-grafikler">
-                <article className="panel-kart grafik-kart">
-                  <div className="panel-baslik">
-                    <h2>Harcanan Tutar ve Elde Edilen Gelir</h2>
-                    <small>Son 6 ay</small>
-                  </div>
-                  <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Gelir ve gider grafiği">
-                    <line x1="10" y1="100" x2="310" y2="100" />
-                    <polyline points={cizgiNoktalari(gelirSerisi)} className="mavi-cizgi" />
-                    <polyline points={cizgiNoktalari(giderSerisi)} className="kirmizi-cizgi" />
-                  </svg>
-                  <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
-                  <div className="grafik-lejant">
-                    <span><i className="lejant-kutu mavi" /> Toplam Gelir</span>
-                    <span><i className="lejant-kutu kirmizi" /> Toplam Gider</span>
-                  </div>
-                </article>
-
-                <article className="panel-kart grafik-kart">
-                  <div className="panel-baslik">
-                    <h2>Aylara Göre Satılan Toplam Ürün</h2>
-                    <small>Adet bazlı</small>
-                  </div>
-                  <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Aylık satılan ürün grafiği">
-                    <line x1="10" y1="100" x2="310" y2="100" />
-                    <polyline points={cizgiNoktalari(aylikSatilanUrun)} className="kirmizi-cizgi" />
-                  </svg>
-                  <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
-                  <div className="grafik-lejant"><span><i className="lejant-kutu kirmizi" /> Satılan Ürün (Adet)</span></div>
-                </article>
-
-                <article className="panel-kart grafik-kart">
-                  <div className="panel-baslik">
-                    <h2>Satılan Ürünlerin Sütun Grafiği</h2>
-                    <small>Aynı verinin sütun görünümü</small>
-                  </div>
-                  <div className="sutun-grafik" aria-label="Satılan ürünlerin sütun grafiği">
-                    {aylikSatilanUrun.map((deger, index) => (
-                      <div key={`${aylar[index]}-${deger}`} className="sutun-ogesi">
-                        <span className="sutun-deger">{deger}</span>
-                        <div className="sutun" style={{ height: `${Math.max((deger / Math.max(...aylikSatilanUrun)) * 100, 8)}%` }} />
-                        <small>{aylar[index]}</small>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              </section>
+                  </article>
+                </section>
+              )}
             </section>
           )}
 
@@ -4688,262 +5001,34 @@ function App() {
           )}
 
           {aktifSayfa === 'faturalama' && (
-            <section>
-              <header className="ust-baslik siparisler-baslik">
-                <div>
-                  <h1>Faturalama (PDF)</h1>
-                  <p>Canlı fatura oluşturun, geçmiş faturaları görüntüleyin ve yazdırılabilir PDF önizlemesi alın.</p>
-                </div>
-              </header>
-
-              <section className="panel-kart fatura-kart">
-                <div className="odeme-sekme-alani">
-                  <button type="button" className={`odeme-sekme ${faturaSekmesi === 'yeni' ? 'aktif' : ''}`} onClick={() => setFaturaSekmesi('yeni')}>
-                    Yeni Fatura
-                  </button>
-                  <button type="button" className={`odeme-sekme ${faturaSekmesi === 'gecmis' ? 'aktif' : ''}`} onClick={() => setFaturaSekmesi('gecmis')}>
-                    Fatura Geçmişi
-                  </button>
-                </div>
-
-                {faturaSekmesi === 'yeni' && (
-                  <div className="fatura-grid">
-                    <div className="fatura-form-alani">
-                      <div className="panel-ust-cizgi">
-                        <h2>Yeni Fatura Oluştur</h2>
-                        <span className="panel-bilgi-rozet">{faturaFormu.tur}</span>
-                      </div>
-
-                      <div className="fatura-form-grid">
-                        <label>
-                          Fatura Türü
-                          <select value={faturaFormu.tur} onChange={(event) => faturaTuruDegistir(event.target.value)}>
-                            <option>Satış Faturası</option>
-                            <option>Alış Faturası</option>
-                          </select>
-                        </label>
-
-                        <label>
-                          {faturaFormu.tur === 'Satış Faturası' ? 'Müşteri' : 'Tedarikçi'}
-                          <select value={faturaFormu.karsiTarafUid} onChange={(event) => faturaKarsiTarafDegistir(event.target.value)}>
-                            <option value="">{faturaFormu.tur === 'Satış Faturası' ? 'Müşteri seçin' : 'Tedarikçi seçin'}</option>
-                            {faturaKarsiTaraflar.map((kayit) => (
-                              <option key={`fatura-karsi-${kayit.uid}`} value={kayit.uid}>{kayit.ad}</option>
-                            ))}
-                          </select>
-                        </label>
-
-                        <label>
-                          Fatura Tarihi
-                          <input type="date" value={faturaFormu.tarih} onChange={(event) => faturaFormuGuncelle('tarih', event.target.value)} />
-                        </label>
-
-                        <label>
-                          Ödeme Tarihi
-                          <input type="date" value={faturaFormu.odemeTarihi} onChange={(event) => faturaFormuGuncelle('odemeTarihi', event.target.value)} />
-                        </label>
-                      </div>
-
-                      <div className="fatura-satirlar">
-                        <div className="panel-ust-cizgi">
-                          <h2>Ürünler</h2>
-                          <button type="button" className="siparis-aksiyon-buton" onClick={faturaSatiriEkle}>Satır Ekle</button>
-                        </div>
-
-                        <div className="fatura-satir-listesi">
-                          {faturaFormu.satirlar.map((satir, index) => (
-                            <div key={`fatura-satir-${satir.id}`} className="fatura-satir-karti">
-                              <div className="fatura-satir-ust">
-                                <strong>Ürün Kalemi {index + 1}</strong>
-                                <button type="button" className="ikon-dugme sil" onClick={() => faturaSatiriSil(satir.id)}><KucukIkon tip="sil" /></button>
-                              </div>
-                              <div className="fatura-satir-grid">
-                                <label>
-                                  Ürün
-                                  <select value={satir.urunUid} onChange={(event) => faturaSatiriGuncelle(satir.id, 'urunUid', event.target.value)}>
-                                    <option value="">Ürün seçin</option>
-                                    {urunler.map((urun) => (
-                                      <option key={`fatura-urun-${urun.uid}`} value={urun.uid}>{urun.ad}</option>
-                                    ))}
-                                  </select>
-                                </label>
-                                <label>
-                                  Miktar
-                                  <input type="number" min="1" value={satir.miktar} onChange={(event) => faturaSatiriGuncelle(satir.id, 'miktar', event.target.value)} />
-                                </label>
-                                <label>
-                                  Birim Fiyat
-                                  <input type="number" min="0" value={satir.birimFiyat} onChange={(event) => faturaSatiriGuncelle(satir.id, 'birimFiyat', event.target.value)} />
-                                </label>
-                                <label>
-                                  KDV
-                                  <select value={satir.kdvOrani} onChange={(event) => faturaSatiriGuncelle(satir.id, 'kdvOrani', event.target.value)}>
-                                    <option value={0.2}>%20</option>
-                                    <option value={0.1}>%10</option>
-                                    <option value={0.01}>%1</option>
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <label className="fatura-not-alani">
-                        Açıklama / Not
-                        <textarea value={faturaFormu.not} onChange={(event) => faturaFormuGuncelle('not', event.target.value)} placeholder="Teslimat, ödeme ve ek açıklama notları." />
-                      </label>
-
-                      <div className="fatura-aksiyonlari">
-                        <button type="button" className="ikinci" onClick={() => faturaPdfOnizlemeAc()}>PDF'e Çevir</button>
-                        <button type="button" className="ikinci" onClick={() => faturayiYazdir(faturaOnizleme)}>Yazdır</button>
-                        <button type="button" onClick={faturaKaydet}>Faturayı Kaydet</button>
-                      </div>
-                    </div>
-
-                    <aside className="fatura-onizleme-karti">
-                      <div className="fatura-onizleme-ust">
-                        <div>
-                          <img
-                            src="/ytu-logo.png"
-                            alt="MTÜ Sanayi logosu"
-                            className="fatura-sirket-rozet"
-                            onError={(event) => {
-                              event.currentTarget.src = '/ytu-logo.svg'
-                            }}
-                          />
-                          <h2>MTÜ Sanayi</h2>
-                          <p>Malatya Yeşilyurt, Ankara Yolu 5. Km No:42</p>
-                          <p>Vergi No: 4481237781</p>
-                        </div>
-                        <div className="fatura-durum-kutu">
-                          <span className="panel-bilgi-rozet">Taslak</span>
-                          <strong>{faturaOnizleme.faturaNo}</strong>
-                        </div>
-                      </div>
-
-                      <div className="fatura-onizleme-bilgi">
-                        <div>
-                          <small>{faturaFormu.tur === 'Satış Faturası' ? 'Müşteri' : 'Tedarikçi'}</small>
-                          <strong>{faturaOnizleme.karsiTarafAdi || 'Seçim bekleniyor'}</strong>
-                        </div>
-                        <div>
-                          <small>Tarih</small>
-                          <strong>{faturaOnizleme.tarih ? tarihFormatla(faturaOnizleme.tarih) : '-'}</strong>
-                        </div>
-                        <div>
-                          <small>Ödeme Tarihi</small>
-                          <strong>{faturaOnizleme.odemeTarihi ? tarihFormatla(faturaOnizleme.odemeTarihi) : '-'}</strong>
-                        </div>
-                      </div>
-
-                      <div className="fatura-onizleme-govde">
-                        <h3>Ürünler</h3>
-                        <div className="fatura-onizleme-satirlar">
-                          {faturaOnizleme.satirlar.length ? faturaOnizleme.satirlar.map((satir) => (
-                            <div key={`onizleme-satir-${satir.id}`} className="fatura-onizleme-satir">
-                              <div>
-                                <strong>{satir.urun}</strong>
-                                <span>{satir.miktar} x {paraFormatla(satir.birimFiyat)}</span>
-                              </div>
-                              <strong>{paraFormatla(Number(satir.miktar) * Number(satir.birimFiyat))}</strong>
-                            </div>
-                          )) : <p className="fatura-bos-metin">Önizleme için ürün satırı ekleyin.</p>}
-                        </div>
-
-                        <div className="fatura-toplamlar">
-                          <div><span>Ara Toplam</span><strong>{paraFormatla(faturaOnizleme.araToplam)}</strong></div>
-                          <div><span>KDV</span><strong>{paraFormatla(faturaOnizleme.kdv)}</strong></div>
-                          <div className="genel-toplam"><span>Toplam</span><strong>{paraFormatla(faturaOnizleme.toplam)}</strong></div>
-                        </div>
-
-                        <div className="fatura-belge-alt">
-                          <div className="fatura-belge-not">{faturaOnizleme.not || 'Standart ödeme ve teslimat koşulları geçerlidir.'}</div>
-                          <img
-                            src="/gib-logo.png"
-                            alt="Gelir İdaresi Başkanlığı mührü"
-                            className="fatura-gib-rozet"
-                            onError={(event) => {
-                              event.currentTarget.src = '/gib-logo.svg'
-                            }}
-                          />
-                        </div>
-
-                        <div className="fatura-onizleme-alt">
-                          <button type="button" className="ikinci" onClick={() => faturayiPdfIndir(faturaOnizleme)}>PDF İndir</button>
-                          <button type="button" onClick={() => faturaPdfOnizlemeAc()}>Önizlemeyi Aç</button>
-                        </div>
-                      </div>
-                    </aside>
-                  </div>
-                )}
-
-                {faturaSekmesi === 'gecmis' && (
-                  <>
-                    <div className="panel-ust-cizgi">
-                      <h2>Fatura Geçmişi</h2>
-                      <input
-                        type="text"
-                        placeholder="Fatura no veya müşteri / tedarikçi ara"
-                        value={faturaArama}
-                        onChange={(event) => setFaturaArama(event.target.value)}
-                      />
-                    </div>
-
-                    <div className="tablo-sarmal masaustu-tablo">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Fatura No</th>
-                            <th>Tür</th>
-                            <th>Firma / Müşteri</th>
-                            <th>Tarih</th>
-                            <th>Toplam</th>
-                            <th>Durum</th>
-                            <th>İşlem</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filtreliFaturalar.map((fatura) => (
-                            <tr key={fatura.id}>
-                              <td>{fatura.faturaNo}</td>
-                              <td>{fatura.tur}</td>
-                              <td>{fatura.karsiTarafAdi}</td>
-                              <td>{tarihFormatla(fatura.tarih)}</td>
-                              <td>{paraFormatla(fatura.toplam)}</td>
-                              <td><span className="stok-log-rozet">{fatura.durum}</span></td>
-                              <td>
-                                <button type="button" className="siparis-aksiyon-buton" onClick={() => faturaDetayAc(fatura)}>Tekrar Görüntüle</button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="mobil-kart-listesi">
-                      {filtreliFaturalar.map((fatura) => (
-                        <article key={`mobil-fatura-${fatura.id}`} className="mobil-kart">
-                          <div className="mobil-kart-ust">
-                            <strong>{fatura.faturaNo}</strong>
-                            <span className="stok-log-rozet">{fatura.durum}</span>
-                          </div>
-                          <div className="mobil-kart-govde">
-                            <div className="mobil-bilgi-satiri"><span>Tür</span><strong>{fatura.tur}</strong></div>
-                            <div className="mobil-bilgi-satiri"><span>Firma / Müşteri</span><strong>{fatura.karsiTarafAdi}</strong></div>
-                            <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(fatura.tarih)}</strong></div>
-                            <div className="mobil-bilgi-satiri"><span>Toplam</span><strong>{paraFormatla(fatura.toplam)}</strong></div>
-                          </div>
-                          <div className="mobil-kart-aksiyon">
-                            <button type="button" className="siparis-aksiyon-buton" onClick={() => faturaDetayAc(fatura)}>Tekrar Görüntüle</button>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </section>
-            </section>
+            <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Faturalama ekranı yükleniyor...</section>}>
+              <FaturalamaPanel
+                KucukIkon={KucukIkon}
+                faturalar={faturalar}
+                faturaArama={faturaArama}
+                faturaDetayAc={faturaDetayAc}
+                faturaFormu={faturaFormu}
+                faturaFormuGuncelle={faturaFormuGuncelle}
+                faturaKarsiTarafDegistir={faturaKarsiTarafDegistir}
+                faturaKarsiTaraflar={faturaKarsiTaraflar}
+                faturaKaydet={faturaKaydet}
+                faturaOnizleme={faturaOnizleme}
+                faturaPdfOnizlemeAc={faturaPdfOnizlemeAc}
+                faturaSatiriEkle={faturaSatiriEkle}
+                faturaSatiriGuncelle={faturaSatiriGuncelle}
+                faturaSatiriSil={faturaSatiriSil}
+                faturaSekmesi={faturaSekmesi}
+                faturaTuruDegistir={faturaTuruDegistir}
+                faturayiPdfIndir={faturayiPdfIndir}
+                faturayiYazdir={faturayiYazdir}
+                filtreliFaturalar={filtreliFaturalar}
+                paraFormatla={paraFormatla}
+                setFaturaArama={setFaturaArama}
+                setFaturaSekmesi={setFaturaSekmesi}
+                tarihFormatla={tarihFormatla}
+                urunler={urunler}
+              />
+            </Suspense>
           )}
 
           {aktifSayfa === 'envanter' && (
@@ -5102,119 +5187,93 @@ function App() {
         </section>
 
         {aktifSayfa !== 'merkez' && (
-          <button
-            type="button"
-            className="bildirim-dugmesi"
-            aria-label="Bildirimler"
-            onClick={bildirimDugmesiTikla}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 17H5l2-2v-4a5 5 0 1 1 10 0v4l2 2h-4" />
-              <path d="M10 17a2 2 0 0 0 4 0" />
-            </svg>
-            {okunmamisBildirimSayisi > 0 && <span className="bildirim-sayisi">{okunmamisBildirimSayisi}</span>}
-          </button>
+          <>
+            <div className={`global-arama-kapsayici ${globalAramaMobilAcik || globalAramaMetni ? 'acik' : ''}`}>
+              <button
+                type="button"
+                className="global-arama-mobil-dugme"
+                aria-label="Global aramayı aç"
+                onClick={() => setGlobalAramaMobilAcik((onceki) => !onceki)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" />
+                </svg>
+              </button>
+
+              <div className="global-arama-alani">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" />
+                </svg>
+                <input
+                  type="text"
+                  value={globalAramaMetni}
+                  onChange={(event) => setGlobalAramaMetni(event.target.value)}
+                  placeholder="Ürün, sipariş, müşteri veya tedarikçi ara"
+                />
+                {globalAramaMetni && (
+                  <button type="button" className="global-arama-temizle" aria-label="Aramayı temizle" onClick={() => setGlobalAramaMetni('')}>
+                    ×
+                  </button>
+                )}
+              </div>
+
+              {globalAramaMetni.trim() && (
+                <div className="global-arama-sonuclar">
+                  {globalAramaSonuclari.length === 0 ? (
+                    <div className="global-arama-bos">
+                      <strong>Sonuç bulunamadı.</strong>
+                      <span>Başka bir anahtar kelime deneyin.</span>
+                    </div>
+                  ) : (
+                    globalAramaSonuclari.map((sonuc) => (
+                      <button
+                        key={sonuc.id}
+                        type="button"
+                        className="global-arama-sonuc"
+                        onClick={() => globalAramaSonucunuAc(sonuc)}
+                      >
+                        <span className="global-arama-etiket">{sonuc.tur}</span>
+                        <strong>{sonuc.baslik}</strong>
+                        <small>{sonuc.alt}</small>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="bildirim-dugmesi"
+              aria-label="Bildirimler"
+              onClick={bildirimDugmesiTikla}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 17H5l2-2v-4a5 5 0 1 1 10 0v4l2 2h-4" />
+                <path d="M10 17a2 2 0 0 0 4 0" />
+              </svg>
+              {okunmamisBildirimSayisi > 0 && <span className="bildirim-sayisi">{okunmamisBildirimSayisi}</span>}
+            </button>
+          </>
         )}
 
         {aktifSayfa !== 'merkez' && bildirimPanelAcik && (
-          <section className={`bildirim-paneli ${bildirimPanelKapaniyor ? 'kapaniyor' : 'aciliyor'}`}>
-            <header className="bildirim-panel-ust">
-              <div>
-                <strong>Bildirimler</strong>
-                <small>Yakın zamanda gerçekleşen gelişmeler</small>
-              </div>
-              <div className="bildirim-panel-aksiyonlari">
-                <button
-                  type="button"
-                  className="bildirim-hepsini-temizle"
-                  onClick={tumBildirimleriTemizle}
-                  disabled={bildirimler.length === 0}
-                >
-                  Hepsini Temizle
-                </button>
-                <button type="button" className="bildirim-panel-kapat" onClick={bildirimPaneliKapat} aria-label="Bildirimleri Kapat">
-                  ×
-                </button>
-              </div>
-            </header>
-
-            <div className="bildirim-listesi">
-              {bildirimler.length === 0 ? (
-                <div className="bildirim-bos">
-                  <strong>Görüntülenecek bildirim kalmadı.</strong>
-                  <p>Yeni kritik stok, satış veya stok hareketleri burada belirecek.</p>
-                </div>
-              ) : (
-                bildirimler.map((bildirim) => {
-                  const okundu = okunanBildirimler.includes(bildirim.id)
-
-                  return (
-                    <article
-                      key={bildirim.id}
-                      className={`bildirim-oge ${bildirim.tur} ${okundu ? 'okundu' : 'okunmadi'}`}
-                      onClick={() => bildirimdenSayfayaGit(bildirim)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault()
-                          bildirimdenSayfayaGit(bildirim)
-                        }
-                      }}
-                    >
-                      <span className="bildirim-ikon" aria-hidden="true">
-                        <KucukIkon
-                          tip={
-                            bildirim.tur === 'kritik'
-                              ? 'bildirim-kritik'
-                              : bildirim.tur === 'stok'
-                                ? 'bildirim-stok'
-                                : bildirim.tur === 'tahsilat'
-                                  ? 'bildirim-tahsilat'
-                                  : 'bildirim-satis'
-                          }
-                        />
-                      </span>
-                      <div className="bildirim-icerik">
-                        <div className="bildirim-etiket-satiri">
-                          <strong>{bildirim.baslik}</strong>
-                          <span className={`bildirim-durum-rozeti ${okundu ? 'okundu' : 'okunmadi'}`}>
-                            {okundu ? 'Okundu' : 'Yeni'}
-                          </span>
-                        </div>
-                        <p>{bildirim.detay}</p>
-                        <div className="bildirim-alt-satir">
-                          <small>{bildirim.zaman}</small>
-                          <div className="bildirim-kart-aksiyonlari">
-                            <button
-                              type="button"
-                              className="bildirim-mini-buton"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                okundu ? bildirimiOkunmadiYap(bildirim.id) : bildirimiOkunduYap(bildirim.id)
-                              }}
-                            >
-                              {okundu ? 'Okunmadı Yap' : 'Okundu Yap'}
-                            </button>
-                            <button
-                              type="button"
-                              className="bildirim-mini-buton vurgulu"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                bildirimiTemizle(bildirim.id)
-                              }}
-                            >
-                              Temizle
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
-                  )
-                })
-              )}
-            </div>
-          </section>
+          <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Bildirimler yükleniyor...</section>}>
+            <BildirimPaneli
+              KucukIkon={KucukIkon}
+              bildirimPanelKapaniyor={bildirimPanelKapaniyor}
+              bildirimPaneliKapat={bildirimPaneliKapat}
+              bildirimdenSayfayaGit={bildirimdenSayfayaGit}
+              bildirimler={bildirimler}
+              bildirimiOkunduYap={bildirimiOkunduYap}
+              bildirimiOkunmadiYap={bildirimiOkunmadiYap}
+              bildirimiTemizle={bildirimiTemizle}
+              okunanBildirimler={okunanBildirimler}
+              tumBildirimleriTemizle={tumBildirimleriTemizle}
+            />
+          </Suspense>
         )}
 
         {aktifSayfa !== 'merkez' && (
@@ -5232,113 +5291,24 @@ function App() {
         )}
 
         {aktifSayfa !== 'merkez' && aiPanelAcik && !aiPanelKucuk && (
-          <section className={`ai-panel ai-tema-acik ${aiPanelKapaniyor ? 'kapaniyor' : 'aciliyor'}`}>
-            <header className="ai-panel-ust">
-              <div className="ai-panel-kontroller">
-                <button
-                  type="button"
-                  className="ai-ikon-buton"
-                  aria-label="Tema menüsü"
-                  onClick={() => setAiTemaMenuAcik((onceki) => !onceki)}
-                >
-                  <KucukIkon tip="ayar" />
-                </button>
-                {aiTemaMenuAcik && (
-                  <div className="ai-tema-menu">
-                    <button
-                      type="button"
-                      className="aktif"
-                      onClick={() => {
-                        setAiTemaMenuAcik(false)
-                      }}
-                    >
-                      <TemaIkonu tema="acik" />
-                      <span>Açık Tema</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="ai-panel-baslik">
-                <div className="ai-avatar" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="8.3" r="4.1" />
-                    <path d="M4.9 19.8a7.9 7.9 0 0 1 14.2 0c-1.7 1.4-4.3 2.2-7.1 2.2s-5.4-.8-7.1-2.2Z" />
-                  </svg>
-                </div>
-                <div>
-                  <strong>Kişisel Asistanınız</strong>
-                  <small>Her zaman yanınızda</small>
-                </div>
-              </div>
-
-              <div className="ai-panel-aksiyonlar">
-                <button
-                  type="button"
-                  className="ai-ikon-buton"
-                  aria-label="Alta al"
-                  onClick={() => {
-                    setAiPanelKucuk(true)
-                    setAiTemaMenuAcik(false)
-                  }}
-                >
-                  -
-                </button>
-                <button
-                  type="button"
-                  className="ai-ikon-buton"
-                  aria-label="Kapat"
-                  onClick={aiPaneliKapat}
-                >
-                  ×
-                </button>
-              </div>
-            </header>
-
-            <div className="ai-mesajlar">
-              {aiMesajlar.map((mesaj, index) => (
-                <article key={mesaj.id} className={`ai-mesaj ai-mesaj-${mesaj.rol}`}>
-                  <p>{mesaj.metin}</p>
-                  {index === 0 && mesaj.rol === 'bot' && aiHizliKonularAcik && (
-                    <div className="ai-hizli-konular">
-                      {aiHizliKonular.map((konu) => (
-                        <button
-                          key={konu.etiket}
-                          type="button"
-                          className="ai-hizli-konu"
-                          onClick={() => {
-                            if (konu.etiket === 'Diğer') {
-                              setAiHizliKonularAcik(false)
-                              return
-                            }
-                            aiMesajGonder(konu.mesaj)
-                          }}
-                        >
-                          {konu.etiket}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <span>{mesaj.saat}</span>
-                </article>
-              ))}
-            </div>
-
-            <div className="ai-giris-alani">
-              <input
-                type="text"
-                value={aiMesajMetni}
-                onChange={(event) => setAiMesajMetni(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') aiMesajGonder()
-                }}
-                placeholder="Mesaj yaz..."
-              />
-              <button type="button" className="ai-gonder-buton" onClick={aiMesajGonder}>
-                <KucukIkon tip="gonder" />
-              </button>
-            </div>
-          </section>
+          <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Asistan yükleniyor...</section>}>
+            <AiPanel
+              KucukIkon={KucukIkon}
+              TemaIkonu={TemaIkonu}
+              aiHizliKonular={aiHizliKonular}
+              aiHizliKonularAcik={aiHizliKonularAcik}
+              aiMesajGonder={aiMesajGonder}
+              aiMesajMetni={aiMesajMetni}
+              aiMesajlar={aiMesajlar}
+              aiPanelKapaniyor={aiPanelKapaniyor}
+              aiPaneliKapat={aiPaneliKapat}
+              aiTemaMenuAcik={aiTemaMenuAcik}
+              setAiMesajMetni={setAiMesajMetni}
+              setAiHizliKonularAcik={setAiHizliKonularAcik}
+              setAiPanelKucuk={setAiPanelKucuk}
+              setAiTemaMenuAcik={setAiTemaMenuAcik}
+            />
+          </Suspense>
         )}
 
         {toastlar.length > 0 && (
@@ -5351,12 +5321,28 @@ function App() {
                 <div className="toast-metin">
                   <strong>{toast.tip === 'basari' ? 'Başarılı' : 'Uyarı'}</strong>
                   <span>{toast.metin}</span>
+                  {toast.eylemEtiketi && typeof toast.eylem === 'function' && (
+                    <button
+                      type="button"
+                      className="toast-eylem"
+                      onClick={() => {
+                        setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))
+                        setSonGeriAlma((onceki) => (onceki?.toastId === toast.id ? null : onceki))
+                        toast.eylem()
+                      }}
+                    >
+                      {toast.eylemEtiketi}
+                    </button>
+                  )}
                 </div>
                 <button
                   type="button"
                   className="toast-kapat"
                   aria-label="Bildirimi kapat"
-                  onClick={() => setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))}
+                  onClick={() => {
+                    setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))
+                    setSonGeriAlma((onceki) => (onceki?.toastId === toast.id ? null : onceki))
+                  }}
                 >
                   ×
                 </button>
@@ -5973,184 +5959,21 @@ function App() {
         </div>
       )}
 
-      {faturaDetayAcik && seciliFatura && (
-        <div className="modal-kaplama">
-          <div className="modal-kutu buyuk fatura-modal">
-            <div className="fatura-modal-ust">
-              <div>
-                <h3>{seciliFatura.faturaNo}</h3>
-                <p>{seciliFatura.karsiTarafAdi} için oluşturulan {seciliFatura.tur.toLocaleLowerCase('tr-TR')}.</p>
-              </div>
-              <span className="stok-log-rozet">{seciliFatura.durum}</span>
-            </div>
-
-            <div className="fatura-detay-belgesi">
-              <div className="fatura-onizleme-ust">
-                <div>
-                  <img
-                    src="/ytu-logo.png"
-                    alt="MTÜ Sanayi logosu"
-                    className="fatura-sirket-rozet"
-                    onError={(event) => {
-                      event.currentTarget.src = '/ytu-logo.svg'
-                    }}
-                  />
-                  <h2>MTÜ Sanayi</h2>
-                  <p>Malatya Yeşilyurt, Ankara Yolu 5. Km No:42</p>
-                  <p>Vergi No: 4481237781</p>
-                </div>
-                <div className="fatura-durum-kutu">
-                  <span className="panel-bilgi-rozet">{seciliFatura.tur}</span>
-                  <strong>{seciliFatura.faturaNo}</strong>
-                </div>
-              </div>
-
-              <div className="fatura-onizleme-bilgi">
-                <div>
-                  <small>{seciliFatura.tur === 'Satış Faturası' ? 'Müşteri' : 'Tedarikçi'}</small>
-                  <strong>{seciliFatura.karsiTarafAdi}</strong>
-                </div>
-                <div>
-                  <small>Tarih</small>
-                  <strong>{tarihFormatla(seciliFatura.tarih)}</strong>
-                </div>
-                <div>
-                  <small>Ödeme Tarihi</small>
-                  <strong>{tarihFormatla(seciliFatura.odemeTarihi)}</strong>
-                </div>
-              </div>
-
-              <div className="fatura-onizleme-govde">
-                <h3>Ürünler</h3>
-                <div className="fatura-onizleme-satirlar">
-                  {seciliFatura.satirlar.map((satir) => (
-                    <div key={`detay-fatura-${seciliFatura.id}-${satir.id}`} className="fatura-onizleme-satir">
-                      <div>
-                        <strong>{satir.urun}</strong>
-                        <span>{satir.miktar} x {paraFormatla(satir.birimFiyat)}</span>
-                      </div>
-                      <strong>{paraFormatla(Number(satir.miktar) * Number(satir.birimFiyat))}</strong>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="fatura-toplamlar">
-                  <div><span>Ara Toplam</span><strong>{paraFormatla(seciliFatura.araToplam)}</strong></div>
-                  <div><span>KDV</span><strong>{paraFormatla(seciliFatura.kdv)}</strong></div>
-                  <div className="genel-toplam"><span>Toplam</span><strong>{paraFormatla(seciliFatura.toplam)}</strong></div>
-                </div>
-
-                <div className="fatura-belge-alt">
-                  <div className="fatura-belge-not">{seciliFatura.not || 'Standart ödeme ve teslimat koşulları geçerlidir.'}</div>
-                  <img
-                    src="/gib-logo.png"
-                    alt="Gelir İdaresi Başkanlığı mührü"
-                    className="fatura-gib-rozet"
-                    onError={(event) => {
-                      event.currentTarget.src = '/gib-logo.svg'
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={() => faturayiPdfIndir(seciliFatura)}>PDF İndir</button>
-              <button type="button" className="ikinci" onClick={() => faturayiYazdir(seciliFatura)}>Yazdır</button>
-              <button type="button" onClick={() => setFaturaDetayAcik(false)}>Kapat</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {pdfOnizlemeAcik && (
-        <div className="modal-kaplama">
-          <div className="modal-kutu buyuk fatura-modal">
-            <div className="fatura-modal-ust">
-              <div>
-                <h3>PDF Önizleme</h3>
-                <p>{(seciliFatura ?? faturaOnizleme).faturaNo} için yazdırılabilir görünüm hazır.</p>
-              </div>
-              <span className="stok-log-rozet">PDF Önizleme</span>
-            </div>
-
-            <div className="fatura-detay-belgesi">
-              <div className="fatura-onizleme-ust">
-                <div>
-                  <img
-                    src="/ytu-logo.png"
-                    alt="MTÜ Sanayi logosu"
-                    className="fatura-sirket-rozet"
-                    onError={(event) => {
-                      event.currentTarget.src = '/ytu-logo.svg'
-                    }}
-                  />
-                  <h2>MTÜ Sanayi</h2>
-                  <p>Malatya Yeşilyurt, Ankara Yolu 5. Km No:42</p>
-                  <p>Vergi No: 4481237781</p>
-                </div>
-                <div className="fatura-durum-kutu">
-                  <span className="panel-bilgi-rozet">{(seciliFatura ?? faturaOnizleme).tur}</span>
-                  <strong>{(seciliFatura ?? faturaOnizleme).faturaNo}</strong>
-                </div>
-              </div>
-
-              <div className="fatura-onizleme-bilgi">
-                <div>
-                  <small>{(seciliFatura ?? faturaOnizleme).tur === 'Satış Faturası' ? 'Müşteri' : 'Tedarikçi'}</small>
-                  <strong>{(seciliFatura ?? faturaOnizleme).karsiTarafAdi}</strong>
-                </div>
-                <div>
-                  <small>Tarih</small>
-                  <strong>{tarihFormatla((seciliFatura ?? faturaOnizleme).tarih)}</strong>
-                </div>
-                <div>
-                  <small>Ödeme Tarihi</small>
-                  <strong>{tarihFormatla((seciliFatura ?? faturaOnizleme).odemeTarihi)}</strong>
-                </div>
-              </div>
-
-              <div className="fatura-onizleme-govde">
-                <h3>Ürünler</h3>
-                <div className="fatura-onizleme-satirlar">
-                  {(seciliFatura ?? faturaOnizleme).satirlar.map((satir) => (
-                    <div key={`pdf-onizleme-${satir.id}`} className="fatura-onizleme-satir">
-                      <div>
-                        <strong>{satir.urun}</strong>
-                        <span>{satir.miktar} x {paraFormatla(satir.birimFiyat)}</span>
-                      </div>
-                      <strong>{paraFormatla(Number(satir.miktar) * Number(satir.birimFiyat))}</strong>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="fatura-toplamlar">
-                  <div><span>Ara Toplam</span><strong>{paraFormatla((seciliFatura ?? faturaOnizleme).araToplam)}</strong></div>
-                  <div><span>KDV</span><strong>{paraFormatla((seciliFatura ?? faturaOnizleme).kdv)}</strong></div>
-                  <div className="genel-toplam"><span>Toplam</span><strong>{paraFormatla((seciliFatura ?? faturaOnizleme).toplam)}</strong></div>
-                </div>
-
-                <div className="fatura-belge-alt">
-                  <div className="fatura-belge-not">{(seciliFatura ?? faturaOnizleme).not || 'Standart ödeme ve teslimat koşulları geçerlidir.'}</div>
-                  <img
-                    src="/gib-logo.png"
-                    alt="Gelir İdaresi Başkanlığı mührü"
-                    className="fatura-gib-rozet"
-                    onError={(event) => {
-                      event.currentTarget.src = '/gib-logo.svg'
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={() => faturayiPdfIndir(seciliFatura ?? faturaOnizleme)}>PDF İndir</button>
-              <button type="button" className="ikinci" onClick={() => faturayiYazdir(seciliFatura ?? faturaOnizleme)}>Yazdır</button>
-              <button type="button" onClick={() => setPdfOnizlemeAcik(false)}>Kapat</button>
-            </div>
-          </div>
-        </div>
+      {(faturaDetayAcik || pdfOnizlemeAcik) && (
+        <Suspense fallback={<div className="modal-kaplama"><div className="modal-kutu buyuk lazy-panel-bekleme">Belge ekranı yükleniyor...</div></div>}>
+          <FaturaModallari
+            faturaDetayAcik={faturaDetayAcik}
+            faturaOnizleme={faturaOnizleme}
+            faturayiPdfIndir={faturayiPdfIndir}
+            faturayiYazdir={faturayiYazdir}
+            paraFormatla={paraFormatla}
+            pdfOnizlemeAcik={pdfOnizlemeAcik}
+            seciliFatura={seciliFatura}
+            setFaturaDetayAcik={setFaturaDetayAcik}
+            setPdfOnizlemeAcik={setPdfOnizlemeAcik}
+            tarihFormatla={tarihFormatla}
+          />
+        </Suspense>
       )}
 
       {eklemeAcik && (
@@ -6270,6 +6093,8 @@ function App() {
 }
 
 export default App
+
+
 
 
 

@@ -26,6 +26,20 @@ const avatarOlustur = (ad) =>
     .join('')
     .slice(0, 2)
 
+const gunEtiketiKisalt = (etiket) => {
+  const harita = {
+    Pzt: 'P',
+    Sal: 'S',
+    Çar: 'Ç',
+    Per: 'P',
+    Cum: 'C',
+    Cmt: 'C',
+    Paz: 'P',
+  }
+
+  return harita[etiket] || etiket?.charAt(0) || etiket
+}
+
 const urunOlustur = (uid, urunId, kategori, ad, urunAdedi, magazaStok, minimumStok, alisFiyati, satisFiyati) => ({
   uid,
   urunId,
@@ -180,6 +194,14 @@ function KucukIkon({ tip }) {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="6" />
         <path d="m20 20-3.5-3.5" />
+      </svg>
+    )
+  }
+
+  if (tip === 'telefon') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72l.39 2.56a2 2 0 0 1-.57 1.72L7.1 9.83a16 16 0 0 0 7.07 7.07l1.83-1.83a2 2 0 0 1 1.72-.57l2.56.39A2 2 0 0 1 22 16.92Z" />
       </svg>
     )
   }
@@ -2321,17 +2343,21 @@ function App() {
     })
   }
 
+  const telefonAramasiBaslat = (telefon, etiket = 'Kayıt') => {
+    if (!telefon) {
+      toastGoster('hata', `${etiket} için telefon bilgisi bulunamadı.`)
+      return
+    }
+
+    window.location.href = `tel:${telefon.replace(/\s+/g, '')}`
+  }
+
   const siparisMusteriAra = (siparis) => {
     const musteriKaydi = musteriler.find(
       (musteri) => metniNormalizeEt(musteri.ad) === metniNormalizeEt(siparis.musteri),
     )
     const telefon = musteriKaydi?.telefon ?? siparisMusteriTelefonlari[siparis.musteri]
-    if (!telefon) {
-      toastGoster('hata', `${siparis.musteri} için telefon bilgisi bulunamadı.`)
-      return
-    }
-
-    window.location.href = `tel:${telefon.replace(/\s+/g, '')}`
+    telefonAramasiBaslat(telefon, siparis.musteri)
   }
 
   const aiMesajGonder = (hazirMetin) => {
@@ -3798,7 +3824,9 @@ function App() {
                         <div className="haftalik-grafik-kapsayici">
                           <div className="satis-olcek">
                             {[haftalikSatisGrafikUstSinir, haftalikSatisGrafikUstSinir * 0.75, haftalikSatisGrafikUstSinir * 0.5, haftalikSatisGrafikUstSinir * 0.25, 0].map((deger) => (
-                              <span key={deger}>{deger === 0 ? '0' : `₺${Math.round(deger / 1000)}B`}</span>
+                              <span key={deger} className="satis-olcek-etiketi">
+                                {deger === 0 ? '0' : `₺${Math.round(deger / 1000)}B`}
+                              </span>
                             ))}
                           </div>
                           <div className="satis-grafik">
@@ -3812,8 +3840,16 @@ function App() {
                                   <div className="bar-alt" style={{ height: `${gun.altOran}%` }} />
                                 </div>
                                 <span className="bar-nokta" />
-                                <span>{gun.etiket}</span>
+                                <span className="bar-etiket">
+                                  <span className="bar-etiket-tam">{gun.etiket}</span>
+                                  <span className="bar-etiket-kisa">{gunEtiketiKisalt(gun.etiket)}</span>
+                                </span>
                               </div>
+                            ))}
+                          </div>
+                          <div className="mobil-gun-etiketleri" aria-hidden="true">
+                            {haftalikSatisVerisi.map((gun) => (
+                              <span key={`mobil-gun-${gun.etiket}`}>{gunEtiketiKisalt(gun.etiket)}</span>
                             ))}
                           </div>
                         </div>
@@ -4461,6 +4497,7 @@ function App() {
                               <button type="button" className={`ikon-dugme favori ${musteri.favori ? 'aktif' : ''}`} title="Favori" onClick={() => musteriFavoriDegistir(musteri.uid)}><KucukIkon tip="favori" /></button>
                               <button type="button" className="ikon-dugme not" title="Not Ekle" onClick={() => musteriNotAc(musteri)}><KucukIkon tip="not" /></button>
                               <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => musteriDuzenlemeAc(musteri)}><KucukIkon tip="duzenle" /></button>
+                              <button type="button" className="ikon-dugme telefon" title="Ara" onClick={() => telefonAramasiBaslat(musteri.telefon, musteri.ad)}><KucukIkon tip="telefon" /></button>
                               <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekMusteri(musteri)}><KucukIkon tip="sil" /></button>
                             </div>
                           </td>
@@ -4499,6 +4536,7 @@ function App() {
                           <button type="button" className={`ikon-dugme favori ${musteri.favori ? 'aktif' : ''}`} title="Favori" onClick={() => musteriFavoriDegistir(musteri.uid)}><KucukIkon tip="favori" /></button>
                           <button type="button" className="ikon-dugme not" title="Not Ekle" onClick={() => musteriNotAc(musteri)}><KucukIkon tip="not" /></button>
                           <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => musteriDuzenlemeAc(musteri)}><KucukIkon tip="duzenle" /></button>
+                          <button type="button" className="ikon-dugme telefon" title="Ara" onClick={() => telefonAramasiBaslat(musteri.telefon, musteri.ad)}><KucukIkon tip="telefon" /></button>
                           <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekMusteri(musteri)}><KucukIkon tip="sil" /></button>
                         </div>
                       </div>
@@ -4608,6 +4646,7 @@ function App() {
                                   <button type="button" className={`ikon-dugme favori ${tedarikci.favori ? 'aktif' : ''}`} title="Favori" onClick={(event) => { event.stopPropagation(); tedarikciFavoriDegistir(tedarikci.uid) }}><KucukIkon tip="favori" /></button>
                                   <button type="button" className="ikon-dugme not" title="Not Ekle" onClick={(event) => { event.stopPropagation(); tedarikciNotAc(tedarikci) }}><KucukIkon tip="not" /></button>
                                   <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={(event) => { event.stopPropagation(); tedarikciDuzenlemeAc(tedarikci) }}><KucukIkon tip="duzenle" /></button>
+                                  <button type="button" className="ikon-dugme telefon" title="Ara" onClick={(event) => { event.stopPropagation(); telefonAramasiBaslat(tedarikci.telefon, tedarikci.firmaAdi) }}><KucukIkon tip="telefon" /></button>
                                   <button type="button" className="ikon-dugme sil" title="Sil" onClick={(event) => { event.stopPropagation(); setSilinecekTedarikci(tedarikci) }}><KucukIkon tip="sil" /></button>
                                 </div>
                               </td>
@@ -4643,6 +4682,7 @@ function App() {
                               <button type="button" className={`ikon-dugme favori ${tedarikci.favori ? 'aktif' : ''}`} title="Favori" onClick={() => tedarikciFavoriDegistir(tedarikci.uid)}><KucukIkon tip="favori" /></button>
                               <button type="button" className="ikon-dugme not" title="Not Ekle" onClick={() => tedarikciNotAc(tedarikci)}><KucukIkon tip="not" /></button>
                               <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => tedarikciDuzenlemeAc(tedarikci)}><KucukIkon tip="duzenle" /></button>
+                              <button type="button" className="ikon-dugme telefon" title="Ara" onClick={() => telefonAramasiBaslat(tedarikci.telefon, tedarikci.firmaAdi)}><KucukIkon tip="telefon" /></button>
                               <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekTedarikci(tedarikci)}><KucukIkon tip="sil" /></button>
                             </div>
                           </div>
@@ -5288,6 +5328,27 @@ function App() {
               <path d="M8 9h8M8 13h5" />
             </svg>
           </button>
+        )}
+
+        {aktifSayfa !== 'merkez' && (
+          <nav className="mobil-alt-menu" aria-label="Hızlı gezinme">
+            {[
+              { sayfa: 'dashboard', etiket: 'Dashboard' },
+              { sayfa: 'envanter', etiket: 'Envanter' },
+              { sayfa: 'siparisler', etiket: 'Siparişler' },
+              { sayfa: 'odemeler', etiket: 'Finansal Akış' },
+            ].map((oge) => (
+              <button
+                key={oge.sayfa}
+                type="button"
+                className={`mobil-alt-menu-ogesi ${aktifSayfa === oge.sayfa ? 'aktif' : ''}`}
+                onClick={() => sayfaDegistir(oge.sayfa)}
+              >
+                <SayfaIkonu sayfa={oge.sayfa} className="mobil-alt-menu-ikon" />
+                <span>{oge.etiket}</span>
+              </button>
+            ))}
+          </nav>
         )}
 
         {aktifSayfa !== 'merkez' && aiPanelAcik && !aiPanelKucuk && (

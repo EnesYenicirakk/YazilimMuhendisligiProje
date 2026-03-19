@@ -1,3 +1,4 @@
+import InvoicePreview from './features/invoices/components/InvoicePreview';
 export default function FaturalamaPanel({
   KucukIkon,
   faturalar,
@@ -139,78 +140,12 @@ export default function FaturalamaPanel({
             </div>
 
             <aside className="fatura-onizleme-karti">
-              <div className="fatura-onizleme-ust">
-                <div>
-                  <img
-                    src="/ytu-logo.png"
-                    alt="MTÜ Sanayi logosu"
-                    className="fatura-sirket-rozet"
-                    onError={(event) => {
-                      event.currentTarget.src = '/ytu-logo.svg'
-                    }}
-                  />
-                  <h2>MTÜ Sanayi</h2>
-                  <p>Malatya Yeşilyurt, Ankara Yolu 5. Km No:42</p>
-                  <p>Vergi No: 4481237781</p>
-                </div>
-                <div className="fatura-durum-kutu">
-                  <span className="panel-bilgi-rozet">Taslak</span>
-                  <strong>{faturaOnizleme.faturaNo}</strong>
-                </div>
-              </div>
-
-              <div className="fatura-onizleme-bilgi">
-                <div>
-                  <small>{faturaFormu.tur === 'Satış Faturası' ? 'Müşteri' : 'Tedarikçi'}</small>
-                  <strong>{faturaOnizleme.karsiTarafAdi || 'Seçim bekleniyor'}</strong>
-                </div>
-                <div>
-                  <small>Tarih</small>
-                  <strong>{faturaOnizleme.tarih ? tarihFormatla(faturaOnizleme.tarih) : '-'}</strong>
-                </div>
-                <div>
-                  <small>Ödeme Tarihi</small>
-                  <strong>{faturaOnizleme.odemeTarihi ? tarihFormatla(faturaOnizleme.odemeTarihi) : '-'}</strong>
-                </div>
-              </div>
-
-              <div className="fatura-onizleme-govde">
-                <h3>Ürünler</h3>
-                <div className="fatura-onizleme-satirlar">
-                  {faturaOnizleme.satirlar.length ? faturaOnizleme.satirlar.map((satir) => (
-                    <div key={`onizleme-satir-${satir.id}`} className="fatura-onizleme-satir">
-                      <div>
-                        <strong>{satir.urun}</strong>
-                        <span>{satir.miktar} x {paraFormatla(satir.birimFiyat)}</span>
-                      </div>
-                      <strong>{paraFormatla(Number(satir.miktar) * Number(satir.birimFiyat))}</strong>
-                    </div>
-                  )) : <p className="fatura-bos-metin">Önizleme için ürün satırı ekleyin.</p>}
-                </div>
-
-                <div className="fatura-toplamlar">
-                  <div><span>Ara Toplam</span><strong>{paraFormatla(faturaOnizleme.araToplam)}</strong></div>
-                  <div><span>KDV</span><strong>{paraFormatla(faturaOnizleme.kdv)}</strong></div>
-                  <div className="genel-toplam"><span>Toplam</span><strong>{paraFormatla(faturaOnizleme.toplam)}</strong></div>
-                </div>
-
-                <div className="fatura-belge-alt">
-                  <div className="fatura-belge-not">{faturaOnizleme.not || 'Standart ödeme ve teslimat koşulları geçerlidir.'}</div>
-                  <img
-                    src="/gib-logo.png"
-                    alt="Gelir İdaresi Başkanlığı mührü"
-                    className="fatura-gib-rozet"
-                    onError={(event) => {
-                      event.currentTarget.src = '/gib-logo.svg'
-                    }}
-                  />
-                </div>
+              <InvoicePreview fatura={faturaOnizleme} paraFormatla={paraFormatla} tarihFormatla={tarihFormatla} />
 
                 <div className="fatura-onizleme-alt">
                   <button type="button" className="ikinci" onClick={() => faturayiPdfIndir(faturaOnizleme)}>PDF İndir</button>
                   <button type="button" onClick={() => faturaPdfOnizlemeAc()}>Önizlemeyi Aç</button>
                 </div>
-              </div>
             </aside>
           </div>
         )}

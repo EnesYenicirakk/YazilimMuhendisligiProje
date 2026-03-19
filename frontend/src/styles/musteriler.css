@@ -1,0 +1,5 @@
+/* Müþteriler stilleri için feature katmaný */
+
+.musteri-mobil-kart .swipe-aksiyon-buton {
+  min-width: 74px;
+}

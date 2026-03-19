@@ -1,0 +1,5 @@
+/* Sipariþler stilleri için feature katmaný */
+
+.siparis-mobil-kart .swipe-aksiyon-buton {
+  min-width: 72px;
+}

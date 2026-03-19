@@ -1,3 +1,8 @@
+import IndexPage from './features/home/components/IndexPage';
+import DashboardPage from './features/dashboard/components/DashboardPage';
+import OdemelerPage from './features/finance/components/OdemelerPage';
+import UrunDuzenlemePage from './features/inventory/components/UrunDuzenlemePage';
+import InventoryPage from './features/inventory/components/InventoryPage';
 ﻿import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import BosDurumKarti from './components/common/BosDurumKarti'
@@ -2533,128 +2538,12 @@ function App() {
 
         <div className={`icerik-alani ${aktifSayfa === 'merkez' ? 'merkez-icerik' : ''} ${merkezeDonusAktif ? 'merkeze-donuyor' : ''}`}>
             {aktifSayfa === 'merkez' && (
-              <section className={`merkez-ekrani ${gecisBalonu ? 'gecis-aktif' : ''} ${merkezGirisEfekti ? 'geri-giris' : ''}`}>
-                <div className="merkez-sahne">
-                  <div className="arka-plan-baloncuklari" aria-hidden="true">
-                    <div className="arka-balon arka-balon-1">
-                      <small>Satış</small>
-                      <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
-                        <path d="M8 37 L25 30 L42 18 L60 23 L78 14 L92 28" className="cizgi-a" />
-                        <path d="M8 43 L25 35 L42 40 L60 29 L78 33 L92 22" className="cizgi-b" />
-                        <path d="M8 46 L25 48 L42 44 L60 47 L78 41 L92 45" className="cizgi-c" />
-                      </svg>
-                    </div>
-                    <div className="arka-balon arka-balon-2">
-                      <small>Nakit</small>
-                      <div className="mini-halka-grafik">
-                        <span>68%</span>
-                      </div>
-                    </div>
-                    <div className="arka-balon arka-balon-3">
-                      <small>Sipariş</small>
-                      <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
-                        <path d="M8 34 L25 22 L42 27 L60 16 L78 12 L92 19" className="cizgi-a" />
-                        <path d="M8 41 L25 39 L42 29 L60 33 L78 23 L92 26" className="cizgi-b" />
-                        <path d="M8 48 L25 46 L42 44 L60 40 L78 43 L92 38" className="cizgi-c" />
-                      </svg>
-                    </div>
-                    <div className="arka-balon arka-balon-4">
-                      <small>Envanter</small>
-                      <div className="mini-liste-grafik">
-                        <span style={{ width: '62%' }} />
-                        <span style={{ width: '48%' }} />
-                        <span style={{ width: '71%' }} />
-                      </div>
-                    </div>
-                    <div className="arka-balon arka-balon-5">
-                      <small>Trend</small>
-                      <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
-                        <path d="M8 38 L25 20 L42 31 L60 26 L78 9 L92 18" className="cizgi-a" />
-                        <path d="M8 44 L25 37 L42 34 L60 20 L78 29 L92 24" className="cizgi-b" />
-                        <path d="M8 50 L25 45 L42 46 L60 42 L78 38 L92 41" className="cizgi-c" />
-                      </svg>
-                    </div>
-                    <div className="arka-balon arka-balon-6">
-                      <small>Gelir</small>
-                      <div className="mini-karsilastirma">
-                        <span style={{ height: '48%' }} />
-                        <span style={{ height: '72%' }} />
-                      </div>
-                    </div>
-                    <div className="arka-balon arka-balon-7">
-                      <small>Sevkiyat</small>
-                      <svg viewBox="0 0 100 58" className="mini-coklu-cizgi-grafik">
-                        <path d="M8 42 L25 33 L42 19 L60 25 L78 17 L92 12" className="cizgi-a" />
-                        <path d="M8 47 L25 40 L42 35 L60 28 L78 24 L92 30" className="cizgi-b" />
-                        <path d="M8 49 L25 46 L42 43 L60 45 L78 39 L92 36" className="cizgi-c" />
-                      </svg>
-                    </div>
-                    <div className="arka-balon arka-balon-8">
-                      <small>Stok</small>
-                      <div className="mini-liste-grafik">
-                        <span style={{ width: '70%' }} />
-                        <span style={{ width: '56%' }} />
-                        <span style={{ width: '64%' }} />
-                      </div>
-                    </div>
-                    <div className="arka-balon arka-balon-9">
-                      <small>Günlük Satış</small>
-                      <div className="mini-cubuk-grafik">
-                        <span style={{ height: '42%' }} />
-                        <span style={{ height: '56%' }} />
-                        <span style={{ height: '34%' }} />
-                        <span style={{ height: '68%' }} />
-                        <span style={{ height: '48%' }} />
-                        <span style={{ height: '74%' }} />
-                      </div>
-                    </div>
-                    <div className="arka-balon arka-balon-10">
-                      <small>Stok Hızı</small>
-                      <div className="mini-cubuk-grafik">
-                        <span style={{ height: '28%' }} />
-                        <span style={{ height: '62%' }} />
-                        <span style={{ height: '52%' }} />
-                        <span style={{ height: '78%' }} />
-                        <span style={{ height: '39%' }} />
-                        <span style={{ height: '58%' }} />
-                      </div>
-                    </div>
-                    <div className="arka-balon arka-balon-11">
-                      <small>Aylık Hacim</small>
-                      <div className="mini-cubuk-grafik">
-                        <span style={{ height: '46%' }} />
-                        <span style={{ height: '36%' }} />
-                        <span style={{ height: '64%' }} />
-                        <span style={{ height: '72%' }} />
-                        <span style={{ height: '54%' }} />
-                        <span style={{ height: '60%' }} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="merkez-cember dis-cember" />
-                  <div className="merkez-cember ic-cember" />
-                  <div className="merkez-baslik-karti">
-                    <p>Yönetim Merkezi</p>
-                    <h1>Stok Takip Sistemi</h1>
-                    <span>Bir modül seçerek devam edin</span>
-                  </div>
-                  {merkezMenusu.map((kart, index) => (
-                    <button
-                      key={kart.sayfa}
-                      type="button"
-                      className={`merkez-balon renk-${kart.renk} balon-${index + 1} ${gecisBalonu === kart.sayfa ? 'giriliyor' : ''}`}
-                      onClick={() => merkezdenSayfayaGit(kart.sayfa)}
-                    >
-                      <div className="merkez-balon-icerik">
-                        <SayfaIkonu sayfa={kart.sayfa} className="menu-ikon merkez-ikon-svg" />
-                        <span>{kart.baslik}</span>
-                        <small>{kart.aciklama}</small>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
+            <IndexPage
+              gecisBalonu={gecisBalonu}
+              merkezGirisEfekti={merkezGirisEfekti}
+              merkezdenSayfayaGit={merkezdenSayfayaGit}
+            />
+          )}
 
           {aktifSayfa !== 'merkez' && (
             <button type="button" className={`geri-buton ${merkezeDonusAktif ? 'aktif' : ''}`} onClick={merkezeDon}>
@@ -2662,300 +2551,23 @@ function App() {
             </button>
           )}
           {aktifSayfa === 'dashboard' && (
-            <section>
-              <header className="ust-baslik envanter-baslik">
-                <div>
-                  <h1>Dashboard</h1>
-                  <p>Genel stok ve sipariş özeti</p>
-                </div>
-                <div className="dashboard-ust-aksiyonlar">
-                  <div className="dashboard-bolum-menu-sarmal">
-                    <button
-                      type="button"
-                      className="ikinci dashboard-bolum-buton"
-                      onClick={() => setDashboardBolumMenusuAcik((onceki) => !onceki)}
-                    >
-                      Tabloları Gizle/Göster
-                    </button>
-                    {dashboardBolumMenusuAcik && (
-                      <div className="dashboard-bolum-menu">
-                        {dashboardBolumSablonu.map((bolum) => (
-                          <label key={bolum.anahtar} className="dashboard-bolum-secenek">
-                            <input
-                              type="checkbox"
-                              checked={gorunenDashboardBolumleri[bolum.anahtar]}
-                              onChange={() => dashboardBolumGorunurlukDegistir(bolum.anahtar)}
-                            />
-                            <span>{bolum.etiket}</span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <button type="button" onClick={() => sayfaDegistir('envanter')}>
-                    Envantere Git
-                  </button>
-                </div>
-              </header>
-
-              <div className="ozet-grid">
-                {dashboardOzet.map((kart) => (
-                  <article key={kart.baslik} className="ozet-kartcik">
-                    <div className="ozet-ust">
-                      <span className="ozet-ikon"><KucukIkon tip={kart.ikon} /></span>
-                      <div className="ozet-menu-sarmal">
-                        <button
-                          type="button"
-                          className="ozet-menu"
-                          aria-label="Kart Menüsü"
-                          onClick={() => setAcikOzetMenusu((onceki) => (onceki === kart.baslik ? '' : kart.baslik))}
-                        >
-                          <KucukIkon tip="menu" />
-                        </button>
-                        {acikOzetMenusu === kart.baslik && (
-                          <div className="ozet-menu-acilir">
-                            <button type="button" onClick={() => ozetKartiniSil(kart.baslik)}>Grafiği Sil</button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <p>{kart.baslik}</p>
-                    <div className="ozet-alt">
-                      <h3>{kart.deger}</h3>
-                      <span className={`ozet-degisim ${kart.degisim.startsWith('+') ? 'pozitif' : 'negatif'}`}>{kart.degisim}</span>
-                    </div>
-                  </article>
-                ))}
-              </div>
-
-              {gorunenDashboardBolumleri.canli && (
-                <section className="dashboard-canli-grid">
-                  <article className="panel-kart canli-ozet-karti">
-                    <div className="panel-baslik">
-                      <h2>Bugünkü Siparişler</h2>
-                      <small>Canlı özet</small>
-                    </div>
-                    <strong className="canli-ozet-deger">{dashboardCanliOzetler.bugunkuSiparisAdedi}</strong>
-                    <p className="canli-ozet-aciklama">Bugün açılan sipariş sayısı</p>
-                    <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bugunkuSiparisTutari)} toplam hacim</span>
-                  </article>
-
-                  <article className="panel-kart canli-ozet-karti">
-                    <div className="panel-baslik">
-                      <h2>Bekleyen Tahsilatlar</h2>
-                      <small>Ödeme takibi</small>
-                    </div>
-                    <strong className="canli-ozet-deger">{dashboardCanliOzetler.bekleyenTahsilatAdedi}</strong>
-                    <p className="canli-ozet-aciklama">Tahsil edilmesi gereken sipariş</p>
-                    <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bekleyenTahsilatTutari)} bekleyen tutar</span>
-                  </article>
-
-                  <article className="panel-kart canli-ozet-karti">
-                    <div className="panel-baslik">
-                      <h2>Geciken Siparişler</h2>
-                      <small>Teslimat uyarısı</small>
-                    </div>
-                    <strong className="canli-ozet-deger">{dashboardCanliOzetler.gecikenSiparisAdedi}</strong>
-                    <p className="canli-ozet-aciklama">Tahmini süresi aşılmış sipariş</p>
-                    <span className="canli-ozet-alt">
-                      {dashboardCanliOzetler.gecikenSiparisAdedi > 0
-                        ? dashboardCanliOzetler.gecikenSiparisler.slice(0, 2).map((siparis) => siparis.siparisNo).join(', ')
-                        : 'Şu an gecikme görünmüyor'}
-                    </span>
-                  </article>
-                </section>
-              )}
-
-              {(gorunenDashboardBolumleri.haftalik || gorunenDashboardBolumleri.kritik) && (
-                <section className="dashboard-orta-grid">
-                  {gorunenDashboardBolumleri.haftalik && (
-                    <>
-                      <article className="panel-kart">
-                        <div className="panel-baslik">
-                          <h2>Haftalık Satış Grafiği</h2>
-                          <small>Son 7 gün</small>
-                        </div>
-                        <div className="haftalik-grafik-kapsayici">
-                          <div className="satis-olcek">
-                            {[haftalikSatisGrafikUstSinir, haftalikSatisGrafikUstSinir * 0.75, haftalikSatisGrafikUstSinir * 0.5, haftalikSatisGrafikUstSinir * 0.25, 0].map((deger) => (
-                              <span key={deger} className="satis-olcek-etiketi">
-                                {deger === 0 ? '0' : `₺${Math.round(deger / 1000)}B`}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="satis-grafik">
-                            {[1, 0.75, 0.5, 0.25, 0].map((cizgi) => (
-                              <div key={cizgi} className="yatay-cizgi" style={{ bottom: `${cizgi * 100}%` }} />
-                            ))}
-                            {haftalikSatisVerisi.map((gun) => (
-                              <div key={gun.etiket} className="bar-wrap">
-                                <div className="bar-katman">
-                                  <div className="bar-ust" style={{ height: `${gun.ustOran}%` }} />
-                                  <div className="bar-alt" style={{ height: `${gun.altOran}%` }} />
-                                </div>
-                                <span className="bar-nokta" />
-                                <span className="bar-etiket">
-                                  <span className="bar-etiket-tam">{gun.etiket}</span>
-                                  <span className="bar-etiket-kisa">{gunEtiketiKisalt(gun.etiket)}</span>
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="mobil-gun-etiketleri" aria-hidden="true">
-                            {haftalikSatisVerisi.map((gun) => (
-                              <span key={`mobil-gun-${gun.etiket}`}>{gunEtiketiKisalt(gun.etiket)}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </article>
-
-                      <article className="panel-kart">
-                        <div className="panel-baslik">
-                          <h2>En Çok Satılan Ürünler</h2>
-                          <small>Aylık</small>
-                        </div>
-                        <ul className="dashboard-liste grafikli-liste">
-                          {urunler.slice(0, 6).map((urun) => {
-                            const maksimum = Math.max(...urunler.map((u) => u.urunAdedi), 1)
-                            const oran = Math.max((urun.urunAdedi / maksimum) * 100, 8)
-                            return (
-                              <li key={urun.uid}>
-                                <div className="urun-grafik-satiri">
-                                  <div className="urun-grafik-ust">
-                                    <span>{urun.ad}</span>
-                                    <strong>{urun.urunAdedi} adet</strong>
-                                  </div>
-                                  <div className="urun-grafik-zemin">
-                                    <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
-                                  </div>
-                                </div>
-                              </li>
-                            )
-                          })}
-                        </ul>
-                      </article>
-                    </>
-                  )}
-
-                  {gorunenDashboardBolumleri.kritik && (
-                    <article className="panel-kart kritik-stok-paneli">
-                      <div className="panel-baslik">
-                        <h2>Kritik Stok Uyarısı</h2>
-                        <small>{dashboardCanliOzetler.kritikStokAdedi} ürün eşik altında</small>
-                      </div>
-
-                      <div className="kritik-stok-ozet">
-                        <strong>{dashboardCanliOzetler.kritikStokAdedi}</strong>
-                        <span>Minimum stok değerinin altına düşen ürünler</span>
-                      </div>
-
-                      <div className="kritik-stok-liste">
-                        {dashboardCanliOzetler.kritikStokluUrunler.slice(0, 4).map((urun) => (
-                          <article key={`kritik-${urun.uid}`} className="kritik-stok-karti">
-                            <div className="kritik-stok-baslik">
-                              <strong className="urun-ad-satiri">
-                                <span>{urun.ad}</span>
-                                <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır.">!</span>
-                              </strong>
-                              <span>{urun.urunId}</span>
-                            </div>
-                            <div className="kritik-stok-detay">
-                              <span>Minimum stok: <strong>{urun.minimumStok}</strong></span>
-                              <span>Mevcut: <strong>{urun.magazaStok}</strong></span>
-                            </div>
-                          </article>
-                        ))}
-                      </div>
-                    </article>
-                  )}
-                </section>
-              )}
-
-              {gorunenDashboardBolumleri.yakin && (
-                <article className="panel-kart">
-                  <div className="panel-baslik">
-                    <h2>Yakın Zamanda Satılan Ürünler</h2>
-                    <small>Şehir içi siparişler</small>
-                  </div>
-                  <div className="tablo-sarmal masaustu-tablo">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Sipariş No</th>
-                          <th>Ürün</th>
-                          <th>Müşteri</th>
-                          <th>Teslimat</th>
-                          <th>Tutar</th>
-                          <th>Durum</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {dashboardYakinSatislar.map((satis) => (
-                          <tr key={satis.siparis}>
-                            <td>{satis.siparis}</td>
-                            <td>{satis.urun}</td>
-                            <td>{satis.musteri}</td>
-                            <td>{satis.teslimat}</td>
-                            <td>{satis.tutar}</td>
-                            <td><span className={`durum-baloncuk ${durumSinifi(satis.durum)}`}>{satis.durum}</span></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </article>
-              )}
-
-              {gorunenDashboardBolumleri.altGrafikler && (
-                <section className="dashboard-alt-grafikler">
-                  <article className="panel-kart grafik-kart">
-                    <div className="panel-baslik">
-                      <h2>Harcanan Tutar ve Elde Edilen Gelir</h2>
-                      <small>Son 6 ay</small>
-                    </div>
-                    <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Gelir ve gider grafiği">
-                      <line x1="10" y1="100" x2="310" y2="100" />
-                      <polyline points={cizgiNoktalari(gelirSerisi)} className="mavi-cizgi" />
-                      <polyline points={cizgiNoktalari(giderSerisi)} className="kirmizi-cizgi" />
-                    </svg>
-                    <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
-                    <div className="grafik-lejant">
-                      <span><i className="lejant-kutu mavi" /> Toplam Gelir</span>
-                      <span><i className="lejant-kutu kirmizi" /> Toplam Gider</span>
-                    </div>
-                  </article>
-
-                  <article className="panel-kart grafik-kart">
-                    <div className="panel-baslik">
-                      <h2>Aylara Göre Satılan Toplam Ürün</h2>
-                      <small>Adet bazlı</small>
-                    </div>
-                    <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Aylık satılan ürün grafiği">
-                      <line x1="10" y1="100" x2="310" y2="100" />
-                      <polyline points={cizgiNoktalari(aylikSatilanUrun)} className="kirmizi-cizgi" />
-                    </svg>
-                    <div className="grafik-etiketleri">{aylar.map((ay) => <span key={ay}>{ay}</span>)}</div>
-                    <div className="grafik-lejant"><span><i className="lejant-kutu kirmizi" /> Satılan Ürün (Adet)</span></div>
-                  </article>
-
-                  <article className="panel-kart grafik-kart">
-                    <div className="panel-baslik">
-                      <h2>Satılan Ürünlerin Sütun Grafiği</h2>
-                      <small>Aynı verinin sütun görünümü</small>
-                    </div>
-                    <div className="sutun-grafik" aria-label="Satılan ürünlerin sütun grafiği">
-                      {aylikSatilanUrun.map((deger, index) => (
-                        <div key={`${aylar[index]}-${deger}`} className="sutun-ogesi">
-                          <span className="sutun-deger">{deger}</span>
-                          <div className="sutun" style={{ height: `${Math.max((deger / Math.max(...aylikSatilanUrun)) * 100, 8)}%` }} />
-                          <small>{aylar[index]}</small>
-                        </div>
-                      ))}
-                    </div>
-                  </article>
-                </section>
-              )}
-            </section>
+            <DashboardPage
+              KucukIkon={KucukIkon}
+              setDashboardBolumMenusuAcik={setDashboardBolumMenusuAcik}
+              dashboardBolumMenusuAcik={dashboardBolumMenusuAcik}
+              gorunenDashboardBolumleri={gorunenDashboardBolumleri}
+              dashboardBolumGorunurlukDegistir={dashboardBolumGorunurlukDegistir}
+              sayfaDegistir={sayfaDegistir}
+              dashboardOzet={dashboardOzet}
+              setAcikOzetMenusu={setAcikOzetMenusu}
+              acikOzetMenusu={acikOzetMenusu}
+              ozetKartiniSil={ozetKartiniSil}
+              dashboardCanliOzetler={dashboardCanliOzetler}
+              haftalikSatisGrafikUstSinir={haftalikSatisGrafikUstSinir}
+              haftalikSatisVerisi={haftalikSatisVerisi}
+              urunler={urunler}
+              dashboardYakinSatislar={dashboardYakinSatislar}
+            />
           )}
 
           {aktifSayfa === 'siparisler' && (
@@ -3050,485 +2662,38 @@ function App() {
           )}
 
           {aktifSayfa === 'odemeler' && (
-            <section>
-              <header className="ust-baslik envanter-baslik">
-                <div>
-                  <h1>Finansal Akış</h1>
-                  <p>Tahsilat ve ödeme hareketlerini tek ekrandan takip edin.</p>
-                </div>
-              </header>
-
-              <section className="panel-kart odeme-kart">
-                <div className="odeme-sekme-alani">
-                  <button
-                    type="button"
-                    className={`odeme-sekme ${odemeSekmesi === 'gelen' ? 'aktif' : ''}`}
-                    onClick={() => setOdemeSekmesi('gelen')}
-                  >
-                    Tahsilatlar
-                  </button>
-                  <button
-                    type="button"
-                    className={`odeme-sekme ${odemeSekmesi === 'giden' ? 'aktif' : ''}`}
-                    onClick={() => setOdemeSekmesi('giden')}
-                  >
-                    Ödemeler
-                  </button>
-                </div>
-
-                <section className="dashboard-canli-grid">
-                  <article className="canli-ozet-kart">
-                    <span className="canli-ozet-etiket">Toplam Tahsilat</span>
-                    <strong>{paraFormatla(toplamGelenNakit)}</strong>
-                  </article>
-                  <article className="canli-ozet-kart">
-                    <span className="canli-ozet-etiket">Toplam Ödeme</span>
-                    <strong>{paraFormatla(toplamGidenNakit)}</strong>
-                  </article>
-                  <article className="canli-ozet-kart">
-                    <span className="canli-ozet-etiket">Net Durum</span>
-                    <strong>{paraFormatla(toplamGelenNakit - toplamGidenNakit)}</strong>
-                  </article>
-                </section>
-
-                {odemeSekmesi === 'gelen' && (
-                  <>
-                    <div className="panel-ust-cizgi">
-                      <h2>Tahsilat Listesi</h2>
-                      <small>{gelenSayfadakiKayitlar.length} kayıt gösteriliyor</small>
-                    </div>
-
-                    <div className="tablo-sarmal masaustu-tablo">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Ödeme No</th>
-                            <th>Taraf</th>
-                            <th>Tarih</th>
-                            <th>Durum</th>
-                            <th>Tutar</th>
-                            <th>İşlem</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {gelenSayfadakiKayitlar.map((kayit) => (
-                            <tr key={kayit.odemeNo}>
-                              <td>{kayit.odemeNo}</td>
-                              <td>{kayit.taraf}</td>
-                              <td>{tarihFormatla(kayit.tarih)}</td>
-                              <td><span className="odeme-durumu odendi">{kayit.durum}</span></td>
-                              <td>{paraFormatla(kayit.tutar)}</td>
-                              <td>
-                                <div className="islem-dugmeleri odeme-islemler">
-                                  <button type="button" className={`ikon-dugme favori ${kayit.favori ? 'aktif' : ''}`} onClick={() => finansFavoriDegistir('gelen', kayit.odemeNo)} title="Favori"><KucukIkon tip="favori" /></button>
-                                  <button type="button" className="ikon-dugme duzenle" onClick={() => odemeDuzenlemeAc('gelen', kayit)} title="Düzenle"><KucukIkon tip="duzenle" /></button>
-                                  <button type="button" className="ikon-dugme sil" onClick={() => setSilinecekOdeme({ sekme: 'gelen', odemeNo: kayit.odemeNo, taraf: kayit.taraf })} title="Sil"><KucukIkon tip="sil" /></button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="mobil-kart-listesi">
-                      {gelenSayfadakiKayitlar.map((kayit) => (
-                        <MobilKart
-                          key={`gelen-${kayit.odemeNo}`}
-                          className="odeme-mobil-kart"
-                          solaEtiket="Sil"
-                          sagaEtiket="Favori ve düzenle"
-                          solaAksiyonlar={[
-                            { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekOdeme({ sekme: 'gelen', odemeNo: kayit.odemeNo, taraf: kayit.taraf }) },
-                          ]}
-                          sagaAksiyonlar={[
-                            { id: 'favori', etiket: 'Favori', onClick: () => finansFavoriDegistir('gelen', kayit.odemeNo) },
-                            { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => odemeDuzenlemeAc('gelen', kayit) },
-                          ]}
-                          ust={<><strong>{kayit.odemeNo}</strong><span>{kayit.taraf}</span></>}
-                          govde={<>
-                            <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(kayit.tarih)}</strong></div>
-                            <div className="mobil-bilgi-satiri"><span>Durum</span><strong>{kayit.durum}</strong></div>
-                            <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(kayit.tutar)}</strong></div>
-                          </>}
-                        />
-                      ))}
-                    </div>
-
-                    <div className="sayfalama">
-                      <button type="button" className="sayfa-ok" onClick={() => setGelenSayfa((onceki) => Math.max(1, onceki - 1))} disabled={gelenSayfa === 1}>‹</button>
-                      {Array.from({ length: toplamGelenSayfa }, (_, i) => i + 1).map((sayfaNo) => (
-                        <button key={`gelen-sayfa-${sayfaNo}`} type="button" className={`sayfa-buton ${gelenSayfa === sayfaNo ? 'aktif' : ''}`} onClick={() => setGelenSayfa(sayfaNo)}>
-                          {sayfaNo}
-                        </button>
-                      ))}
-                      <button type="button" className="sayfa-ok" onClick={() => setGelenSayfa((onceki) => Math.min(toplamGelenSayfa, onceki + 1))} disabled={gelenSayfa === toplamGelenSayfa}>›</button>
-                    </div>
-                  </>
-                )}
-
-                {odemeSekmesi === 'giden' && (
-                  <>
-                    <div className="panel-ust-cizgi">
-                      <h2>Ödeme Listesi</h2>
-                      <small>{gidenSayfadakiKayitlar.length} kayıt gösteriliyor</small>
-                    </div>
-
-                    <div className="tablo-sarmal masaustu-tablo">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Ödeme No</th>
-                            <th>Taraf</th>
-                            <th>Tarih</th>
-                            <th>Durum</th>
-                            <th>Tutar</th>
-                            <th>İşlem</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {gidenSayfadakiKayitlar.map((kayit) => (
-                            <tr key={kayit.odemeNo}>
-                              <td>{kayit.odemeNo}</td>
-                              <td>{kayit.taraf}</td>
-                              <td>{tarihFormatla(kayit.tarih)}</td>
-                              <td><span className="odeme-durumu odendi">{kayit.durum}</span></td>
-                              <td>{paraFormatla(kayit.tutar)}</td>
-                              <td>
-                                <div className="islem-dugmeleri odeme-islemler">
-                                  <button type="button" className={`ikon-dugme favori ${kayit.favori ? 'aktif' : ''}`} onClick={() => finansFavoriDegistir('giden', kayit.odemeNo)} title="Favori"><KucukIkon tip="favori" /></button>
-                                  <button type="button" className="ikon-dugme duzenle" onClick={() => odemeDuzenlemeAc('giden', kayit)} title="Düzenle"><KucukIkon tip="duzenle" /></button>
-                                  <button type="button" className="ikon-dugme sil" onClick={() => setSilinecekOdeme({ sekme: 'giden', odemeNo: kayit.odemeNo, taraf: kayit.taraf })} title="Sil"><KucukIkon tip="sil" /></button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="mobil-kart-listesi">
-                      {gidenSayfadakiKayitlar.map((kayit) => (
-                        <MobilKart
-                          key={`giden-${kayit.odemeNo}`}
-                          className="odeme-mobil-kart"
-                          solaEtiket="Sil"
-                          sagaEtiket="Favori ve düzenle"
-                          solaAksiyonlar={[
-                            { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekOdeme({ sekme: 'giden', odemeNo: kayit.odemeNo, taraf: kayit.taraf }) },
-                          ]}
-                          sagaAksiyonlar={[
-                            { id: 'favori', etiket: 'Favori', onClick: () => finansFavoriDegistir('giden', kayit.odemeNo) },
-                            { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => odemeDuzenlemeAc('giden', kayit) },
-                          ]}
-                          ust={<><strong>{kayit.odemeNo}</strong><span>{kayit.taraf}</span></>}
-                          govde={<>
-                            <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(kayit.tarih)}</strong></div>
-                            <div className="mobil-bilgi-satiri"><span>Durum</span><strong>{kayit.durum}</strong></div>
-                            <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(kayit.tutar)}</strong></div>
-                          </>}
-                        />
-                      ))}
-                    </div>
-
-                    <div className="sayfalama">
-                      <button type="button" className="sayfa-ok" onClick={() => setGidenSayfa((onceki) => Math.max(1, onceki - 1))} disabled={gidenSayfa === 1}>‹</button>
-                      {Array.from({ length: toplamGidenSayfa }, (_, i) => i + 1).map((sayfaNo) => (
-                        <button key={`giden-sayfa-${sayfaNo}`} type="button" className={`sayfa-buton ${gidenSayfa === sayfaNo ? 'aktif' : ''}`} onClick={() => setGidenSayfa(sayfaNo)}>
-                          {sayfaNo}
-                        </button>
-                      ))}
-                      <button type="button" className="sayfa-ok" onClick={() => setGidenSayfa((onceki) => Math.min(toplamGidenSayfa, onceki + 1))} disabled={gidenSayfa === toplamGidenSayfa}>›</button>
-                    </div>
-                  </>
-                )}
-              </section>
-            </section>
+            <OdemelerPage
+              KucukIkon={KucukIkon}
+              MobilKart={MobilKart}
+              odemeSekmesi={odemeSekmesi}
+              setOdemeSekmesi={setOdemeSekmesi}
+              toplamGelenNakit={toplamGelenNakit}
+              toplamGidenNakit={toplamGidenNakit}
+              gelenSayfadakiKayitlar={gelenSayfadakiKayitlar}
+              gidenSayfadakiKayitlar={gidenSayfadakiKayitlar}
+              finansFavoriDegistir={finansFavoriDegistir}
+              odemeDuzenlemeAc={odemeDuzenlemeAc}
+              setSilinecekOdeme={setSilinecekOdeme}
+              gelenSayfa={gelenSayfa}
+              setGelenSayfa={setGelenSayfa}
+              toplamGelenSayfa={toplamGelenSayfa}
+              gidenSayfa={gidenSayfa}
+              setGidenSayfa={setGidenSayfa}
+              toplamGidenSayfa={toplamGidenSayfa}
+            />
           )}
 
           {aktifSayfa === 'urun-duzenleme' && (
-            <section>
-              <header className="ust-baslik envanter-baslik">
-                <div>
-                  <h1>Ürün Düzenleme</h1>
-                  <p>Alış ve satış fiyatlarını ürün bazında yönetin.</p>
-                </div>
-              </header>
-
-              <section className="panel-kart envanter-kart">
-                <div className="odeme-sekme-alani">
-                  <button
-                    type="button"
-                    className={`odeme-sekme ${urunDuzenlemeSekmesi === 'urunler' ? 'aktif' : ''}`}
-                    onClick={() => setUrunDuzenlemeSekmesi('urunler')}
-                  >
-                    Ürün Listesi
-                  </button>
-                  <button
-                    type="button"
-                    className={`odeme-sekme ${urunDuzenlemeSekmesi === 'stok-loglari' ? 'aktif' : ''}`}
-                    onClick={() => setUrunDuzenlemeSekmesi('stok-loglari')}
-                  >
-                    Stok Geçmişi
-                  </button>
-                </div>
-
-                {urunDuzenlemeSekmesi === 'urunler' && (
-                  <>
-                    <div className="panel-ust-cizgi">
-                      <h2>Ürün Fiyat Listesi</h2>
-                      <input
-                        type="text"
-                        placeholder="Ürün veya ID ara"
-                        value={urunDuzenlemeArama}
-                        onChange={(event) => {
-                          setUrunDuzenlemeArama(event.target.value)
-                          setUrunDuzenlemeSayfa(1)
-                        }}
-                      />
-                    </div>
-
-                    {sayfadakiDuzenlemeUrunleri.length > 0 ? (
-                      <>
-                    <div className="tablo-sarmal masaustu-tablo">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>No</th>
-                            <th>Ürün</th>
-                            <th>Ürün ID</th>
-                            <th>Ürün Adedi</th>
-                            <th>Alış Fiyatı</th>
-                            <th>Satış Fiyatı</th>
-                            <th>Mağaza Stok</th>
-                            <th>İşlem</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sayfadakiDuzenlemeUrunleri.map((urun, index) => (
-                            <tr key={`duzenleme-${urun.uid}`}>
-                              <td>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')}</td>
-                              <td>
-                                <div className="urun-bilgi">
-                                  <span className="urun-avatar">{urun.avatar}</span>
-                                  <span className="urun-ad-satiri">
-                                    <span>{urun.ad}</span>
-                                    {kritikStoktaMi(urun) && (
-                                      <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
-                                        !
-                                      </span>
-                                    )}
-                                  </span>
-                                </div>
-                              </td>
-                              <td>{urun.urunId}</td>
-                              <td>{urun.urunAdedi}</td>
-                              <td>{paraFormatla(urun.alisFiyati ?? 0)}</td>
-                              <td>{paraFormatla(urun.satisFiyati ?? 0)}</td>
-                              <td>{urun.magazaStok}</td>
-                              <td>
-                                <div className="islem-dugmeleri">
-                                  <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}><KucukIkon tip="favori" /></button>
-                                  <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => urunDuzenlemeModaliniAc(urun)}><KucukIkon tip="duzenle" /></button>
-                                  <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekDuzenlemeUrunu(urun)}><KucukIkon tip="sil" /></button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="mobil-kart-listesi">
-                      {sayfadakiDuzenlemeUrunleri.map((urun, index) => (
-                        <MobilKart
-                          key={`mobil-duzenleme-${urun.uid}`}
-                          className="envanter-mobil-kart"
-                          solaEtiket="Sil"
-                          sagaEtiket="Favori ve düzenle"
-                          solaAksiyonlar={[
-                            { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekDuzenlemeUrunu(urun) },
-                          ]}
-                          sagaAksiyonlar={[
-                            { id: 'favori', etiket: 'Favori', onClick: () => favoriDegistir(urun.uid) },
-                            { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => urunDuzenlemeModaliniAc(urun) },
-                          ]}
-                          ust={
-                            <>
-                              <strong>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')} - {urun.ad}</strong>
-                              <span>{urun.urunId}</span>
-                            </>
-                          }
-                          govde={
-                            <>
-                              <div className="mobil-kart-kisi">
-                                <span className="urun-avatar">{urun.avatar}</span>
-                                <div className="mobil-kisi-metin">
-                                  <strong className="urun-ad-satiri">
-                                    <span>{urun.ad}</span>
-                                    {kritikStoktaMi(urun) && (
-                                      <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
-                                        !
-                                      </span>
-                                    )}
-                                  </strong>
-                                  <span>{urun.urunId}</span>
-                                </div>
-                              </div>
-                              <div className="mobil-bilgi-satiri"><span>Ürün Adedi</span><strong>{urun.urunAdedi}</strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Minimum Stok</span><strong>{urun.minimumStok}</strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Alış Fiyatı</span><strong>{paraFormatla(urun.alisFiyati ?? 0)}</strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Satış Fiyatı</span><strong>{paraFormatla(urun.satisFiyati ?? 0)}</strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Mağaza Stok</span><strong>{urun.magazaStok}</strong></div>
-                            </>
-                          }
-                        />
-                      ))}
-                    </div>
-
-                    <div className="sayfalama">
-                      <button type="button" className="sayfa-ok" onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa - 1)} disabled={urunDuzenlemeSayfa === 1}>‹</button>
-                      {Array.from({ length: toplamUrunDuzenlemeSayfa }, (_, i) => i + 1).map((sayfaNo) => (
-                        <button
-                          key={`duzenleme-sayfa-${sayfaNo}`}
-                          type="button"
-                          className={`sayfa-buton ${urunDuzenlemeSayfa === sayfaNo ? 'aktif' : ''}`}
-                          onClick={() => urunDuzenlemeSayfayaGit(sayfaNo)}
-                        >
-                          {sayfaNo}
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        className="sayfa-ok"
-                        onClick={() => urunDuzenlemeSayfayaGit(urunDuzenlemeSayfa + 1)}
-                        disabled={urunDuzenlemeSayfa === toplamUrunDuzenlemeSayfa}
-                      >
-                        ›
-                      </button>
-                    </div>
-                      </>
-                    ) : (
-                      <BosDurumKarti
-                        baslik="Düzenlenecek ürün bulunamadı"
-                        aciklama="Arama kriterine göre görüntülenecek ürün yok."
-                        eylemMetni="Aramayı Temizle"
-                        onEylem={() => {
-                          setUrunDuzenlemeArama('')
-                          setUrunDuzenlemeSayfa(1)
-                        }}
-                      />
-                    )}
-                  </>
-                )}
-
-                {urunDuzenlemeSekmesi === 'stok-loglari' && (
-                  <>
-                    <div className="panel-ust-cizgi">
-                      <h2>Son Stok Değişiklikleri</h2>
-                      <span className="panel-bilgi-rozet">Son 16 hareket</span>
-                    </div>
-
-                    {sayfadakiStokLoglari.length > 0 ? (
-                      <>
-                    <div className="tablo-sarmal masaustu-tablo">
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>No</th>
-                            <th>Tarih</th>
-                            <th>Ürün</th>
-                            <th>Ürün ID</th>
-                            <th>İşlem</th>
-                            <th>Eski Stok</th>
-                            <th>Yeni Stok</th>
-                            <th>Kullanıcı</th>
-                            <th>Açıklama</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sayfadakiStokLoglari.map((log, index) => (
-                            <tr key={`stok-log-${log.id}`}>
-                              <td>{String(stokLogBaslangic + index + 1).padStart(2, '0')}</td>
-                              <td>{log.tarih}</td>
-                              <td>{log.urun}</td>
-                              <td>{log.urunId}</td>
-                              <td><span className="stok-log-rozet">{log.islem}</span></td>
-                              <td>
-                                <span className={`stok-log-deger-baloncuk ${log.eskiStok > log.yeniStok ? 'yuksek' : 'dusuk'}`}>
-                                  {log.eskiStok}
-                                </span>
-                              </td>
-                              <td>
-                                <span className={`stok-log-deger-baloncuk ${log.yeniStok > log.eskiStok ? 'yuksek' : 'dusuk'}`}>
-                                  {log.yeniStok}
-                                </span>
-                              </td>
-                              <td>{log.kullanici}</td>
-                              <td>{log.aciklama}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="mobil-kart-listesi">
-                      {sayfadakiStokLoglari.map((log, index) => (
-                        <MobilKart
-                          key={`mobil-stok-log-${log.id}`}
-                          className="stok-log-mobil-kart"
-                          ust={
-                            <>
-                              <strong>{String(stokLogBaslangic + index + 1).padStart(2, '0')} - {log.urun}</strong>
-                              <span className="stok-log-rozet">{log.islem}</span>
-                            </>
-                          }
-                          govde={
-                            <>
-                              <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{log.tarih}</strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Ürün ID</span><strong>{log.urunId}</strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Eski Stok</span><strong><span className={`stok-log-deger-baloncuk ${log.eskiStok > log.yeniStok ? 'yuksek' : 'dusuk'}`}>{log.eskiStok}</span></strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Yeni Stok</span><strong><span className={`stok-log-deger-baloncuk ${log.yeniStok > log.eskiStok ? 'yuksek' : 'dusuk'}`}>{log.yeniStok}</span></strong></div>
-                              <div className="mobil-bilgi-satiri"><span>Kullanıcı</span><strong>{log.kullanici}</strong></div>
-                              <div className="mobil-bilgi-satiri tam"><span>Açıklama</span><strong>{log.aciklama}</strong></div>
-                            </>
-                          }
-                        />
-                      ))}
-                    </div>
-
-                    <div className="sayfalama">
-                      <button type="button" className="sayfa-ok" onClick={() => setStokLogSayfa(stokLogSayfa - 1)} disabled={stokLogSayfa === 1}>‹</button>
-                      {Array.from({ length: toplamStokLogSayfa }, (_, i) => i + 1).map((sayfaNo) => (
-                        <button
-                          key={`stok-log-sayfa-${sayfaNo}`}
-                          type="button"
-                          className={`sayfa-buton ${stokLogSayfa === sayfaNo ? 'aktif' : ''}`}
-                          onClick={() => setStokLogSayfa(sayfaNo)}
-                        >
-                          {sayfaNo}
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        className="sayfa-ok"
-                        onClick={() => setStokLogSayfa(stokLogSayfa + 1)}
-                        disabled={stokLogSayfa === toplamStokLogSayfa}
-                      >
-                        ›
-                      </button>
-                    </div>
-                      </>
-                    ) : (
-                      <BosDurumKarti
-                        baslik="Stok hareketi bulunamadı"
-                        aciklama="Henüz görüntülenecek stok değişiklik kaydı yok."
-                      />
-                    )}
-                  </>
-                )}
-              </section>
-            </section>
+            <UrunDuzenlemePage
+              KucukIkon={KucukIkon}
+              BosDurumKarti={BosDurumKarti}
+              MobilKart={MobilKart}
+              urunler={urunler}
+              setUrunler={setUrunler}
+              stokDegisimLoglari={stokDegisimLoglari}
+              toastGoster={toastGoster}
+              favoriDegistir={favoriDegistir}
+            />
           )}
 
           {aktifSayfa === 'faturalama' && (
@@ -3563,179 +2728,15 @@ function App() {
           )}
 
           {aktifSayfa === 'envanter' && (
-            <section>
-              <header className="ust-baslik envanter-baslik">
-                <div>
-                  <h1>Envanter</h1>
-                  <p>Mağaza: Merkez Şube</p>
-                </div>
-                <button type="button" className="urun-ekle-karti" onClick={eklemePenceresiniAc}>
-                  <span className="urun-ekle-ikon" aria-hidden="true"><KucukIkon tip="urun-ekle" /></span>
-                  <span className="urun-ekle-metin">Yeni Ürün</span>
-                </button>
-              </header>
-
-              <section className="panel-kart envanter-kart">
-                <div className="odeme-sekme-alani kategori-sekme-alani">
-                  {envanterKategorileri.map((kategori) => (
-                    <button
-                      key={kategori}
-                      type="button"
-                      className={`odeme-sekme ${envanterKategori === kategori ? 'aktif' : ''}`}
-                      onClick={() => {
-                        setEnvanterKategori(kategori)
-                        setEnvanterSayfa(1)
-                      }}
-                    >
-                      {kategori}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="panel-ust-cizgi">
-                  <h2>Parça Listesi</h2>
-                  <input
-                    type="text"
-                    placeholder="Ürün veya ID ara"
-                    value={aramaMetni}
-                    onChange={(event) => {
-                      setAramaMetni(event.target.value)
-                      setEnvanterSayfa(1)
-                    }}
-                  />
-                </div>
-
-                {sayfadakiUrunler.length > 0 ? (
-                  <>
-                <div className="tablo-sarmal masaustu-tablo">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>No</th>
-                        <th>Ürün</th>
-                        <th>Ürün ID</th>
-                        <th>Kategori</th>
-                        <th>Ürün Adedi</th>
-                        <th>Mağaza Stok</th>
-                        <th>İşlem</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sayfadakiUrunler.map((urun, index) => (
-                        <tr key={urun.uid}>
-                          <td>{String(sayfaBaslangic + index + 1).padStart(2, '0')}</td>
-                          <td>
-                            <div className="urun-hucre">
-                              <span className="urun-avatar">{urun.avatar}</span>
-                              <strong className="urun-ad-satiri">
-                                <span>{urun.ad}</span>
-                                {kritikStoktaMi(urun) && (
-                                  <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
-                                    !
-                                  </span>
-                                )}
-                              </strong>
-                            </div>
-                          </td>
-                          <td>{urun.urunId}</td>
-                          <td>{urun.kategori}</td>
-                          <td>{urun.urunAdedi}</td>
-                          <td>{urun.magazaStok}</td>
-                          <td>
-                            <div className="islem-dugmeleri">
-                              <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}><KucukIkon tip="favori" /></button>
-                              <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => duzenlemePenceresiniAc(urun)}><KucukIkon tip="duzenle" /></button>
-                              <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekUrun(urun)}><KucukIkon tip="sil" /></button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="mobil-kart-listesi">
-                  {sayfadakiUrunler.map((urun, index) => (
-                    <MobilKart
-                      key={`mobil-envanter-${urun.uid}`}
-                      className="envanter-mobil-kart"
-                      solaEtiket="Sil"
-                      sagaEtiket="Favori ve düzenle"
-                      solaAksiyonlar={[
-                        { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekUrun(urun) },
-                      ]}
-                      sagaAksiyonlar={[
-                        { id: 'favori', etiket: 'Favori', onClick: () => favoriDegistir(urun.uid) },
-                        { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => duzenlemePenceresiniAc(urun) },
-                      ]}
-                      ust={
-                        <>
-                          <strong>{String(sayfaBaslangic + index + 1).padStart(2, '0')} - {urun.ad}</strong>
-                          <span>{urun.kategori}</span>
-                        </>
-                      }
-                      govde={
-                        <>
-                          <div className="mobil-kart-kisi">
-                            <span className="urun-avatar">{urun.avatar}</span>
-                            <div className="mobil-kisi-metin">
-                              <strong className="urun-ad-satiri">
-                                <span>{urun.ad}</span>
-                                {kritikStoktaMi(urun) && (
-                                  <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır." title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}>
-                                    !
-                                  </span>
-                                )}
-                              </strong>
-                              <span>{urun.urunId}</span>
-                            </div>
-                          </div>
-                          <div className="mobil-bilgi-satiri"><span>Kategori</span><strong>{urun.kategori}</strong></div>
-                          <div className="mobil-bilgi-satiri"><span>Ürün Adedi</span><strong>{urun.urunAdedi}</strong></div>
-                          <div className="mobil-bilgi-satiri"><span>Minimum Stok</span><strong>{urun.minimumStok}</strong></div>
-                          <div className="mobil-bilgi-satiri"><span>Mağaza Stok</span><strong>{urun.magazaStok}</strong></div>
-                        </>
-                      }
-                    />
-                  ))}
-                </div>
-
-                <div className="sayfalama">
-                  <button type="button" className="sayfa-ok" onClick={() => envanterSayfayaGit(envanterSayfa - 1)} disabled={envanterSayfa === 1}>‹</button>
-                  {Array.from({ length: toplamEnvanterSayfa }, (_, i) => i + 1).map((sayfaNo) => (
-                    <button
-                      key={sayfaNo}
-                      type="button"
-                      className={`sayfa-buton ${envanterSayfa === sayfaNo ? 'aktif' : ''}`}
-                      onClick={() => envanterSayfayaGit(sayfaNo)}
-                    >
-                      {sayfaNo}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    className="sayfa-ok"
-                    onClick={() => envanterSayfayaGit(envanterSayfa + 1)}
-                    disabled={envanterSayfa === toplamEnvanterSayfa}
-                  >
-                    ›
-                  </button>
-                </div>
-                  </>
-                ) : (
-                  <BosDurumKarti
-                    baslik="Parça bulunamadı"
-                    aciklama="Arama veya kategori filtresine uyan ürün görünmüyor."
-                    eylemMetni="Filtreleri Temizle"
-                    onEylem={() => {
-                      setAramaMetni('')
-                      setEnvanterKategori('Tümü')
-                      setEnvanterSayfa(1)
-                    }}
-                  />
-                )}
-              </section>
-            </section>
+            <InventoryPage
+              KucukIkon={KucukIkon}
+              BosDurumKarti={BosDurumKarti}
+              MobilKart={MobilKart}
+              urunler={urunler}
+              setUrunler={setUrunler}
+              toastGoster={toastGoster}
+              favoriDegistir={favoriDegistir}
+            />
           )}
           </div>
         </section>
@@ -4668,3 +3669,3681 @@ function App() {
 }
 
 export default App
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

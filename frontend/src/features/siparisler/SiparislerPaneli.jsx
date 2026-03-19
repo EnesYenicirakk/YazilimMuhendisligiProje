@@ -1,6 +1,58 @@
 import BosDurumKarti from '../../components/common/BosDurumKarti'
 import { KucukIkon } from '../../components/common/Ikonlar'
 import MobilKart from '../../components/common/MobilKart'
+import PageHeader from '../../shared/ui/PageHeader'
+import SectionToolbar from '../../shared/ui/SectionToolbar'
+import StatusBadge from '../../shared/ui/StatusBadge'
+import TabSwitcher from '../../shared/ui/TabSwitcher'
+
+function odemeDurumuRozeti(durum) {
+  return {
+    tone: durum === 'Ödendi' ? 'success' : 'warning',
+  }
+}
+
+function teslimatDurumuRozeti(teslimatDurumuSinifi) {
+  if (teslimatDurumuSinifi === 'durum-hazirlaniyor') {
+    return {
+      tone: 'info',
+      className: 'durum-hazirlaniyor',
+    }
+  }
+
+  if (teslimatDurumuSinifi === 'durum-teslim') {
+    return {
+      tone: 'info',
+      className: 'durum-teslim',
+    }
+  }
+
+  return {
+    tone: 'info',
+  }
+}
+
+function gecmisSiparisDurumuRozeti(durum) {
+  if (durum === 'İptal Edildi') {
+    return {
+      tone: 'danger',
+      variant: 'outline',
+    }
+  }
+
+  if (durum === 'İade Edildi') {
+    return {
+      tone: 'neutral',
+      variant: 'outline',
+      className: 'iade',
+    }
+  }
+
+  return {
+    tone: 'success',
+    variant: 'outline',
+  }
+}
 
 function SiparislerPaneli(props) {
   const {
@@ -35,26 +87,27 @@ function SiparislerPaneli(props) {
 
   return (
     <section>
-      <header className="ust-baslik siparisler-baslik">
-        <div>
-          <h1>Siparişler</h1>
-          <p>En yeni siparişten en eski siparişe doğru listelenir.</p>
-        </div>
-        <button type="button" className="urun-ekle-karti" onClick={yeniSiparisPenceresiniAc}>
-          <span className="urun-ekle-ikon" aria-hidden="true"><KucukIkon tip="siparis-ekle" /></span>
-          <span className="urun-ekle-metin">Yeni Sipariş</span>
-        </button>
-      </header>
+      <PageHeader
+        title="Siparişler"
+        description="En yeni siparişten en eski siparişe doğru listelenir."
+        className="siparisler-baslik"
+        actions={(
+          <button type="button" className="urun-ekle-karti" onClick={yeniSiparisPenceresiniAc}>
+            <span className="urun-ekle-ikon" aria-hidden="true"><KucukIkon tip="siparis-ekle" /></span>
+            <span className="urun-ekle-metin">Yeni Sipariş</span>
+          </button>
+        )}
+      />
 
       <section className="panel-kart siparisler-kart">
-        <div className="odeme-sekme-alani">
-          <button type="button" className={`odeme-sekme ${siparisSekmesi === 'aktif' ? 'aktif' : ''}`} onClick={() => setSiparisSekmesi('aktif')}>
-            Aktif Siparişler
-          </button>
-          <button type="button" className={`odeme-sekme ${siparisSekmesi === 'gecmis' ? 'aktif' : ''}`} onClick={() => setSiparisSekmesi('gecmis')}>
-            Geçmiş Siparişler
-          </button>
-        </div>
+        <TabSwitcher
+          value={siparisSekmesi}
+          onChange={setSiparisSekmesi}
+          options={[
+            { id: 'aktif', label: 'Aktif Siparişler' },
+            { id: 'gecmis', label: 'Geçmiş Siparişler' },
+          ]}
+        />
 
         {siparisSekmesi === 'aktif' && (
           <>
@@ -113,9 +166,19 @@ function SiparislerPaneli(props) {
                           <td>{siparis.musteri}</td>
                           <td>{paraFormatla(siparis.toplamTutar)}</td>
                           <td>{tarihFormatla(siparis.siparisTarihi)}</td>
-                          <td><span className={`odeme-durumu ${siparis.odemeDurumu === 'Ödendi' ? 'odendi' : 'beklemede'}`}>{siparis.odemeDurumu}</span></td>
+                          <td>
+                            <StatusBadge
+                              label={siparis.odemeDurumu}
+                              {...odemeDurumuRozeti(siparis.odemeDurumu)}
+                            />
+                          </td>
                           <td>{siparis.urunHazirlik}</td>
-                          <td><span className={`durum-baloncuk ${durumSinifi(siparis.teslimatDurumu)}`}>{siparis.teslimatDurumu}</span></td>
+                          <td>
+                            <StatusBadge
+                              label={siparis.teslimatDurumu}
+                              {...teslimatDurumuRozeti(durumSinifi(siparis.teslimatDurumu))}
+                            />
+                          </td>
                           <td>
                             <div className="islem-dugmeleri siparis-islemleri">
                               <button type="button" className="ikon-dugme not" title="Detay" onClick={() => setDetaySiparis(siparis)}><KucukIkon tip="detay" /></button>
@@ -149,7 +212,10 @@ function SiparislerPaneli(props) {
                       ust={
                         <>
                           <strong>{siparis.siparisNo}</strong>
-                          <span className={`durum-baloncuk ${durumSinifi(siparis.teslimatDurumu)}`}>{siparis.teslimatDurumu}</span>
+                          <StatusBadge
+                            label={siparis.teslimatDurumu}
+                            {...teslimatDurumuRozeti(durumSinifi(siparis.teslimatDurumu))}
+                          />
                         </>
                       }
                       govde={
@@ -158,7 +224,15 @@ function SiparislerPaneli(props) {
                           <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Ürün</span><strong>{siparis.urun}</strong></div>
                           <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Tutar</span><strong>{paraFormatla(siparis.toplamTutar)}</strong></div>
                           <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Tarih</span><strong>{tarihFormatla(siparis.siparisTarihi)}</strong></div>
-                          <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Ödeme</span><strong><span className={`odeme-durumu ${siparis.odemeDurumu === 'Ödendi' ? 'odendi' : 'beklemede'}`}>{siparis.odemeDurumu}</span></strong></div>
+                          <div className="mobil-bilgi-satiri siparis-detay-satiri">
+                            <span>Ödeme</span>
+                            <strong>
+                              <StatusBadge
+                                label={siparis.odemeDurumu}
+                                {...odemeDurumuRozeti(siparis.odemeDurumu)}
+                              />
+                            </strong>
+                          </div>
                           <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Hazırlık</span><strong>{siparis.urunHazirlik}</strong></div>
                         </>
                       }
@@ -193,18 +267,20 @@ function SiparislerPaneli(props) {
 
         {siparisSekmesi === 'gecmis' && (
           <>
-            <div className="panel-ust-cizgi">
-              <h2>Geçmiş Siparişler</h2>
-              <input
-                type="text"
-                placeholder="Log no, sipariş no, müşteri veya ürün ara"
-                value={gecmisSiparisArama}
-                onChange={(event) => {
-                  setGecmisSiparisArama(event.target.value)
-                  setGecmisSiparisSayfa(1)
-                }}
-              />
-            </div>
+            <SectionToolbar
+              title="Geçmiş Siparişler"
+              rightSlot={(
+                <input
+                  type="text"
+                  placeholder="Log no, sipariş no, müşteri veya ürün ara"
+                  value={gecmisSiparisArama}
+                  onChange={(event) => {
+                    setGecmisSiparisArama(event.target.value)
+                    setGecmisSiparisSayfa(1)
+                  }}
+                />
+              )}
+            />
 
             {sayfadakiGecmisSiparisler.length > 0 ? (
               <>
@@ -232,7 +308,12 @@ function SiparislerPaneli(props) {
                           <td>{tarihFormatla(kayit.tarih)}</td>
                           <td>{kayit.miktar}</td>
                           <td>{paraFormatla(kayit.tutar)}</td>
-                          <td><span className={`tedarik-durum ${kayit.durum === 'İptal Edildi' ? 'iptal' : kayit.durum === 'İade Edildi' ? 'iade' : 'teslim'}`}>{kayit.durum}</span></td>
+                          <td>
+                            <StatusBadge
+                              label={kayit.durum}
+                              {...gecmisSiparisDurumuRozeti(kayit.durum)}
+                            />
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -251,7 +332,10 @@ function SiparislerPaneli(props) {
                       ust={
                         <>
                           <strong>{kayit.siparisNo}</strong>
-                          <span className={`tedarik-durum ${kayit.durum === 'İptal Edildi' ? 'iptal' : kayit.durum === 'İade Edildi' ? 'iade' : 'teslim'}`}>{kayit.durum}</span>
+                          <StatusBadge
+                            label={kayit.durum}
+                            {...gecmisSiparisDurumuRozeti(kayit.durum)}
+                          />
                         </>
                       }
                       govde={

@@ -3,7 +3,7 @@ import DashboardPage from './features/dashboard/components/DashboardPage';
 import OdemelerPage from './features/finance/components/OdemelerPage';
 import UrunDuzenlemePage from './features/inventory/components/UrunDuzenlemePage';
 import InventoryPage from './features/inventory/components/InventoryPage';
-﻿import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import BosDurumKarti from './components/common/BosDurumKarti'
 import {
@@ -253,9 +253,9 @@ function App() {
     const sonuc = !metin
       ? urunler
       : urunler.filter((urun) =>
-          urun.ad.toLowerCase().includes(metin) ||
-          urun.urunId.toLowerCase().includes(metin),
-        )
+        urun.ad.toLowerCase().includes(metin) ||
+        urun.urunId.toLowerCase().includes(metin),
+      )
 
     return favorileriOneTasi(sonuc)
   }, [urunDuzenlemeArama, urunler])
@@ -276,9 +276,9 @@ function App() {
     const sonuc = !metin
       ? musteriler
       : musteriler.filter((musteri) =>
-          musteri.ad.toLowerCase().includes(metin) ||
-          musteri.telefon.toLowerCase().includes(metin),
-        )
+        musteri.ad.toLowerCase().includes(metin) ||
+        musteri.telefon.toLowerCase().includes(metin),
+      )
 
     return favorileriOneTasi(sonuc, (musteri) => new Date(`${musteri.sonAlim}T00:00:00`).getTime())
   }, [musteriArama, musteriler])
@@ -292,11 +292,11 @@ function App() {
     const sonuc = !metin
       ? tedarikciler
       : tedarikciler.filter((tedarikci) =>
-          tedarikci.firmaAdi.toLowerCase().includes(metin) ||
-          tedarikci.telefon.toLowerCase().includes(metin) ||
-          tedarikci.yetkiliKisi.toLowerCase().includes(metin) ||
-          tedarikci.urunGrubu.toLowerCase().includes(metin),
-        )
+        tedarikci.firmaAdi.toLowerCase().includes(metin) ||
+        tedarikci.telefon.toLowerCase().includes(metin) ||
+        tedarikci.yetkiliKisi.toLowerCase().includes(metin) ||
+        tedarikci.urunGrubu.toLowerCase().includes(metin),
+      )
 
     return favorileriOneTasi(sonuc, (tedarikci) => tedarikci.toplamHarcama)
   }, [tedarikciArama, tedarikciler])
@@ -952,19 +952,19 @@ function App() {
     }
 
     if (mod === 'ekle') {
-        const yeniUrun = {
-          uid: Date.now(),
-          urunId,
-          kategori: 'Diğer',
-          ad,
-          avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
-          urunAdedi,
-          magazaStok,
-          minimumStok,
-          alisFiyati: 0,
-          satisFiyati: 0,
-          favori: false,
-        }
+      const yeniUrun = {
+        uid: Date.now(),
+        urunId,
+        kategori: 'Diğer',
+        ad,
+        avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
+        urunAdedi,
+        magazaStok,
+        minimumStok,
+        alisFiyati: 0,
+        satisFiyati: 0,
+        favori: false,
+      }
 
       setUrunler((onceki) => [yeniUrun, ...onceki])
       setEklemeAcik(false)
@@ -1057,16 +1057,16 @@ function App() {
       onceki.map((urun) =>
         urun.uid === urunDuzenlemeUid
           ? {
-              ...urun,
-              urunId,
-              kategori: urun.kategori ?? 'Diğer',
-              ad,
-              urunAdedi,
-              magazaStok,
-              alisFiyati,
-              satisFiyati,
-              avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
-            }
+            ...urun,
+            urunId,
+            kategori: urun.kategori ?? 'Diğer',
+            ad,
+            urunAdedi,
+            magazaStok,
+            alisFiyati,
+            satisFiyati,
+            avatar: ad.split(' ').slice(0, 2).map((parca) => parca[0]?.toUpperCase() || '').join('').slice(0, 2),
+          }
           : urun,
       ),
     )
@@ -1231,16 +1231,16 @@ function App() {
       onceki.map((siparis) =>
         siparis.siparisNo === duzenlenenSiparisNo
           ? {
-              ...siparis,
-              musteri,
-              urun,
-              toplamTutar,
-              siparisTarihi,
-              odemeDurumu,
-              urunHazirlik,
-              teslimatDurumu,
-              teslimatSuresi,
-            }
+            ...siparis,
+            musteri,
+            urun,
+            toplamTutar,
+            siparisTarihi,
+            odemeDurumu,
+            urunHazirlik,
+            teslimatDurumu,
+            teslimatSuresi,
+          }
           : siparis,
       ),
     )
@@ -1266,12 +1266,12 @@ function App() {
       onceki.map((siparis) =>
         siparis.siparisNo === durumGuncellenenSiparisNo
           ? {
-              ...siparis,
-              odemeDurumu,
-              urunHazirlik,
-              teslimatDurumu,
-              teslimatSuresi,
-            }
+            ...siparis,
+            odemeDurumu,
+            urunHazirlik,
+            teslimatDurumu,
+            teslimatSuresi,
+          }
           : siparis,
       ),
     )
@@ -1815,11 +1815,11 @@ function App() {
     const sonSiparis = secili?.siparisler?.[0]
     const onEk = secili
       ? secili.firmaAdi
-          .split(' ')
-          .map((parca) => parca[0] || '')
-          .join('')
-          .slice(0, 2)
-          .toUpperCase()
+        .split(' ')
+        .map((parca) => parca[0] || '')
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
       : 'TD'
     const sonNumara = sonSiparis ? Number(String(sonSiparis.siparisNo).replace(/[^\d]/g, '')) : 100
 
@@ -1836,11 +1836,11 @@ function App() {
     const ilkTedarikci = tedarikciler[0]
     const onEk = ilkTedarikci
       ? ilkTedarikci.firmaAdi
-          .split(' ')
-          .map((parca) => parca[0] || '')
-          .join('')
-          .slice(0, 2)
-          .toUpperCase()
+        .split(' ')
+        .map((parca) => parca[0] || '')
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
       : 'TD'
     const sonNumara = tumTedarikSiparisleri[0] ? Number(String(tumTedarikSiparisleri[0].siparisNo).replace(/[^\d]/g, '')) : 100
 
@@ -1884,11 +1884,11 @@ function App() {
       onceki.map((tedarikci) =>
         tedarikci.uid === seciliTedarikciUid
           ? {
-              ...tedarikci,
-              siparisler: [{ siparisNo, tarih, tutar, durum }, ...tedarikci.siparisler],
-              toplamAlisSayisi: tedarikci.toplamAlisSayisi + 1,
-              toplamHarcama: tedarikci.toplamHarcama + tutar,
-            }
+            ...tedarikci,
+            siparisler: [{ siparisNo, tarih, tutar, durum }, ...tedarikci.siparisler],
+            toplamAlisSayisi: tedarikci.toplamAlisSayisi + 1,
+            toplamHarcama: tedarikci.toplamHarcama + tutar,
+          }
           : tedarikci,
       ),
     )
@@ -1930,11 +1930,11 @@ function App() {
       onceki.map((tedarikci) =>
         tedarikci.uid === tedarikciUid
           ? {
-              ...tedarikci,
-              siparisler: [{ siparisNo, tarih, tutar, durum }, ...tedarikci.siparisler],
-              toplamAlisSayisi: tedarikci.toplamAlisSayisi + 1,
-              toplamHarcama: tedarikci.toplamHarcama + tutar,
-            }
+            ...tedarikci,
+            siparisler: [{ siparisNo, tarih, tutar, durum }, ...tedarikci.siparisler],
+            toplamAlisSayisi: tedarikci.toplamAlisSayisi + 1,
+            toplamHarcama: tedarikci.toplamHarcama + tutar,
+          }
           : tedarikci,
       ),
     )
@@ -2110,9 +2110,9 @@ function App() {
       gorsel.complete
         ? Promise.resolve()
         : new Promise((resolve) => {
-            gorsel.onload = () => resolve()
-            gorsel.onerror = () => resolve()
-          }),
+          gorsel.onload = () => resolve()
+          gorsel.onerror = () => resolve()
+        }),
     )
 
     Promise.all(bekleyenler)
@@ -2460,84 +2460,84 @@ function App() {
   return (
     <main className="dashboard-page">
       <section className={`dashboard-shell ${aktifSayfa === 'merkez' ? 'merkez-modu' : ''}`}>
-          {aktifSayfa !== 'merkez' && (
-            <button
-              type="button"
-              className="mobil-menu-dugmesi"
-              onClick={() => setMobilMenuAcik(true)}
-              aria-label="Menüyü Aç"
-            >
-              <span />
-              <span />
-              <span />
-            </button>
-          )}
+        {aktifSayfa !== 'merkez' && (
+          <button
+            type="button"
+            className="mobil-menu-dugmesi"
+            onClick={() => setMobilMenuAcik(true)}
+            aria-label="Menüyü Aç"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        )}
 
-          {aktifSayfa !== 'merkez' && mobilMenuAcik && (
-            <button
-              type="button"
-              className="mobil-menu-arka-plan"
-              aria-label="Menüyü Kapat"
-              onClick={() => setMobilMenuAcik(false)}
+        {aktifSayfa !== 'merkez' && mobilMenuAcik && (
+          <button
+            type="button"
+            className="mobil-menu-arka-plan"
+            aria-label="Menüyü Kapat"
+            onClick={() => setMobilMenuAcik(false)}
+          />
+        )}
+
+        {aktifSayfa !== 'merkez' && (
+          <aside className={`yan-menu ${mobilMenuAcik ? 'mobil-acik' : ''}`}>
+            <div className="mobil-menu-ust">
+              <h2>Menü</h2>
+              <button type="button" className="mobil-menu-kapat" onClick={() => setMobilMenuAcik(false)} aria-label="Menüyü Kapat">
+                ×
+              </button>
+            </div>
+            <img
+              src="/ytu-logo.png"
+              alt="MTÜ Sanayi logosu"
+              className="sayfa-logo menu-logo"
+              onError={(event) => {
+                event.currentTarget.onerror = null
+                event.currentTarget.src = '/ytu-logo.svg'
+              }}
             />
-          )}
-
-          {aktifSayfa !== 'merkez' && (
-            <aside className={`yan-menu ${mobilMenuAcik ? 'mobil-acik' : ''}`}>
-              <div className="mobil-menu-ust">
-                <h2>Menü</h2>
-                <button type="button" className="mobil-menu-kapat" onClick={() => setMobilMenuAcik(false)} aria-label="Menüyü Kapat">
-                  ×
-                </button>
-              </div>
-              <img
-                src="/ytu-logo.png"
-                alt="MTÜ Sanayi logosu"
-                className="sayfa-logo menu-logo"
-                onError={(event) => {
-                  event.currentTarget.onerror = null
-                  event.currentTarget.src = '/ytu-logo.svg'
-                }}
-              />
-              <nav>
-                <button type="button" className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('dashboard')}>
-                  <SayfaIkonu sayfa="dashboard" />
-                  <span>Dashboard</span>
-                </button>
-                <button type="button" className={`menu-link ${aktifSayfa === 'envanter' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('envanter')}>
-                  <SayfaIkonu sayfa="envanter" />
-                  <span>Envanter</span>
-                </button>
-                <button type="button" className={`menu-link ${aktifSayfa === 'siparisler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('siparisler')}>
-                  <SayfaIkonu sayfa="siparisler" />
-                  <span>Siparişler</span>
-                </button>
-                <button type="button" className={`menu-link ${aktifSayfa === 'musteriler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('musteriler')}>
-                  <SayfaIkonu sayfa="musteriler" />
-                  <span>Kayıtlı Müşteriler</span>
-                </button>
-                <button type="button" className={`menu-link ${aktifSayfa === 'alicilar' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('alicilar')}>
-                  <SayfaIkonu sayfa="alicilar" />
-                  <span>Kayıtlı Tedarikçiler</span>
-                </button>
-                <button type="button" className={`menu-link ${aktifSayfa === 'odemeler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('odemeler')}>
-                  <SayfaIkonu sayfa="odemeler" />
-                  <span>Finansal Akış</span>
-                </button>
-                <button type="button" className={`menu-link ${aktifSayfa === 'urun-duzenleme' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('urun-duzenleme')}>
-                  <SayfaIkonu sayfa="urun-duzenleme" />
-                  <span>Ürün Düzenleme</span>
-                </button>
-                <button type="button" className={`menu-link ${aktifSayfa === 'faturalama' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('faturalama')}>
-                  <SayfaIkonu sayfa="faturalama" />
-                  <span>Faturalama (PDF)</span>
-                </button>
+            <nav>
+              <button type="button" className={`menu-link ${aktifSayfa === 'dashboard' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('dashboard')}>
+                <SayfaIkonu sayfa="dashboard" />
+                <span>Dashboard</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'envanter' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('envanter')}>
+                <SayfaIkonu sayfa="envanter" />
+                <span>Envanter</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'siparisler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('siparisler')}>
+                <SayfaIkonu sayfa="siparisler" />
+                <span>Siparişler</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'musteriler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('musteriler')}>
+                <SayfaIkonu sayfa="musteriler" />
+                <span>Kayıtlı Müşteriler</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'alicilar' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('alicilar')}>
+                <SayfaIkonu sayfa="alicilar" />
+                <span>Kayıtlı Tedarikçiler</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'odemeler' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('odemeler')}>
+                <SayfaIkonu sayfa="odemeler" />
+                <span>Finansal Akış</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'urun-duzenleme' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('urun-duzenleme')}>
+                <SayfaIkonu sayfa="urun-duzenleme" />
+                <span>Ürün Düzenleme</span>
+              </button>
+              <button type="button" className={`menu-link ${aktifSayfa === 'faturalama' ? 'aktif' : ''}`} onClick={() => sayfaDegistir('faturalama')}>
+                <SayfaIkonu sayfa="faturalama" />
+                <span>Faturalama (PDF)</span>
+              </button>
             </nav>
           </aside>
         )}
 
         <div className={`icerik-alani ${aktifSayfa === 'merkez' ? 'merkez-icerik' : ''} ${merkezeDonusAktif ? 'merkeze-donuyor' : ''}`}>
-            {aktifSayfa === 'merkez' && (
+          {aktifSayfa === 'merkez' && (
             <IndexPage
               gecisBalonu={gecisBalonu}
               merkezGirisEfekti={merkezGirisEfekti}
@@ -2738,355 +2738,355 @@ function App() {
               favoriDegistir={favoriDegistir}
             />
           )}
-          </div>
-        </section>
+        </div>
+      </section>
 
-        {aktifSayfa !== 'merkez' && (
-          <>
-            <div className={`global-arama-kapsayici ${globalAramaMobilAcik || globalAramaMetni ? 'acik' : ''}`}>
-              <button
-                type="button"
-                className="global-arama-mobil-dugme"
-                aria-label="Global aramayı aç"
-                onClick={() => setGlobalAramaMobilAcik((onceki) => !onceki)}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="m20 20-3.5-3.5" />
-                </svg>
-              </button>
+      {aktifSayfa !== 'merkez' && (
+        <>
+          <div className={`global-arama-kapsayici ${globalAramaMobilAcik || globalAramaMetni ? 'acik' : ''}`}>
+            <button
+              type="button"
+              className="global-arama-mobil-dugme"
+              aria-label="Global aramayı aç"
+              onClick={() => setGlobalAramaMobilAcik((onceki) => !onceki)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+            </button>
 
-              <div className="global-arama-alani">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="m20 20-3.5-3.5" />
-                </svg>
-                <input
-                  type="text"
-                  value={globalAramaMetni}
-                  onChange={(event) => setGlobalAramaMetni(event.target.value)}
-                  placeholder="Ürün, sipariş, müşteri veya tedarikçi ara"
-                />
-                {globalAramaMetni && (
-                  <button type="button" className="global-arama-temizle" aria-label="Aramayı temizle" onClick={() => setGlobalAramaMetni('')}>
-                    ×
-                  </button>
-                )}
-              </div>
-
-              {globalAramaMetni.trim() && (
-                <div className="global-arama-sonuclar">
-                  {globalAramaSonuclari.length === 0 ? (
-                    <div className="global-arama-bos">
-                      <strong>Sonuç bulunamadı.</strong>
-                      <span>Başka bir anahtar kelime deneyin.</span>
-                    </div>
-                  ) : (
-                    globalAramaSonuclari.map((sonuc) => (
-                      <button
-                        key={sonuc.id}
-                        type="button"
-                        className="global-arama-sonuc"
-                        onClick={() => globalAramaSonucunuAc(sonuc)}
-                      >
-                        <span className="global-arama-etiket">{sonuc.tur}</span>
-                        <strong>{sonuc.baslik}</strong>
-                        <small>{sonuc.alt}</small>
-                      </button>
-                    ))
-                  )}
-                </div>
+            <div className="global-arama-alani">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <input
+                type="text"
+                value={globalAramaMetni}
+                onChange={(event) => setGlobalAramaMetni(event.target.value)}
+                placeholder="Ürün, sipariş, müşteri veya tedarikçi ara"
+              />
+              {globalAramaMetni && (
+                <button type="button" className="global-arama-temizle" aria-label="Aramayı temizle" onClick={() => setGlobalAramaMetni('')}>
+                  ×
+                </button>
               )}
             </div>
 
-            <button
-              type="button"
-              className="bildirim-dugmesi"
-              aria-label="Bildirimler"
-              onClick={bildirimDugmesiTikla}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 17H5l2-2v-4a5 5 0 1 1 10 0v4l2 2h-4" />
-                <path d="M10 17a2 2 0 0 0 4 0" />
-              </svg>
-              {okunmamisBildirimSayisi > 0 && <span className="bildirim-sayisi">{okunmamisBildirimSayisi}</span>}
-            </button>
-          </>
-        )}
+            {globalAramaMetni.trim() && (
+              <div className="global-arama-sonuclar">
+                {globalAramaSonuclari.length === 0 ? (
+                  <div className="global-arama-bos">
+                    <strong>Sonuç bulunamadı.</strong>
+                    <span>Başka bir anahtar kelime deneyin.</span>
+                  </div>
+                ) : (
+                  globalAramaSonuclari.map((sonuc) => (
+                    <button
+                      key={sonuc.id}
+                      type="button"
+                      className="global-arama-sonuc"
+                      onClick={() => globalAramaSonucunuAc(sonuc)}
+                    >
+                      <span className="global-arama-etiket">{sonuc.tur}</span>
+                      <strong>{sonuc.baslik}</strong>
+                      <small>{sonuc.alt}</small>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
 
-        {aktifSayfa !== 'merkez' && bildirimPanelAcik && (
-          <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Bildirimler yükleniyor...</section>}>
-            <BildirimPaneli
-              KucukIkon={KucukIkon}
-              bildirimPanelKapaniyor={bildirimPanelKapaniyor}
-              bildirimPaneliKapat={bildirimPaneliKapat}
-              bildirimdenSayfayaGit={bildirimdenSayfayaGit}
-              bildirimler={bildirimler}
-              bildirimiOkunduYap={bildirimiOkunduYap}
-              bildirimiOkunmadiYap={bildirimiOkunmadiYap}
-              bildirimiTemizle={bildirimiTemizle}
-              okunanBildirimler={okunanBildirimler}
-              tumBildirimleriTemizle={tumBildirimleriTemizle}
-            />
-          </Suspense>
-        )}
-
-        {aktifSayfa !== 'merkez' && (
           <button
             type="button"
-            className="ai-yardim-buton"
-            aria-label="Yapay zeka yardımı"
-            onClick={aiPanelDugmeTikla}
+            className="bildirim-dugmesi"
+            aria-label="Bildirimler"
+            onClick={bildirimDugmesiTikla}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              <path d="M8 9h8M8 13h5" />
+              <path d="M15 17H5l2-2v-4a5 5 0 1 1 10 0v4l2 2h-4" />
+              <path d="M10 17a2 2 0 0 0 4 0" />
             </svg>
+            {okunmamisBildirimSayisi > 0 && <span className="bildirim-sayisi">{okunmamisBildirimSayisi}</span>}
           </button>
-        )}
+        </>
+      )}
 
-        {aktifSayfa !== 'merkez' && (
-          <nav className="mobil-alt-menu" aria-label="Hızlı gezinme">
-            {[
-              { sayfa: 'dashboard', etiket: 'Dashboard' },
-              { sayfa: 'envanter', etiket: 'Envanter' },
-              { sayfa: 'siparisler', etiket: 'Siparişler' },
-              { sayfa: 'odemeler', etiket: 'Finansal Akış' },
-            ].map((oge) => (
+      {aktifSayfa !== 'merkez' && bildirimPanelAcik && (
+        <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Bildirimler yükleniyor...</section>}>
+          <BildirimPaneli
+            KucukIkon={KucukIkon}
+            bildirimPanelKapaniyor={bildirimPanelKapaniyor}
+            bildirimPaneliKapat={bildirimPaneliKapat}
+            bildirimdenSayfayaGit={bildirimdenSayfayaGit}
+            bildirimler={bildirimler}
+            bildirimiOkunduYap={bildirimiOkunduYap}
+            bildirimiOkunmadiYap={bildirimiOkunmadiYap}
+            bildirimiTemizle={bildirimiTemizle}
+            okunanBildirimler={okunanBildirimler}
+            tumBildirimleriTemizle={tumBildirimleriTemizle}
+          />
+        </Suspense>
+      )}
+
+      {aktifSayfa !== 'merkez' && (
+        <button
+          type="button"
+          className="ai-yardim-buton"
+          aria-label="Yapay zeka yardımı"
+          onClick={aiPanelDugmeTikla}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            <path d="M8 9h8M8 13h5" />
+          </svg>
+        </button>
+      )}
+
+      {aktifSayfa !== 'merkez' && (
+        <nav className="mobil-alt-menu" aria-label="Hızlı gezinme">
+          {[
+            { sayfa: 'dashboard', etiket: 'Dashboard' },
+            { sayfa: 'envanter', etiket: 'Envanter' },
+            { sayfa: 'siparisler', etiket: 'Siparişler' },
+            { sayfa: 'odemeler', etiket: 'Finansal Akış' },
+          ].map((oge) => (
+            <button
+              key={oge.sayfa}
+              type="button"
+              className={`mobil-alt-menu-ogesi ${aktifSayfa === oge.sayfa ? 'aktif' : ''}`}
+              onClick={() => sayfaDegistir(oge.sayfa)}
+            >
+              <SayfaIkonu sayfa={oge.sayfa} className="mobil-alt-menu-ikon" />
+              <span>{oge.etiket}</span>
+            </button>
+          ))}
+        </nav>
+      )}
+
+      {aktifSayfa !== 'merkez' && aiPanelAcik && !aiPanelKucuk && (
+        <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Asistan yükleniyor...</section>}>
+          <AiPanel
+            KucukIkon={KucukIkon}
+            TemaIkonu={TemaIkonu}
+            aiHizliKonular={aiHizliKonular}
+            aiHizliKonularAcik={aiHizliKonularAcik}
+            aiMesajGonder={aiMesajGonder}
+            aiMesajMetni={aiMesajMetni}
+            aiMesajlar={aiMesajlar}
+            aiPanelKapaniyor={aiPanelKapaniyor}
+            aiPaneliKapat={aiPaneliKapat}
+            aiTemaMenuAcik={aiTemaMenuAcik}
+            setAiMesajMetni={setAiMesajMetni}
+            setAiHizliKonularAcik={setAiHizliKonularAcik}
+            setAiPanelKucuk={setAiPanelKucuk}
+            setAiTemaMenuAcik={setAiTemaMenuAcik}
+          />
+        </Suspense>
+      )}
+
+      {toastlar.length > 0 && (
+        <div className="toast-kapsayici" aria-live="polite" aria-atomic="true">
+          {toastlar.map((toast) => (
+            <article key={toast.id} className={`toast-bildirim ${toast.tip}`}>
+              <span className="toast-ikon" aria-hidden="true">
+                <KucukIkon tip={toast.tip === 'basari' ? 'basari' : 'uyari'} />
+              </span>
+              <div className="toast-metin">
+                <strong>{toast.tip === 'basari' ? 'Başarılı' : 'Uyarı'}</strong>
+                <span>{toast.metin}</span>
+                {toast.eylemEtiketi && typeof toast.eylem === 'function' && (
+                  <button
+                    type="button"
+                    className="toast-eylem"
+                    onClick={() => {
+                      setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))
+                      setSonGeriAlma((onceki) => (onceki?.toastId === toast.id ? null : onceki))
+                      toast.eylem()
+                    }}
+                  >
+                    {toast.eylemEtiketi}
+                  </button>
+                )}
+              </div>
               <button
-                key={oge.sayfa}
                 type="button"
-                className={`mobil-alt-menu-ogesi ${aktifSayfa === oge.sayfa ? 'aktif' : ''}`}
-                onClick={() => sayfaDegistir(oge.sayfa)}
+                className="toast-kapat"
+                aria-label="Bildirimi kapat"
+                onClick={() => {
+                  setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))
+                  setSonGeriAlma((onceki) => (onceki?.toastId === toast.id ? null : onceki))
+                }}
               >
-                <SayfaIkonu sayfa={oge.sayfa} className="mobil-alt-menu-ikon" />
-                <span>{oge.etiket}</span>
+                ×
               </button>
-            ))}
-          </nav>
-        )}
+            </article>
+          ))}
+        </div>
+      )}
 
-        {aktifSayfa !== 'merkez' && aiPanelAcik && !aiPanelKucuk && (
-          <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Asistan yükleniyor...</section>}>
-            <AiPanel
-              KucukIkon={KucukIkon}
-              TemaIkonu={TemaIkonu}
-              aiHizliKonular={aiHizliKonular}
-              aiHizliKonularAcik={aiHizliKonularAcik}
-              aiMesajGonder={aiMesajGonder}
-              aiMesajMetni={aiMesajMetni}
-              aiMesajlar={aiMesajlar}
-              aiPanelKapaniyor={aiPanelKapaniyor}
-              aiPaneliKapat={aiPaneliKapat}
-              aiTemaMenuAcik={aiTemaMenuAcik}
-              setAiMesajMetni={setAiMesajMetni}
-              setAiHizliKonularAcik={setAiHizliKonularAcik}
-              setAiPanelKucuk={setAiPanelKucuk}
-              setAiTemaMenuAcik={setAiTemaMenuAcik}
-            />
-          </Suspense>
-        )}
+      {yeniSiparisAcik && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu">
+            <h3>Yeni Sipariş Oluştur</h3>
+            <div className="modal-form">
+              <label>Müşteri</label>
+              <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
 
-        {toastlar.length > 0 && (
-          <div className="toast-kapsayici" aria-live="polite" aria-atomic="true">
-            {toastlar.map((toast) => (
-              <article key={toast.id} className={`toast-bildirim ${toast.tip}`}>
-                <span className="toast-ikon" aria-hidden="true">
-                  <KucukIkon tip={toast.tip === 'basari' ? 'basari' : 'uyari'} />
-                </span>
-                <div className="toast-metin">
-                  <strong>{toast.tip === 'basari' ? 'Başarılı' : 'Uyarı'}</strong>
-                  <span>{toast.metin}</span>
-                  {toast.eylemEtiketi && typeof toast.eylem === 'function' && (
-                    <button
-                      type="button"
-                      className="toast-eylem"
-                      onClick={() => {
-                        setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))
-                        setSonGeriAlma((onceki) => (onceki?.toastId === toast.id ? null : onceki))
-                        toast.eylem()
-                      }}
-                    >
-                      {toast.eylemEtiketi}
-                    </button>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="toast-kapat"
-                  aria-label="Bildirimi kapat"
-                  onClick={() => {
-                    setToastlar((onceki) => onceki.filter((oge) => oge.id !== toast.id))
-                    setSonGeriAlma((onceki) => (onceki?.toastId === toast.id ? null : onceki))
-                  }}
-                >
-                  ×
-                </button>
-              </article>
-            ))}
-          </div>
-        )}
+              <label>Ürün</label>
+              <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
 
-        {yeniSiparisAcik && (
-          <div className="modal-kaplama">
-            <div className="modal-kutu">
-              <h3>Yeni Sipariş Oluştur</h3>
-              <div className="modal-form">
-                <label>Müşteri</label>
-                <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
+              <label>Toplam Tutar</label>
+              <input type="number" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
 
-                <label>Ürün</label>
-                <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
+              <label>Sipariş Tarihi</label>
+              <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
 
-                <label>Toplam Tutar</label>
-                <input type="number" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
+              <label>Ödeme Durumu</label>
+              <input value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)} />
 
-                <label>Sipariş Tarihi</label>
-                <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
+              <label>Ürün Hazırlık</label>
+              <input value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)} />
 
-                <label>Ödeme Durumu</label>
-                <input value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)} />
+              <label>Teslimat Durumu</label>
+              <input value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)} />
 
-                <label>Ürün Hazırlık</label>
-                <input value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)} />
-
-                <label>Teslimat Durumu</label>
-                <input value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)} />
-
-                <label>Teslimat Süresi</label>
-                <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
-              </div>
-              <div className="modal-aksiyon">
-                <button type="button" className="ikinci" onClick={() => setYeniSiparisAcik(false)}>İptal</button>
-                <button type="button" onClick={yeniSiparisKaydet}>Siparişi Oluştur</button>
-              </div>
+              <label>Teslimat Süresi</label>
+              <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
+            </div>
+            <div className="modal-aksiyon">
+              <button type="button" className="ikinci" onClick={() => setYeniSiparisAcik(false)}>İptal</button>
+              <button type="button" onClick={yeniSiparisKaydet}>Siparişi Oluştur</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {detaySiparis && (
-          <div className="modal-kaplama">
-            <div className="modal-kutu">
-              <h3>Sipariş Detayı</h3>
-              <div className="modal-form siparis-detay-icerik">
-                <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detaySiparis.siparisNo}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{detaySiparis.musteri}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Telefon</span><strong>{siparisMusteriTelefonlari[detaySiparis.musteri] ?? 'Bilinmiyor'}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Ürün</span><strong>{detaySiparis.urun}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(detaySiparis.toplamTutar)}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(detaySiparis.siparisTarihi)}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Ödeme</span><strong>{detaySiparis.odemeDurumu}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Hazırlık</span><strong>{detaySiparis.urunHazirlik}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Teslimat</span><strong>{detaySiparis.teslimatDurumu}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Tahmini Süre</span><strong>{detaySiparis.teslimatSuresi}</strong></div>
-              </div>
-              <div className="modal-aksiyon">
-                <button type="button" onClick={() => setDetaySiparis(null)}>Kapat</button>
-              </div>
+      {detaySiparis && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu">
+            <h3>Sipariş Detayı</h3>
+            <div className="modal-form siparis-detay-icerik">
+              <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detaySiparis.siparisNo}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{detaySiparis.musteri}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Telefon</span><strong>{siparisMusteriTelefonlari[detaySiparis.musteri] ?? 'Bilinmiyor'}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Ürün</span><strong>{detaySiparis.urun}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(detaySiparis.toplamTutar)}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(detaySiparis.siparisTarihi)}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Ödeme</span><strong>{detaySiparis.odemeDurumu}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Hazırlık</span><strong>{detaySiparis.urunHazirlik}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Teslimat</span><strong>{detaySiparis.teslimatDurumu}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Tahmini Süre</span><strong>{detaySiparis.teslimatSuresi}</strong></div>
+            </div>
+            <div className="modal-aksiyon">
+              <button type="button" onClick={() => setDetaySiparis(null)}>Kapat</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {detayGecmisSiparis && (
-          <div className="modal-kaplama">
-            <div className="modal-kutu">
-              <h3>Geçmiş Sipariş Detayı</h3>
-              <div className="modal-form siparis-detay-icerik">
-                <div className="mobil-bilgi-satiri"><span>Log No</span><strong>{detayGecmisSiparis.logNo}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detayGecmisSiparis.siparisNo}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{detayGecmisSiparis.musteri}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Telefon</span><strong>{siparisMusteriTelefonlari[detayGecmisSiparis.musteri] ?? 'Bilinmiyor'}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Ürün</span><strong>{detayGecmisSiparis.urun}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(detayGecmisSiparis.tarih)}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Miktar</span><strong>{detayGecmisSiparis.miktar}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(detayGecmisSiparis.tutar)}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Durum</span><strong>{detayGecmisSiparis.durum}</strong></div>
-                <div className="mobil-bilgi-satiri tam"><span>Açıklama</span><strong>{detayGecmisSiparis.aciklama}</strong></div>
-              </div>
-              <div className="modal-aksiyon">
-                <button type="button" onClick={() => setDetayGecmisSiparis(null)}>Kapat</button>
-              </div>
+      {detayGecmisSiparis && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu">
+            <h3>Geçmiş Sipariş Detayı</h3>
+            <div className="modal-form siparis-detay-icerik">
+              <div className="mobil-bilgi-satiri"><span>Log No</span><strong>{detayGecmisSiparis.logNo}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detayGecmisSiparis.siparisNo}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{detayGecmisSiparis.musteri}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Telefon</span><strong>{siparisMusteriTelefonlari[detayGecmisSiparis.musteri] ?? 'Bilinmiyor'}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Ürün</span><strong>{detayGecmisSiparis.urun}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(detayGecmisSiparis.tarih)}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Miktar</span><strong>{detayGecmisSiparis.miktar}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(detayGecmisSiparis.tutar)}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Durum</span><strong>{detayGecmisSiparis.durum}</strong></div>
+              <div className="mobil-bilgi-satiri tam"><span>Açıklama</span><strong>{detayGecmisSiparis.aciklama}</strong></div>
+            </div>
+            <div className="modal-aksiyon">
+              <button type="button" onClick={() => setDetayGecmisSiparis(null)}>Kapat</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {duzenlenenSiparisNo && (
-          <div className="modal-kaplama">
-            <div className="modal-kutu">
-              <h3>Siparişi Düzenle</h3>
-              <div className="modal-form">
-                <label>Müşteri</label>
-                <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
+      {duzenlenenSiparisNo && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu">
+            <h3>Siparişi Düzenle</h3>
+            <div className="modal-form">
+              <label>Müşteri</label>
+              <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
 
-                <label>Ürün</label>
-                <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
+              <label>Ürün</label>
+              <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
 
-                <label>Toplam Tutar</label>
-                <input type="number" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
+              <label>Toplam Tutar</label>
+              <input type="number" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
 
-                <label>Sipariş Tarihi</label>
-                <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
+              <label>Sipariş Tarihi</label>
+              <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
 
-                <label>Ödeme Durumu</label>
-                <input value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)} />
+              <label>Ödeme Durumu</label>
+              <input value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)} />
 
-                <label>Ürün Hazırlık</label>
-                <input value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)} />
+              <label>Ürün Hazırlık</label>
+              <input value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)} />
 
-                <label>Teslimat Durumu</label>
-                <input value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)} />
+              <label>Teslimat Durumu</label>
+              <input value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)} />
 
-                <label>Teslimat Süresi</label>
-                <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
-              </div>
-              <div className="modal-aksiyon">
-                <button type="button" className="ikinci" onClick={() => setDuzenlenenSiparisNo(null)}>İptal</button>
-                <button type="button" onClick={siparisDuzenlemeKaydet}>Kaydet</button>
-              </div>
+              <label>Teslimat Süresi</label>
+              <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
+            </div>
+            <div className="modal-aksiyon">
+              <button type="button" className="ikinci" onClick={() => setDuzenlenenSiparisNo(null)}>İptal</button>
+              <button type="button" onClick={siparisDuzenlemeKaydet}>Kaydet</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {durumGuncellenenSiparisNo && (
-          <div className="modal-kaplama">
-            <div className="modal-kutu">
-              <h3>Sipariş Durumu Güncelle</h3>
-              <div className="modal-form">
-                <label>Ödeme Durumu</label>
-                <input value={siparisDurumFormu.odemeDurumu} onChange={(event) => siparisDurumFormuGuncelle('odemeDurumu', event.target.value)} />
+      {durumGuncellenenSiparisNo && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu">
+            <h3>Sipariş Durumu Güncelle</h3>
+            <div className="modal-form">
+              <label>Ödeme Durumu</label>
+              <input value={siparisDurumFormu.odemeDurumu} onChange={(event) => siparisDurumFormuGuncelle('odemeDurumu', event.target.value)} />
 
-                <label>Ürün Hazırlık</label>
-                <input value={siparisDurumFormu.urunHazirlik} onChange={(event) => siparisDurumFormuGuncelle('urunHazirlik', event.target.value)} />
+              <label>Ürün Hazırlık</label>
+              <input value={siparisDurumFormu.urunHazirlik} onChange={(event) => siparisDurumFormuGuncelle('urunHazirlik', event.target.value)} />
 
-                <label>Teslimat Durumu</label>
-                <input value={siparisDurumFormu.teslimatDurumu} onChange={(event) => siparisDurumFormuGuncelle('teslimatDurumu', event.target.value)} />
+              <label>Teslimat Durumu</label>
+              <input value={siparisDurumFormu.teslimatDurumu} onChange={(event) => siparisDurumFormuGuncelle('teslimatDurumu', event.target.value)} />
 
-                <label>Teslimat Süresi</label>
-                <input value={siparisDurumFormu.teslimatSuresi} onChange={(event) => siparisDurumFormuGuncelle('teslimatSuresi', event.target.value)} />
-              </div>
-              <div className="modal-aksiyon">
-                <button type="button" className="ikinci" onClick={() => setDurumGuncellenenSiparisNo(null)}>İptal</button>
-                <button type="button" onClick={siparisDurumKaydet}>Kaydet</button>
-              </div>
+              <label>Teslimat Süresi</label>
+              <input value={siparisDurumFormu.teslimatSuresi} onChange={(event) => siparisDurumFormuGuncelle('teslimatSuresi', event.target.value)} />
+            </div>
+            <div className="modal-aksiyon">
+              <button type="button" className="ikinci" onClick={() => setDurumGuncellenenSiparisNo(null)}>İptal</button>
+              <button type="button" onClick={siparisDurumKaydet}>Kaydet</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {silinecekSiparis && (
-          <div className="modal-kaplama">
-            <div className="modal-kutu kucuk">
-              <h3>Silmek istediğinizden emin misiniz?</h3>
-              <p><strong>{silinecekSiparis.siparisNo}</strong> siparişi kaldırılacak.</p>
-              <div className="modal-aksiyon">
-                <button type="button" className="ikinci" onClick={() => setSilinecekSiparis(null)}>Hayır</button>
-                <button type="button" className="tehlike" onClick={siparisSil}>Evet</button>
-              </div>
+      {silinecekSiparis && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu kucuk">
+            <h3>Silmek istediğinizden emin misiniz?</h3>
+            <p><strong>{silinecekSiparis.siparisNo}</strong> siparişi kaldırılacak.</p>
+            <div className="modal-aksiyon">
+              <button type="button" className="ikinci" onClick={() => setSilinecekSiparis(null)}>Hayır</button>
+              <button type="button" className="tehlike" onClick={siparisSil}>Evet</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {duzenlenenOdeme && (
-          <div className="modal-kaplama">
+      {duzenlenenOdeme && (
+        <div className="modal-kaplama">
           <div className="modal-kutu">
             <h3>Ödeme Kaydını Düzenle</h3>
             <div className="modal-form">
@@ -3669,3681 +3669,4 @@ function App() {
 }
 
 export default App
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

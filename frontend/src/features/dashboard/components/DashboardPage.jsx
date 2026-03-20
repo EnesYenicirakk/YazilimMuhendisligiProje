@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   dashboardBolumSablonu,
   paraFormatla, 
@@ -13,21 +12,25 @@ import {
 
 export default function DashboardPage({
   KucukIkon,
-  setDashboardBolumMenusuAcik,
-  dashboardBolumMenusuAcik,
-  gorunenDashboardBolumleri,
-  dashboardBolumGorunurlukDegistir,
   sayfaDegistir,
-  dashboardOzet,
-  setAcikOzetMenusu,
-  acikOzetMenusu,
-  ozetKartiniSil,
-  dashboardCanliOzetler,
-  haftalikSatisGrafikUstSinir,
-  haftalikSatisVerisi,
+  dashboardData,
   urunler,
-  dashboardYakinSatislar,
 }) {
+  const {
+    setDashboardBolumMenusuAcik,
+    dashboardBolumMenusuAcik,
+    gorunenDashboardBolumleri,
+    dashboardBolumGorunurlukDegistir,
+    dashboardOzet,
+    setAcikOzetMenusu,
+    acikOzetMenusu,
+    ozetKartiniSil,
+    dashboardCanliOzetler,
+    haftalikSatisGrafikUstSinir,
+    haftalikSatisVerisi,
+    dashboardYakinSatislar,
+  } = dashboardData
+
   return (
     <>
 <section>
@@ -327,3 +330,4 @@ export default function DashboardPage({
     </>
   );
 }
+

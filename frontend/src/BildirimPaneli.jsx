@@ -1,4 +1,4 @@
-export default function BildirimPaneli({
+﻿export default function BildirimPaneli({
   KucukIkon,
   bildirimPanelKapaniyor,
   bildirimPaneliKapat,
@@ -41,6 +41,14 @@ export default function BildirimPaneli({
         ) : (
           bildirimler.map((bildirim) => {
             const okundu = okunanBildirimler.includes(bildirim.id)
+            const ikonTipi =
+              bildirim.tur === 'kritik'
+                ? 'bildirim-kritik'
+                : bildirim.tur === 'stok'
+                  ? 'bildirim-stok'
+                  : bildirim.tur === 'tahsilat'
+                    ? 'bildirim-tahsilat'
+                    : 'bildirim-satis'
 
             return (
               <article
@@ -57,17 +65,7 @@ export default function BildirimPaneli({
                 }}
               >
                 <span className="bildirim-ikon" aria-hidden="true">
-                  <KucukIkon
-                    tip={
-                      bildirim.tur === 'kritik'
-                        ? 'bildirim-kritik'
-                        : bildirim.tur === 'stok'
-                          ? 'bildirim-stok'
-                          : bildirim.tur === 'tahsilat'
-                            ? 'bildirim-tahsilat'
-                            : 'bildirim-satis'
-                    }
-                  />
+                  <KucukIkon tip={ikonTipi} />
                 </span>
                 <div className="bildirim-icerik">
                   <div className="bildirim-etiket-satiri">
@@ -85,7 +83,11 @@ export default function BildirimPaneli({
                         className="bildirim-mini-buton"
                         onClick={(event) => {
                           event.stopPropagation()
-                          okundu ? bildirimiOkunmadiYap(bildirim.id) : bildirimiOkunduYap(bildirim.id)
+                          if (okundu) {
+                            bildirimiOkunmadiYap(bildirim.id)
+                          } else {
+                            bildirimiOkunduYap(bildirim.id)
+                          }
                         }}
                       >
                         {okundu ? 'Okunmadı Yap' : 'Okundu Yap'}

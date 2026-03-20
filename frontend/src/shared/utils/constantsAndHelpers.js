@@ -8,7 +8,7 @@ export const avatarOlustur = (ad) =>
   ad
     .split(' ')
     .slice(0, 2)
-    .map((parca) => parca[0]?.toUpperCase() || '')
+    .map((parca) => parca[0].toUpperCase() || '')
     .join('')
     .slice(0, 2)
 
@@ -23,7 +23,7 @@ export const gunEtiketiKisalt = (etiket) => {
     Paz: 'P',
   }
 
-  return harita[etiket] || etiket?.charAt(0) || etiket
+  return harita[etiket] || etiket.charAt(0) || etiket
 }
 
 export const urunOlustur = (uid, urunId, kategori, ad, urunAdedi, magazaStok, minimumStok, alisFiyati, satisFiyati) => ({
@@ -258,7 +258,7 @@ export const bosFaturaFormu = {
 export const faturaToplamlariHesapla = (satirlar) => {
   const araToplam = satirlar.reduce((toplam, satir) => toplam + Number(satir.miktar || 0) * Number(satir.birimFiyat || 0), 0)
   const kdv = satirlar.reduce(
-    (toplam, satir) => toplam + Number(satir.miktar || 0) * Number(satir.birimFiyat || 0) * Number(satir.kdvOrani ?? FATURA_KDV_ORANI),
+    (toplam, satir) => toplam + Number(satir.miktar || 0) * Number(satir.birimFiyat || 0) * Number(satir.kdvOrani || FATURA_KDV_ORANI),
     0,
   )
   return {
@@ -273,7 +273,7 @@ export const faturaKaydiOlustur = ({ id, faturaNo, tur, karsiTarafUid, karsiTara
     ...satir,
     miktar: Number(satir.miktar),
     birimFiyat: Number(satir.birimFiyat),
-    kdvOrani: Number(satir.kdvOrani ?? FATURA_KDV_ORANI),
+    kdvOrani: Number(satir.kdvOrani || FATURA_KDV_ORANI),
   }))
   const toplamlar = faturaToplamlariHesapla(temizSatirlar)
   return {
@@ -368,8 +368,8 @@ export const merkezMenusu = [
 export const aiHizliKonular = [
   { etiket: 'Aylık Satış', mesaj: 'Bu ay gerçekleşen satışlar hakkında bilgi ver.' },
   { etiket: 'Stok Durumu', mesaj: 'Bana stokları azalan ürünlerimiz hakkında bilgi ver.' },
-  { etiket: 'Kargolanmış Siparişler', mesaj: 'Kargolanan siparişlerin teslimi yapıldı mı?' },
-  { etiket: 'Kargolanmamış Siparişler', mesaj: 'Hangi siparişlerimiz henüz kargolanmadı?' },
+  { etiket: 'Kargolanmış Siparişler', mesaj: 'Kargolanan siparişlerin teslimi yapıldı mı' },
+  { etiket: 'Kargolanmamış Siparişler', mesaj: 'Hangi siparişlerimiz henüz kargolanmadı' },
   { etiket: 'En Çok Satanlar', mesaj: 'En çok satan ürünlerimizden bana bahset.' },
   { etiket: 'En Son Satış', mesaj: 'En son gerçekleşen satışın ayrıntılarını anlat.' },
   { etiket: 'Diğer', mesaj: null },
@@ -380,7 +380,7 @@ export const metniNormalizeEt = (metin) =>
     .toLocaleLowerCase('tr-TR')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[?.!,;:]/g, '')
+    .replace(/[.!,;:]/g, '')
     .trim()
 
 export const favorileriOneTasi = (liste, tarihAl) =>
@@ -431,9 +431,9 @@ export const faturaBelgeHtmlOlustur = (fatura, karsiTaraf) => {
   const guvenliTarih = htmlGuvenliMetin(tarihFormatla(fatura.tarih))
   const guvenliOdemeTarihi = htmlGuvenliMetin(tarihFormatla(fatura.odemeTarihi))
   const guvenliKarsiTarafAdi = htmlGuvenliMetin(fatura.karsiTarafAdi)
-  const guvenliTelefon = htmlGuvenliMetin(karsiTaraf?.telefon ?? '0532 000 00 00')
-  const guvenliAdres = htmlGuvenliMetin(karsiTaraf?.adres ?? 'Malatya Yeşilyurt / Malatya')
-  const guvenliVergiNo = htmlGuvenliMetin(karsiTaraf?.vergiNumarasi ?? karsiTaraf?.vergiNo ?? '1111111111')
+  const guvenliTelefon = htmlGuvenliMetin(karsiTaraf.telefon || '0532 000 00 00')
+  const guvenliAdres = htmlGuvenliMetin(karsiTaraf.adres || 'Malatya Ye?ilyurt / Malatya')
+  const guvenliVergiNo = htmlGuvenliMetin(karsiTaraf.vergiNumarasi || karsiTaraf.vergiNo || '1111111111')
   const guvenliDurum = htmlGuvenliMetin(fatura.durum)
   const guvenliNot = htmlGuvenliMetin(fatura.not || 'Standart ödeme ve teslimat koşulları geçerlidir.')
 
@@ -446,7 +446,7 @@ export const faturaBelgeHtmlOlustur = (fatura, karsiTaraf) => {
           <td style="padding:8px 6px;border-bottom:1px solid #dfeaf8;">${htmlGuvenliMetin(satir.urun)}</td>
           <td style="padding:8px 6px;border-bottom:1px solid #dfeaf8;">${satir.miktar}</td>
           <td style="padding:8px 6px;border-bottom:1px solid #dfeaf8;">${paraFormatla(satir.birimFiyat)}</td>
-          <td style="padding:8px 6px;border-bottom:1px solid #dfeaf8;">%${Math.round((satir.kdvOrani ?? FATURA_KDV_ORANI) * 100)}</td>
+          <td style="padding:8px 6px;border-bottom:1px solid #dfeaf8;">%${Math.round((satir.kdvOrani || FATURA_KDV_ORANI) * 100)}</td>
           <td style="padding:8px 6px;border-bottom:1px solid #dfeaf8;">${paraFormatla(toplam)}</td>
         </tr>
       `

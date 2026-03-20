@@ -2,6 +2,7 @@ import { Component, StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import { ToastProvider } from './core/contexts/ToastContext.jsx'
 
 class UygulamaHataSiniri extends Component {
   constructor(props) {
@@ -27,7 +28,7 @@ class UygulamaHataSiniri extends Component {
               Bu beyaz ekranın yerine gerçek hata bilgisini gösteriyoruz ki sorunu hızlıca kapatabilelim.
             </p>
             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: 14, lineHeight: 1.5, background: '#f8fbff', border: '1px solid #dce7f4', borderRadius: 14, padding: 16 }}>
-              {String(this.state.hata?.stack || this.state.hata?.message || this.state.hata)}
+              {String(this.state.hata.stack || this.state.hata.message || this.state.hata)}
             </pre>
           </section>
         </main>
@@ -41,7 +42,9 @@ class UygulamaHataSiniri extends Component {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <UygulamaHataSiniri>
-      <App />
+      <ToastProvider>
+        <App />
+      </ToastProvider>
     </UygulamaHataSiniri>
   </StrictMode>,
 )

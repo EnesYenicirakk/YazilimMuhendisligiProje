@@ -21,6 +21,7 @@ function MobilKart({
   const oncekiKaydirmaRef = useRef(0)
   const [kaydirma, setKaydirma] = useState(KAPALI_KONUM)
   const [surukleniyor, setSurukleniyor] = useState(false)
+  const [acik, setAcik] = useState(false)
 
   const solaAcik = kaydirma < -AKSIYON_ESIGI
   const sagaAcik = kaydirma > AKSIYON_ESIGI
@@ -31,7 +32,7 @@ function MobilKart({
     if (kaydirma === KAPALI_KONUM) return undefined
 
     const disTiklamaKapat = (event) => {
-      if (!kartRef.current?.contains(event.target)) {
+      if (!kartRef.current.contains(event.target)) {
         setKaydirma(KAPALI_KONUM)
       }
     }
@@ -87,6 +88,11 @@ function MobilKart({
     aksiyonCalistir?.()
   }
 
+  const kartAcikliginiDegistir = () => {
+    setKaydirma(KAPALI_KONUM)
+    setAcik((onceki) => !onceki)
+  }
+
   return (
     <div
       ref={kartRef}
@@ -125,16 +131,30 @@ function MobilKart({
       </div>
 
       <article
-        className={`mobil-kart ${className}`.trim()}
+        className={`mobil-kart ${acik ? 'kart-acik' : ''} ${className}`.trim()}
         style={{ transform: `translateX(${kaydirma}px)` }}
         onTouchStart={dokunmaBasladi}
         onTouchMove={dokunmaHareketi}
         onTouchEnd={dokunmaBitti}
         onTouchCancel={dokunmaBitti}
       >
-        {ust ? <div className="mobil-kart-ust">{ust}</div> : null}
-        {govde ? <div className="mobil-kart-govde">{govde}</div> : null}
-        {aksiyon ? <div className="mobil-kart-aksiyon">{aksiyon}</div> : null}
+        {ust ? (
+          <button
+            type="button"
+            className="mobil-kart-ust mobil-kart-ust-dugme"
+            onClick={kartAcikliginiDegistir}
+            aria-expanded={acik}
+          >
+            <div className="mobil-kart-ust-icerik">{ust}</div>
+            <span className={`mobil-kart-chevron ${acik ? 'acik' : ''}`} aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </span>
+          </button>
+        ) : null}
+        {acik && govde ? <div className="mobil-kart-govde">{govde}</div> : null}
+        {acik && aksiyon ? <div className="mobil-kart-aksiyon">{aksiyon}</div> : null}
         {children}
       </article>
     </div>

@@ -3492,7 +3492,7 @@ th {
   justify-content: space-between;
   align-items: flex-start;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .mobil-kart-ust strong {
@@ -3501,7 +3501,28 @@ th {
   line-height: 1.3;
 }
 
-.mobil-kart-ust span {
+.mobil-kart.kart-acik .mobil-kart-ust {
+  margin-bottom: 12px;
+}
+
+.mobil-kart-ust-dugme {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mobil-kart-ust-icerik {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+}
+
+.mobil-kart-ust-icerik span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3514,6 +3535,32 @@ th {
   font-size: 0.74rem;
   font-weight: 700;
   text-align: center;
+}
+
+.mobil-kart-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  margin-top: -2px;
+  border-radius: 999px;
+  border: 1px solid #dbe8f7;
+  background: #f7fbff;
+  color: #5f7691;
+  transition: transform 180ms ease, color 180ms ease, background-color 180ms ease;
+}
+
+.mobil-kart-chevron svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mobil-kart-chevron.acik {
+  transform: rotate(180deg);
+  background: #edf5ff;
+  color: #2f6fbf;
 }
 
 .mobil-kart-govde {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { merkezMenusu } from '../../../shared/utils/constantsAndHelpers';
 import { SayfaIkonu } from '../../../components/common/Ikonlar';
 
@@ -133,3 +132,4 @@ export default function IndexPage({
     </>
   );
 }
+

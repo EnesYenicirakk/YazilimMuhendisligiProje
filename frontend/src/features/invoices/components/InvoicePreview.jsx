@@ -1,10 +1,4 @@
-import React from 'react';
-
-export default function InvoicePreview({
-  fatura,
-  paraFormatla,
-  tarihFormatla,
-}) {
+﻿export default function InvoicePreview({ fatura, paraFormatla, tarihFormatla }) {
   return (
     <>
       <div className="fatura-onizleme-ust">
@@ -45,15 +39,19 @@ export default function InvoicePreview({
       <div className="fatura-onizleme-govde">
         <h3>Ürünler</h3>
         <div className="fatura-onizleme-satirlar">
-          {fatura.satirlar && fatura.satirlar.length ? fatura.satirlar.map((satir, index) => (
-            <div key={`onizleme-satir-${satir.id}-${index}`} className="fatura-onizleme-satir">
-              <div>
-                <strong>{satir.urun}</strong>
-                <span>{satir.miktar} x {paraFormatla(satir.birimFiyat)}</span>
+          {fatura.satirlar && fatura.satirlar.length ? (
+            fatura.satirlar.map((satir, index) => (
+              <div key={`onizleme-satir-${satir.id}-${index}`} className="fatura-onizleme-satir">
+                <div>
+                  <strong>{satir.urun}</strong>
+                  <span>{satir.miktar} x {paraFormatla(satir.birimFiyat)}</span>
+                </div>
+                <strong>{paraFormatla(Number(satir.miktar) * Number(satir.birimFiyat))}</strong>
               </div>
-              <strong>{paraFormatla(Number(satir.miktar) * Number(satir.birimFiyat))}</strong>
-            </div>
-          )) : <p className="fatura-bos-metin">Önizleme için ürün satırı ekleyin.</p>}
+            ))
+          ) : (
+            <p className="fatura-bos-metin">Önizleme için ürün satırı ekleyin.</p>
+          )}
         </div>
 
         <div className="fatura-toplamlar">
@@ -75,5 +73,5 @@ export default function InvoicePreview({
         </div>
       </div>
     </>
-  );
+  )
 }

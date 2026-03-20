@@ -1,4 +1,4 @@
-﻿import BosDurumKarti from '../../components/common/BosDurumKarti'
+import BosDurumKarti from '../../components/common/BosDurumKarti'
 import { KucukIkon } from '../../components/common/Ikonlar'
 import MobilKart from '../../components/common/MobilKart'
 

@@ -1,30 +1,28 @@
-import InvoicePreview from './features/invoices/components/InvoicePreview';
-export default function FaturalamaPanel({
-  KucukIkon,
-  faturalar,
-  faturaArama,
-  faturaDetayAc,
-  faturaFormu,
-  faturaFormuGuncelle,
-  faturaKarsiTarafDegistir,
-  faturaKarsiTaraflar,
-  faturaKaydet,
-  faturaOnizleme,
-  faturaPdfOnizlemeAc,
-  faturaSatiriEkle,
-  faturaSatiriGuncelle,
-  faturaSatiriSil,
-  faturaSekmesi,
-  faturaTuruDegistir,
-  faturayiPdfIndir,
-  faturayiYazdir,
-  filtreliFaturalar,
-  paraFormatla,
-  setFaturaArama,
-  setFaturaSekmesi,
-  tarihFormatla,
-  urunler,
-}) {
+﻿import InvoicePreview from './InvoicePreview'
+
+export default function InvoicesPanel({ KucukIkon, invoicesData, paraFormatla, tarihFormatla, urunler }) {
+  const {
+    faturaArama,
+    faturaDetayAc,
+    faturaFormu,
+    faturaFormuGuncelle,
+    faturaKarsiTarafDegistir,
+    faturaKarsiTaraflar,
+    faturaKaydet,
+    faturaOnizleme,
+    faturaPdfOnizlemeAc,
+    faturaSatiriEkle,
+    faturaSatiriGuncelle,
+    faturaSatiriSil,
+    faturaSekmesi,
+    faturaTuruDegistir,
+    faturayiPdfIndir,
+    faturayiYazdir,
+    filtreliFaturalar,
+    setFaturaArama,
+    setFaturaSekmesi,
+  } = invoicesData
+
   return (
     <section>
       <header className="ust-baslik siparisler-baslik">
@@ -93,7 +91,9 @@ export default function FaturalamaPanel({
                     <div key={`fatura-satir-${satir.id}`} className="fatura-satir-karti">
                       <div className="fatura-satir-ust">
                         <strong>Ürün Kalemi {index + 1}</strong>
-                        <button type="button" className="ikon-dugme sil" onClick={() => faturaSatiriSil(satir.id)}><KucukIkon tip="sil" /></button>
+                        <button type="button" className="ikon-dugme sil" onClick={() => faturaSatiriSil(satir.id)}>
+                          <KucukIkon tip="sil" />
+                        </button>
                       </div>
                       <div className="fatura-satir-grid">
                         <label>
@@ -133,7 +133,7 @@ export default function FaturalamaPanel({
               </label>
 
               <div className="fatura-aksiyonlari">
-                <button type="button" className="ikinci" onClick={() => faturaPdfOnizlemeAc()}>PDF'e Çevir</button>
+                <button type="button" className="ikinci" onClick={() => faturaPdfOnizlemeAc()}>PDF&apos;e Çevir</button>
                 <button type="button" className="ikinci" onClick={() => faturayiYazdir(faturaOnizleme)}>Yazdır</button>
                 <button type="button" onClick={faturaKaydet}>Faturayı Kaydet</button>
               </div>
@@ -141,11 +141,10 @@ export default function FaturalamaPanel({
 
             <aside className="fatura-onizleme-karti">
               <InvoicePreview fatura={faturaOnizleme} paraFormatla={paraFormatla} tarihFormatla={tarihFormatla} />
-
-                <div className="fatura-onizleme-alt">
-                  <button type="button" className="ikinci" onClick={() => faturayiPdfIndir(faturaOnizleme)}>PDF İndir</button>
-                  <button type="button" onClick={() => faturaPdfOnizlemeAc()}>Önizlemeyi Aç</button>
-                </div>
+              <div className="fatura-onizleme-alt">
+                <button type="button" className="ikinci" onClick={() => faturayiPdfIndir(faturaOnizleme)}>PDF İndir</button>
+                <button type="button" onClick={() => faturaPdfOnizlemeAc()}>Önizlemeyi Aç</button>
+              </div>
             </aside>
           </div>
         )}
@@ -154,25 +153,14 @@ export default function FaturalamaPanel({
           <>
             <div className="panel-ust-cizgi">
               <h2>Fatura Geçmişi</h2>
-              <input
-                type="text"
-                placeholder="Fatura no veya müşteri / tedarikçi ara"
-                value={faturaArama}
-                onChange={(event) => setFaturaArama(event.target.value)}
-              />
+              <input type="text" placeholder="Fatura no veya müşteri / tedarikçi ara" value={faturaArama} onChange={(event) => setFaturaArama(event.target.value)} />
             </div>
 
             <div className="tablo-sarmal masaustu-tablo">
               <table>
                 <thead>
                   <tr>
-                    <th>Fatura No</th>
-                    <th>Tür</th>
-                    <th>Firma / Müşteri</th>
-                    <th>Tarih</th>
-                    <th>Toplam</th>
-                    <th>Durum</th>
-                    <th>İşlem</th>
+                    <th>Fatura No</th><th>Tür</th><th>Firma / Müşteri</th><th>Tarih</th><th>Toplam</th><th>Durum</th><th>İşlem</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -184,9 +172,7 @@ export default function FaturalamaPanel({
                       <td>{tarihFormatla(fatura.tarih)}</td>
                       <td>{paraFormatla(fatura.toplam)}</td>
                       <td><span className="stok-log-rozet">{fatura.durum}</span></td>
-                      <td>
-                        <button type="button" className="siparis-aksiyon-buton" onClick={() => faturaDetayAc(fatura)}>Tekrar Görüntüle</button>
-                      </td>
+                      <td><button type="button" className="siparis-aksiyon-buton" onClick={() => faturaDetayAc(fatura)}>Tekrar Görüntüle</button></td>
                     </tr>
                   ))}
                 </tbody>

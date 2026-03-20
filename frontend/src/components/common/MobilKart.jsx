@@ -42,6 +42,8 @@ function MobilKart({
   }, [kaydirma])
 
   const dokunmaBasladi = (event) => {
+    if (!acik) return
+
     const dokunus = event.touches[0]
     baslangicXRef.current = dokunus.clientX
     baslangicYRef.current = dokunus.clientY
@@ -50,7 +52,7 @@ function MobilKart({
   }
 
   const dokunmaHareketi = (event) => {
-    if (!surukleniyor) return
+    if (!acik || !surukleniyor) return
 
     const dokunus = event.touches[0]
     const farkX = dokunus.clientX - baslangicXRef.current
@@ -69,6 +71,10 @@ function MobilKart({
 
   const dokunmaBitti = () => {
     setSurukleniyor(false)
+    if (!acik) {
+      setKaydirma(KAPALI_KONUM)
+      return
+    }
 
     if (kaydirma <= -AKSIYON_ESIGI && solaAksiyonlar.length > 0) {
       setKaydirma(-Math.min(MAKS_KAYDIRMA, 112 + solaAksiyonlar.length * 6))
@@ -105,7 +111,7 @@ function MobilKart({
             <button
               key={aksiyonItem.id}
               type="button"
-              className={`swipe-aksiyon-buton ${aksiyonItem.varyant || ''}`.trim()}
+              className={`swipe-aksiyon-buton ${aksiyonItem.varyant || ''} ${aksiyonItem.aktif ? 'aktif' : ''}`.trim()}
               onClick={() => aksiyonTiklandi(aksiyonItem.onClick)}
             >
               {aksiyonItem.etiket}
@@ -121,7 +127,7 @@ function MobilKart({
             <button
               key={aksiyonItem.id}
               type="button"
-              className={`swipe-aksiyon-buton ${aksiyonItem.varyant || ''}`.trim()}
+              className={`swipe-aksiyon-buton ${aksiyonItem.varyant || ''} ${aksiyonItem.aktif ? 'aktif' : ''}`.trim()}
               onClick={() => aksiyonTiklandi(aksiyonItem.onClick)}
             >
               {aksiyonItem.etiket}

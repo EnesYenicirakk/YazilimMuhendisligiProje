@@ -1,4 +1,4 @@
-import { paraFormatla } from '../../../shared/utils/constantsAndHelpers'
+﻿import { paraFormatla } from '../../../shared/utils/constantsAndHelpers'
 import { tarihFormatla } from '../../../components/common/Ikonlar'
 
 export default function OdemelerPage({
@@ -24,8 +24,8 @@ export default function OdemelerPage({
     <section>
       <header className="ust-baslik envanter-baslik">
         <div>
-          <h1>Finansal Akış</h1>
-          <p>Tahsilat ve ödeme hareketlerini tek ekrandan takip edin.</p>
+          <h1>Finansal AkÄ±ÅŸ</h1>
+          <p>Tahsilat ve Ã¶deme hareketlerini tek ekrandan takip edin.</p>
         </div>
       </header>
 
@@ -43,7 +43,7 @@ export default function OdemelerPage({
             className={`odeme-sekme ${odemeSekmesi === 'giden' ? 'aktif' : ''}`}
             onClick={() => setOdemeSekmesi('giden')}
           >
-            Ödemeler
+            Ã–demeler
           </button>
         </div>
 
@@ -53,7 +53,7 @@ export default function OdemelerPage({
             <strong>{paraFormatla(toplamGelenNakit)}</strong>
           </article>
           <article className="canli-ozet-kart">
-            <span className="canli-ozet-etiket">Toplam Ödeme</span>
+            <span className="canli-ozet-etiket">Toplam Ã–deme</span>
             <strong>{paraFormatla(toplamGidenNakit)}</strong>
           </article>
           <article className="canli-ozet-kart">
@@ -66,19 +66,19 @@ export default function OdemelerPage({
           <>
             <div className="panel-ust-cizgi">
               <h2>Tahsilat Listesi</h2>
-              <small>{gelenSayfadakiKayitlar.length} kayıt gösteriliyor</small>
+              <small>{gelenSayfadakiKayitlar.length} kayÄ±t gÃ¶steriliyor</small>
             </div>
 
             <div className="tablo-sarmal masaustu-tablo">
               <table>
                 <thead>
                   <tr>
-                    <th>Ödeme No</th>
+                    <th>Ã–deme No</th>
                     <th>Taraf</th>
                     <th>Tarih</th>
                     <th>Durum</th>
                     <th>Tutar</th>
-                    <th>İşlem</th>
+                    <th>Ä°ÅŸlem</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -105,7 +105,7 @@ export default function OdemelerPage({
                             type="button"
                             className="ikon-dugme duzenle"
                             onClick={() => odemeDuzenlemeAc('gelen', kayit)}
-                            title="Düzenle"
+                            title="DÃ¼zenle"
                           >
                             <KucukIkon tip="duzenle" />
                           </button>
@@ -133,7 +133,7 @@ export default function OdemelerPage({
                   key={`gelen-${kayit.odemeNo}`}
                   className="odeme-mobil-kart"
                   solaEtiket="Sil"
-                  sagaEtiket="Favori ve düzenle"
+                  sagaEtiket="Favori ve dÃ¼zenle"
                   solaAksiyonlar={[
                     {
                       id: 'sil',
@@ -143,8 +143,8 @@ export default function OdemelerPage({
                     },
                   ]}
                   sagaAksiyonlar={[
-                    { id: 'favori', etiket: 'Favori', onClick: () => finansFavoriDegistir('gelen', kayit.odemeNo) },
-                    { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => odemeDuzenlemeAc('gelen', kayit) },
+                    { id: 'favori', etiket: 'Favori', varyant: 'favori', aktif: kayit.favori, onClick: () => finansFavoriDegistir('gelen', kayit.odemeNo) },
+                    { id: 'duzenle', etiket: 'DÃ¼zenle', varyant: 'ikincil', onClick: () => odemeDuzenlemeAc('gelen', kayit) },
                   ]}
                   ust={
                     <>
@@ -179,7 +179,7 @@ export default function OdemelerPage({
                 onClick={() => setGelenSayfa((onceki) => Math.max(1, onceki - 1))}
                 disabled={gelenSayfa === 1}
               >
-                ‹
+                â€¹
               </button>
               {Array.from({ length: toplamGelenSayfa }, (_, i) => i + 1).map((sayfaNo) => (
                 <button
@@ -197,7 +197,7 @@ export default function OdemelerPage({
                 onClick={() => setGelenSayfa((onceki) => Math.min(toplamGelenSayfa, onceki + 1))}
                 disabled={gelenSayfa === toplamGelenSayfa}
               >
-                ›
+                â€º
               </button>
             </div>
           </>
@@ -206,20 +206,20 @@ export default function OdemelerPage({
         {odemeSekmesi === 'giden' && (
           <>
             <div className="panel-ust-cizgi">
-              <h2>Ödeme Listesi</h2>
-              <small>{gidenSayfadakiKayitlar.length} kayıt gösteriliyor</small>
+              <h2>Ã–deme Listesi</h2>
+              <small>{gidenSayfadakiKayitlar.length} kayÄ±t gÃ¶steriliyor</small>
             </div>
 
             <div className="tablo-sarmal masaustu-tablo">
               <table>
                 <thead>
                   <tr>
-                    <th>Ödeme No</th>
+                    <th>Ã–deme No</th>
                     <th>Taraf</th>
                     <th>Tarih</th>
                     <th>Durum</th>
                     <th>Tutar</th>
-                    <th>İşlem</th>
+                    <th>Ä°ÅŸlem</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -246,7 +246,7 @@ export default function OdemelerPage({
                             type="button"
                             className="ikon-dugme duzenle"
                             onClick={() => odemeDuzenlemeAc('giden', kayit)}
-                            title="Düzenle"
+                            title="DÃ¼zenle"
                           >
                             <KucukIkon tip="duzenle" />
                           </button>
@@ -274,7 +274,7 @@ export default function OdemelerPage({
                   key={`giden-${kayit.odemeNo}`}
                   className="odeme-mobil-kart"
                   solaEtiket="Sil"
-                  sagaEtiket="Favori ve düzenle"
+                  sagaEtiket="Favori ve dÃ¼zenle"
                   solaAksiyonlar={[
                     {
                       id: 'sil',
@@ -284,8 +284,8 @@ export default function OdemelerPage({
                     },
                   ]}
                   sagaAksiyonlar={[
-                    { id: 'favori', etiket: 'Favori', onClick: () => finansFavoriDegistir('giden', kayit.odemeNo) },
-                    { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => odemeDuzenlemeAc('giden', kayit) },
+                    { id: 'favori', etiket: 'Favori', varyant: 'favori', aktif: kayit.favori, onClick: () => finansFavoriDegistir('giden', kayit.odemeNo) },
+                    { id: 'duzenle', etiket: 'DÃ¼zenle', varyant: 'ikincil', onClick: () => odemeDuzenlemeAc('giden', kayit) },
                   ]}
                   ust={
                     <>
@@ -320,7 +320,7 @@ export default function OdemelerPage({
                 onClick={() => setGidenSayfa((onceki) => Math.max(1, onceki - 1))}
                 disabled={gidenSayfa === 1}
               >
-                ‹
+                â€¹
               </button>
               {Array.from({ length: toplamGidenSayfa }, (_, i) => i + 1).map((sayfaNo) => (
                 <button
@@ -338,7 +338,7 @@ export default function OdemelerPage({
                 onClick={() => setGidenSayfa((onceki) => Math.min(toplamGidenSayfa, onceki + 1))}
                 disabled={gidenSayfa === toplamGidenSayfa}
               >
-                ›
+                â€º
               </button>
             </div>
           </>
@@ -347,4 +347,6 @@ export default function OdemelerPage({
     </section>
   )
 }
+
+
 

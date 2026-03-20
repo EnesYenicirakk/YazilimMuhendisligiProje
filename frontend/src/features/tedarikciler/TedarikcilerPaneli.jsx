@@ -1,4 +1,4 @@
-import BosDurumKarti from '../../components/common/BosDurumKarti'
+﻿import BosDurumKarti from '../../components/common/BosDurumKarti'
 import { KucukIkon } from '../../components/common/Ikonlar'
 import MobilKart from '../../components/common/MobilKart'
 
@@ -37,8 +37,8 @@ function TedarikcilerPaneli(props) {
     <section>
       <header className="ust-baslik envanter-baslik">
         <div>
-          <h1>Kayıtlı Tedarikçiler</h1>
-          <p>Tedarikçi detaylarını, siparişlerini ve fiyat geçmişlerini tek yerden yönetin.</p>
+          <h1>KayÄ±tlÄ± TedarikÃ§iler</h1>
+          <p>TedarikÃ§i detaylarÄ±nÄ±, sipariÅŸlerini ve fiyat geÃ§miÅŸlerini tek yerden yÃ¶netin.</p>
         </div>
       </header>
 
@@ -49,33 +49,33 @@ function TedarikcilerPaneli(props) {
             className={`odeme-sekme ${tedarikciSekmesi === 'liste' ? 'aktif' : ''}`}
             onClick={() => setTedarikciSekmesi('liste')}
           >
-            Tedarikçi Listesi
+            TedarikÃ§i Listesi
           </button>
           <button
             type="button"
             className={`odeme-sekme ${tedarikciSekmesi === 'siparisler' ? 'aktif' : ''}`}
             onClick={() => setTedarikciSekmesi('siparisler')}
           >
-            Son Tedarik Siparişleri
+            Son Tedarik SipariÅŸleri
           </button>
         </div>
 
         {tedarikciSekmesi === 'liste' && (
           <>
             <div className="panel-ust-cizgi tedarikci-ust-cizgi">
-              <h2>Tedarikçi Listesi</h2>
+              <h2>TedarikÃ§i Listesi</h2>
               <div className="tedarikci-arama-alani">
                 <input
                   type="text"
-                  placeholder="Firma, yetkili, telefon veya ürün grubu ara"
+                  placeholder="Firma, yetkili, telefon veya Ã¼rÃ¼n grubu ara"
                   value={tedarikciArama}
                   onChange={(event) => setTedarikciArama(event.target.value)}
                 />
-                <button type="button" className="mobil-arama-dugmesi" aria-label="Tedarikçi ara"><KucukIkon tip="detay" /></button>
+                <button type="button" className="mobil-arama-dugmesi" aria-label="TedarikÃ§i ara"><KucukIkon tip="detay" /></button>
               </div>
               <button type="button" className="urun-ekle-karti" onClick={tedarikciEklemeAc}>
                 <span className="urun-ekle-ikon" aria-hidden="true"><KucukIkon tip="fabrika" /></span>
-                <span className="urun-ekle-metin">Tedarikçi Ekle</span>
+                <span className="urun-ekle-metin">TedarikÃ§i Ekle</span>
               </button>
             </div>
 
@@ -89,12 +89,12 @@ function TedarikcilerPaneli(props) {
                         <th>Firma</th>
                         <th>Yetkili</th>
                         <th>Telefon</th>
-                        <th>Ürün Grubu</th>
-                        <th>Toplam Alış</th>
+                        <th>ÃœrÃ¼n Grubu</th>
+                        <th>Toplam AlÄ±ÅŸ</th>
                         <th>Ortalama Teslim</th>
                         <th>Toplam Harcama</th>
                         <th>Not</th>
-                        <th>İşlem</th>
+                        <th>Ä°ÅŸlem</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -118,7 +118,7 @@ function TedarikcilerPaneli(props) {
                             <div className="islem-dugmeleri">
                               <button type="button" className={`ikon-dugme favori ${tedarikci.favori ? 'aktif' : ''}`} title="Favori" onClick={(event) => { event.stopPropagation(); tedarikciFavoriDegistir(tedarikci.uid) }}><KucukIkon tip="favori" /></button>
                               <button type="button" className="ikon-dugme not" title="Not Ekle" onClick={(event) => { event.stopPropagation(); tedarikciNotAc(tedarikci) }}><KucukIkon tip="not" /></button>
-                              <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={(event) => { event.stopPropagation(); tedarikciDuzenlemeAc(tedarikci) }}><KucukIkon tip="duzenle" /></button>
+                              <button type="button" className="ikon-dugme duzenle" title="DÃ¼zenle" onClick={(event) => { event.stopPropagation(); tedarikciDuzenlemeAc(tedarikci) }}><KucukIkon tip="duzenle" /></button>
                               <button type="button" className="ikon-dugme telefon" title="Ara" onClick={(event) => { event.stopPropagation(); telefonAramasiBaslat(tedarikci.telefon, tedarikci.firmaAdi) }}><KucukIkon tip="telefon" /></button>
                               <button type="button" className="ikon-dugme sil" title="Sil" onClick={(event) => { event.stopPropagation(); setSilinecekTedarikci(tedarikci) }}><KucukIkon tip="sil" /></button>
                             </div>
@@ -135,15 +135,15 @@ function TedarikcilerPaneli(props) {
                       key={`mobil-tedarikci-${tedarikci.uid}`}
                       className="tedarikci-mobil-kart"
                       solaEtiket="Sil"
-                      sagaEtiket="Detay ve işlemler"
+                      sagaEtiket="Detay ve iÅŸlemler"
                       solaAksiyonlar={[
                         { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekTedarikci(tedarikci) },
                       ]}
                       sagaAksiyonlar={[
                         { id: 'detay', etiket: 'Detay', onClick: () => tedarikciDetayAc(tedarikci) },
-                        { id: 'favori', etiket: 'Favori', onClick: () => tedarikciFavoriDegistir(tedarikci.uid) },
+                        { id: 'favori', etiket: 'Favori', varyant: 'favori', aktif: tedarikci.favori, onClick: () => tedarikciFavoriDegistir(tedarikci.uid) },
                         { id: 'not', etiket: 'Not', onClick: () => tedarikciNotAc(tedarikci) },
-                        { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => tedarikciDuzenlemeAc(tedarikci) },
+                        { id: 'duzenle', etiket: 'DÃ¼zenle', varyant: 'ikincil', onClick: () => tedarikciDuzenlemeAc(tedarikci) },
                         { id: 'ara', etiket: 'Ara', varyant: 'ikincil', onClick: () => telefonAramasiBaslat(tedarikci.telefon, tedarikci.firmaAdi) },
                       ]}
                       ust={
@@ -162,7 +162,7 @@ function TedarikcilerPaneli(props) {
                             </div>
                           </div>
                           <div className="mobil-bilgi-satiri"><span>E-posta</span><strong>{tedarikci.email}</strong></div>
-                          <div className="mobil-bilgi-satiri"><span>Toplam Alış</span><strong>{tedarikci.toplamAlisSayisi}</strong></div>
+                          <div className="mobil-bilgi-satiri"><span>Toplam AlÄ±ÅŸ</span><strong>{tedarikci.toplamAlisSayisi}</strong></div>
                           <div className="mobil-bilgi-satiri"><span>Toplam Harcama</span><strong>{paraFormatla(tedarikci.toplamHarcama)}</strong></div>
                           <div className="mobil-bilgi-satiri tam"><span>Not</span><strong>{tedarikci.not}</strong></div>
                         </>
@@ -172,20 +172,20 @@ function TedarikcilerPaneli(props) {
                 </div>
 
                 <div className="sayfalama">
-                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSayfayaGit(tedarikciSayfa - 1)} disabled={tedarikciSayfa === 1}>‹</button>
+                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSayfayaGit(tedarikciSayfa - 1)} disabled={tedarikciSayfa === 1}>â€¹</button>
                   {Array.from({ length: toplamTedarikciSayfa }, (_, i) => i + 1).map((sayfaNo) => (
                     <button key={`tedarikci-sayfa-${sayfaNo}`} type="button" className={`sayfa-buton ${tedarikciSayfa === sayfaNo ? 'aktif' : ''}`} onClick={() => tedarikciSayfayaGit(sayfaNo)}>
                       {sayfaNo}
                     </button>
                   ))}
-                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSayfayaGit(tedarikciSayfa + 1)} disabled={tedarikciSayfa === toplamTedarikciSayfa}>›</button>
+                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSayfayaGit(tedarikciSayfa + 1)} disabled={tedarikciSayfa === toplamTedarikciSayfa}>â€º</button>
                 </div>
               </>
             ) : (
               <BosDurumKarti
-                baslik="Tedarikçi bulunamadı"
-                aciklama="Firma, yetkili veya ürün grubu filtresine uygun tedarikçi görünmüyor."
-                eylemMetni="Aramayı Temizle"
+                baslik="TedarikÃ§i bulunamadÄ±"
+                aciklama="Firma, yetkili veya Ã¼rÃ¼n grubu filtresine uygun tedarikÃ§i gÃ¶rÃ¼nmÃ¼yor."
+                eylemMetni="AramayÄ± Temizle"
                 onEylem={() => {
                   setTedarikciArama('')
                   setTedarikciSayfa(1)
@@ -198,9 +198,9 @@ function TedarikcilerPaneli(props) {
         {tedarikciSekmesi === 'siparisler' && (
           <>
             <div className="panel-ust-cizgi tedarikci-ust-cizgi">
-              <h2>Mağazaya Verilen Son Siparişler</h2>
+              <h2>MaÄŸazaya Verilen Son SipariÅŸler</h2>
               <button type="button" className="siparis-aksiyon-buton" onClick={genelTedarikSiparisEklemeAc}>
-                Yeni Sipariş
+                Yeni SipariÅŸ
               </button>
             </div>
 
@@ -211,8 +211,8 @@ function TedarikcilerPaneli(props) {
                     <thead>
                       <tr>
                         <th>No</th>
-                        <th>Tedarikçi</th>
-                        <th>Sipariş No</th>
+                        <th>TedarikÃ§i</th>
+                        <th>SipariÅŸ No</th>
                         <th>Tarih</th>
                         <th>Tutar</th>
                         <th>Durum</th>
@@ -234,7 +234,7 @@ function TedarikcilerPaneli(props) {
                           <td>{siparis.siparisNo}</td>
                           <td>{tarihFormatla(siparis.tarih)}</td>
                           <td>{paraFormatla(siparis.tutar)}</td>
-                          <td><span className={`tedarik-durum ${siparis.durum === 'Bekliyor' ? 'bekliyor' : siparis.durum === 'Hazırlanıyor' ? 'hazirlaniyor' : 'teslim'}`}>{siparis.durum}</span></td>
+                          <td><span className={`tedarik-durum ${siparis.durum === 'Bekliyor' ? 'bekliyor' : siparis.durum === 'HazÄ±rlanÄ±yor' ? 'hazirlaniyor' : 'teslim'}`}>{siparis.durum}</span></td>
                         </tr>
                       ))}
                     </tbody>
@@ -246,7 +246,7 @@ function TedarikcilerPaneli(props) {
                     <MobilKart
                       key={`mobil-tedarik-siparis-${siparis.tedarikciUid}-${siparis.siparisNo}`}
                       className="tedarikci-mobil-kart"
-                      sagaEtiket="Tedarikçiye git"
+                      sagaEtiket="TedarikÃ§iye git"
                       sagaAksiyonlar={[
                         {
                           id: 'git',
@@ -257,7 +257,7 @@ function TedarikcilerPaneli(props) {
                       ust={
                         <>
                           <strong>{siparis.siparisNo}</strong>
-                          <span className={`tedarik-durum ${siparis.durum === 'Bekliyor' ? 'bekliyor' : siparis.durum === 'Hazırlanıyor' ? 'hazirlaniyor' : 'teslim'}`}>{siparis.durum}</span>
+                          <span className={`tedarik-durum ${siparis.durum === 'Bekliyor' ? 'bekliyor' : siparis.durum === 'HazÄ±rlanÄ±yor' ? 'hazirlaniyor' : 'teslim'}`}>{siparis.durum}</span>
                         </>
                       }
                       govde={
@@ -278,20 +278,20 @@ function TedarikcilerPaneli(props) {
                 </div>
 
                 <div className="sayfalama">
-                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSiparisSayfayaGit(tedarikciSiparisSayfa - 1)} disabled={tedarikciSiparisSayfa === 1}>‹</button>
+                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSiparisSayfayaGit(tedarikciSiparisSayfa - 1)} disabled={tedarikciSiparisSayfa === 1}>â€¹</button>
                   {Array.from({ length: toplamTedarikSiparisSayfa }, (_, i) => i + 1).map((sayfaNo) => (
                     <button key={`tedarik-siparis-sayfa-${sayfaNo}`} type="button" className={`sayfa-buton ${tedarikciSiparisSayfa === sayfaNo ? 'aktif' : ''}`} onClick={() => tedarikciSiparisSayfayaGit(sayfaNo)}>
                       {sayfaNo}
                     </button>
                   ))}
-                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSiparisSayfayaGit(tedarikciSiparisSayfa + 1)} disabled={tedarikciSiparisSayfa === toplamTedarikSiparisSayfa}>›</button>
+                  <button type="button" className="sayfa-ok" onClick={() => tedarikciSiparisSayfayaGit(tedarikciSiparisSayfa + 1)} disabled={tedarikciSiparisSayfa === toplamTedarikSiparisSayfa}>â€º</button>
                 </div>
               </>
             ) : (
               <BosDurumKarti
-                baslik="Tedarik siparişi bulunamadı"
-                aciklama="Henüz görüntülenecek mağaza tedarik siparişi kaydı yok."
-                eylemMetni="Yeni Sipariş"
+                baslik="Tedarik sipariÅŸi bulunamadÄ±"
+                aciklama="HenÃ¼z gÃ¶rÃ¼ntÃ¼lenecek maÄŸaza tedarik sipariÅŸi kaydÄ± yok."
+                eylemMetni="Yeni SipariÅŸ"
                 onEylem={genelTedarikSiparisEklemeAc}
               />
             )}
@@ -303,3 +303,4 @@ function TedarikcilerPaneli(props) {
 }
 
 export default TedarikcilerPaneli
+

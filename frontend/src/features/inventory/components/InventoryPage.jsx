@@ -1,4 +1,4 @@
-import { envanterKategorileri, kritikStoktaMi } from '../../../shared/utils/constantsAndHelpers'
+﻿import { envanterKategorileri, kritikStoktaMi } from '../../../shared/utils/constantsAndHelpers'
 
 export default function InventoryPage({
   KucukIkon,
@@ -24,11 +24,11 @@ export default function InventoryPage({
       <header className="ust-baslik envanter-baslik">
         <div>
           <h1>Envanter</h1>
-          <p>Mağaza: Merkez Şube</p>
+          <p>MaÄŸaza: Merkez Åube</p>
         </div>
         <button type="button" className="urun-ekle-karti" onClick={eklemePenceresiniAc}>
           <span className="urun-ekle-ikon" aria-hidden="true"><KucukIkon tip="urun-ekle" /></span>
-          <span className="urun-ekle-metin">Yeni Ürün</span>
+          <span className="urun-ekle-metin">Yeni ÃœrÃ¼n</span>
         </button>
       </header>
 
@@ -50,10 +50,10 @@ export default function InventoryPage({
         </div>
 
         <div className="panel-ust-cizgi">
-          <h2>Parça Listesi</h2>
+          <h2>ParÃ§a Listesi</h2>
           <input
             type="text"
-            placeholder="Ürün veya ID ara"
+            placeholder="ÃœrÃ¼n veya ID ara"
             value={aramaMetni}
             onChange={(event) => {
               setAramaMetni(event.target.value)
@@ -69,12 +69,12 @@ export default function InventoryPage({
                 <thead>
                   <tr>
                     <th>No</th>
-                    <th>Ürün</th>
-                    <th>Ürün ID</th>
+                    <th>ÃœrÃ¼n</th>
+                    <th>ÃœrÃ¼n ID</th>
                     <th>Kategori</th>
-                    <th>Ürün Adedi</th>
-                    <th>Mağaza Stok</th>
-                    <th>İşlem</th>
+                    <th>ÃœrÃ¼n Adedi</th>
+                    <th>MaÄŸaza Stok</th>
+                    <th>Ä°ÅŸlem</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -89,7 +89,7 @@ export default function InventoryPage({
                             {kritikStoktaMi(urun) && (
                               <span
                                 className="kritik-stok-rozet"
-                                data-tooltip="Bu ürün kritik stok değerinin altındadır."
+                                data-tooltip="Bu Ã¼rÃ¼n kritik stok deÄŸerinin altÄ±ndadÄ±r."
                                 title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}
                               >
                                 !
@@ -105,7 +105,7 @@ export default function InventoryPage({
                       <td>
                         <div className="islem-dugmeleri">
                           <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}><KucukIkon tip="favori" /></button>
-                          <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => duzenlemePenceresiniAc(urun)}><KucukIkon tip="duzenle" /></button>
+                          <button type="button" className="ikon-dugme duzenle" title="DÃ¼zenle" onClick={() => duzenlemePenceresiniAc(urun)}><KucukIkon tip="duzenle" /></button>
                           <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekUrun(urun)}><KucukIkon tip="sil" /></button>
                         </div>
                       </td>
@@ -121,13 +121,13 @@ export default function InventoryPage({
                   key={`mobil-envanter-${urun.uid}`}
                   className="envanter-mobil-kart"
                   solaEtiket="Sil"
-                  sagaEtiket="Favori ve düzenle"
+                  sagaEtiket="Favori ve dÃ¼zenle"
                   solaAksiyonlar={[
                     { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekUrun(urun) },
                   ]}
                   sagaAksiyonlar={[
-                    { id: 'favori', etiket: 'Favori', onClick: () => favoriDegistir(urun.uid) },
-                    { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => duzenlemePenceresiniAc(urun) },
+                    { id: 'favori', etiket: 'Favori', varyant: 'favori', aktif: urun.favori, onClick: () => favoriDegistir(urun.uid) },
+                    { id: 'duzenle', etiket: 'DÃ¼zenle', varyant: 'ikincil', onClick: () => duzenlemePenceresiniAc(urun) },
                   ]}
                   ust={(
                     <>
@@ -145,7 +145,7 @@ export default function InventoryPage({
                             {kritikStoktaMi(urun) && (
                               <span
                                 className="kritik-stok-rozet"
-                                data-tooltip="Bu ürün kritik stok değerinin altındadır."
+                                data-tooltip="Bu Ã¼rÃ¼n kritik stok deÄŸerinin altÄ±ndadÄ±r."
                                 title={`Kritik stok: minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}`}
                               >
                                 !
@@ -156,9 +156,9 @@ export default function InventoryPage({
                         </div>
                       </div>
                       <div className="mobil-bilgi-satiri"><span>Kategori</span><strong>{urun.kategori}</strong></div>
-                      <div className="mobil-bilgi-satiri"><span>Ürün Adedi</span><strong>{urun.urunAdedi}</strong></div>
+                      <div className="mobil-bilgi-satiri"><span>ÃœrÃ¼n Adedi</span><strong>{urun.urunAdedi}</strong></div>
                       <div className="mobil-bilgi-satiri"><span>Minimum Stok</span><strong>{urun.minimumStok}</strong></div>
-                      <div className="mobil-bilgi-satiri"><span>Mağaza Stok</span><strong>{urun.magazaStok}</strong></div>
+                      <div className="mobil-bilgi-satiri"><span>MaÄŸaza Stok</span><strong>{urun.magazaStok}</strong></div>
                     </>
                   )}
                 />
@@ -166,7 +166,7 @@ export default function InventoryPage({
             </div>
 
             <div className="sayfalama">
-              <button type="button" className="sayfa-ok" onClick={() => envanterSayfayaGit(envanterSayfa - 1)} disabled={envanterSayfa === 1}>‹</button>
+              <button type="button" className="sayfa-ok" onClick={() => envanterSayfayaGit(envanterSayfa - 1)} disabled={envanterSayfa === 1}>â€¹</button>
               {Array.from({ length: toplamEnvanterSayfa }, (_, i) => i + 1).map((sayfaNo) => (
                 <button
                   key={sayfaNo}
@@ -177,17 +177,17 @@ export default function InventoryPage({
                   {sayfaNo}
                 </button>
               ))}
-              <button type="button" className="sayfa-ok" onClick={() => envanterSayfayaGit(envanterSayfa + 1)} disabled={envanterSayfa === toplamEnvanterSayfa}>›</button>
+              <button type="button" className="sayfa-ok" onClick={() => envanterSayfayaGit(envanterSayfa + 1)} disabled={envanterSayfa === toplamEnvanterSayfa}>â€º</button>
             </div>
           </>
         ) : (
           <BosDurumKarti
-            baslik="Parça bulunamadı"
-            aciklama="Arama veya kategori filtresine uyan ürün görünmüyor."
+            baslik="ParÃ§a bulunamadÄ±"
+            aciklama="Arama veya kategori filtresine uyan Ã¼rÃ¼n gÃ¶rÃ¼nmÃ¼yor."
             eylemMetni="Filtreleri Temizle"
             onEylem={() => {
               setAramaMetni('')
-              setEnvanterKategori('Tümü')
+              setEnvanterKategori('TÃ¼mÃ¼')
               setEnvanterSayfa(1)
             }}
           />
@@ -196,4 +196,5 @@ export default function InventoryPage({
     </section>
   )
 }
+
 

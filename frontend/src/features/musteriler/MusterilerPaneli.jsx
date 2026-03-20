@@ -1,4 +1,4 @@
-import BosDurumKarti from '../../components/common/BosDurumKarti'
+﻿import BosDurumKarti from '../../components/common/BosDurumKarti'
 import { KucukIkon } from '../../components/common/Ikonlar'
 import MobilKart from '../../components/common/MobilKart'
 
@@ -111,7 +111,7 @@ function MusterilerPaneli(props) {
                     { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekMusteri(musteri) },
                   ]}
                   sagaAksiyonlar={[
-                    { id: 'favori', etiket: 'Favori', onClick: () => musteriFavoriDegistir(musteri.uid) },
+                    { id: 'favori', etiket: 'Favori', varyant: 'favori', aktif: musteri.favori, onClick: () => musteriFavoriDegistir(musteri.uid) },
                     { id: 'not', etiket: 'Not', onClick: () => musteriNotAc(musteri) },
                     { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => musteriDuzenlemeAc(musteri) },
                     { id: 'ara', etiket: 'Ara', varyant: 'ikincil', onClick: () => telefonAramasiBaslat(musteri.telefon, musteri.ad) },

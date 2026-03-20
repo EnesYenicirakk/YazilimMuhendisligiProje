@@ -1,4 +1,4 @@
-import { SayfaIkonu } from '../common/Ikonlar'
+﻿import { SayfaIkonu } from '../common/Ikonlar'
 
 const MENU_OGELERI = [
   { sayfa: 'dashboard', etiket: 'Dashboard' },
@@ -21,16 +21,18 @@ export default function Sidebar({
 
   return (
     <>
-      <button
-        type="button"
-        className="mobil-menu-dugmesi"
-        onClick={() => setMobilMenuAcik(true)}
-        aria-label="Menüyü aç"
-      >
-        <span />
-        <span />
-        <span />
-      </button>
+      {!mobilMenuAcik && (
+        <button
+          type="button"
+          className="mobil-menu-dugmesi"
+          onClick={() => setMobilMenuAcik(true)}
+          aria-label="Menüyü aç"
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      )}
 
       {mobilMenuAcik && (
         <button

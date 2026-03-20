@@ -4963,7 +4963,7 @@ th {
   }
 
   .icerik-alani {
-    padding: 82px 8px 14px;
+    padding: 82px 8px calc(136px + env(safe-area-inset-bottom, 0px));
   }
 
   .ust-baslik h1,
@@ -5717,6 +5717,7 @@ th {
 }
 
 .swipe-aksiyon-etiketi {
+  display: none;
   position: absolute;
   top: 12px;
   left: 50%;
@@ -5739,27 +5740,56 @@ th {
 
 .swipe-aksiyonlar {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 78%;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: min(132px, 58%);
+  max-width: none;
+  margin-top: 18px;
+}
+
+.mobil-kart-arka-plan-sol .swipe-aksiyonlar {
+  align-items: flex-end;
+}
+
+.mobil-kart-arka-plan-sag .swipe-aksiyonlar {
+  align-items: flex-start;
 }
 
 .swipe-aksiyon-buton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: auto;
   border: 1px solid #cfe0f7;
   background: rgba(255, 255, 255, 0.94);
   color: #2d578a;
   border-radius: 999px;
+  width: 100%;
   min-height: 34px;
+  min-width: 112px;
   padding: 8px 12px;
   font-size: 0.74rem;
   font-weight: 800;
   line-height: 1;
+  text-align: center;
 }
 
 .swipe-aksiyon-buton.ikincil {
   background: #f8fbff;
+}
+
+.swipe-aksiyon-buton.favori {
+  border-color: #d7e4f7;
+  background: rgba(255, 255, 255, 0.96);
+  color: #2d578a;
+}
+
+.swipe-aksiyon-buton.favori.aktif {
+  border-color: #f0d67a;
+  background: linear-gradient(180deg, #fff8d9 0%, #ffe896 100%);
+  color: #9b6a00;
+  box-shadow: 0 10px 22px rgba(244, 194, 58, 0.22);
 }
 
 .swipe-aksiyon-buton.tehlike {

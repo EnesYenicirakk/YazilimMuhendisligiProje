@@ -1,0 +1,356 @@
+﻿/* Inventory feature styles */
+
+/* Inventory entry card */
+.urun-ekle-karti {
+  width: 150px;
+  min-height: 108px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #2f72c4;
+  background: linear-gradient(180deg, #347ed6 0%, #245fab 100%);
+  box-shadow: 0 12px 26px rgba(34, 93, 171, 0.18);
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+}
+
+.urun-ekle-ikon {
+  width: 56px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #d5e5f8;
+  background: #fff;
+  color: #2f7dd6;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+}
+
+.urun-ekle-ikon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.urun-ekle-metin {
+  width: 100%;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #2f7dd6 0%, #1f61b8 100%);
+}
+
+/* Inventory table helpers */
+.urun-hucre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.urun-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d8eaff 0%, #b8d7ff 100%);
+  color: #1f56a4;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.73rem;
+  font-weight: 700;
+  border: 1px solid #c8defe;
+}
+
+.urun-ad-satiri {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kritik-stok-rozet {
+  position: relative;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e24a53;
+  color: #fff;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 6px 12px rgba(226, 74, 83, 0.18);
+}
+
+.kritik-stok-rozet::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  min-width: 180px;
+  max-width: 220px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(28, 41, 58, 0.96);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 14px 28px rgba(22, 34, 46, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms ease;
+  z-index: 8;
+}
+
+.kritik-stok-rozet::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  transform: translateX(-50%) translateY(4px);
+  width: 10px;
+  height: 10px;
+  background: rgba(28, 41, 58, 0.96);
+  rotate: 45deg;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms ease;
+  z-index: 7;
+}
+
+.kritik-stok-rozet:hover::after,
+.kritik-stok-rozet:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.envanter-kart {
+  padding: 14px;
+}
+
+/* Inventory page header */
+.envanter-baslik {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.envanter-baslik h1 {
+  margin: 0;
+  color: var(--metin);
+  font-size: 1.9rem;
+}
+
+.envanter-baslik p {
+  margin: 4px 0 0;
+  color: #5f7390;
+  font-size: 0.9rem;
+}
+
+.envanter-baslik button {
+  border: 0;
+  background: linear-gradient(90deg, var(--mavi-koyu), var(--mavi-orta));
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Inventory badges */
+.panel-bilgi-rozet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #eef5ff;
+  border: 1px solid #cfe0f7;
+  color: #345577;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.stok-log-rozet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #315273;
+  background: #eef5ff;
+  border: 1px solid #cfe0f7;
+}
+
+.stok-log-deger-baloncuk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.stok-log-deger-baloncuk.yuksek {
+  color: #18784a;
+  background: #e7f7ef;
+  border-color: #bfe7d2;
+}
+
+.stok-log-deger-baloncuk.dusuk {
+  color: #ba3340;
+  background: #ffedf0;
+  border-color: #f1c5cb;
+}
+
+/* Critical stock detail charts */
+.kritik-stok-baslik {
+  display: grid;
+  gap: 4px;
+}
+
+.kritik-stok-baslik > span {
+  color: #6a7f97;
+  font-size: 0.78rem;
+}
+
+.kritik-stok-detay {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.kritik-stok-detay span {
+  color: #526981;
+  font-size: 0.82rem;
+}
+
+.kritik-stok-detay strong {
+  color: #203247;
+}
+
+.urun-grafik-satiri {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+}
+
+.urun-grafik-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.urun-grafik-zemin {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e5effb;
+  overflow: hidden;
+}
+
+.urun-grafik-dolgu {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2f7dd6 0%, #1f61b8 100%);
+}
+
+@media (max-width: 900px) {
+  .ust-baslik,
+  .siparisler-baslik,
+  .envanter-baslik {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .urun-ekle-karti {
+    width: 100%;
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 900px) {
+  .envanter-kart {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .envanter-baslik {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .ust-baslik h1,
+  .envanter-baslik h1 {
+    font-size: 1.55rem;
+  }
+
+  .ust-baslik p,
+  .envanter-baslik p {
+    font-size: 0.84rem;
+  }
+
+  .urun-avatar,
+  .musteri-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 420px) {
+  .ust-baslik h1,
+  .envanter-baslik h1 {
+    font-size: 1.4rem;
+  }
+
+  .ust-baslik,
+  .siparisler-baslik,
+  .envanter-baslik {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .urun-grafik-ust {
+    gap: 8px;
+  }
+
+  .urun-grafik-ust span,
+  .urun-grafik-ust strong {
+    font-size: 0.82rem;
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .kritik-stok-baslik {
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .kritik-stok-baslik > span {
+    text-align: left;
+  }
+
+  .kritik-stok-detay {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

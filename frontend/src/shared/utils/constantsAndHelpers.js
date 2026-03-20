@@ -1,4 +1,4 @@
-
+﻿
 import { tarihFormatla } from '../../components/common/Ikonlar';
 const FATURA_KDV_ORANI = 0.2; // needed inside
 
@@ -120,12 +120,6 @@ export const baslangicUrunleri = [
   urunOlustur(72, 'DGR-2512', 'Diğer', 'Direksiyon Rot Başı', 31, 13, 9, 410, 660),
 ]
 
-export const dashboardOzetSablon = [
-  { baslik: 'Acil Sipariş', deger: '17', degisim: '-%6', ikon: 'kutu' },
-  { baslik: 'Toplam Sipariş', deger: '1865', degisim: '+%12', ikon: 'liste' },
-  { baslik: 'Ortalama Teslimat', deger: '2,6 Gün', degisim: '+%8', ikon: 'saat' },
-]
-
 export const dashboardBolumSablonu = [
   { anahtar: 'canli', etiket: 'Canlı Özetler' },
   { anahtar: 'haftalik', etiket: 'Haftalık Grafik ve En Çok Satanlar' },
@@ -137,11 +131,6 @@ export const dashboardBolumSablonu = [
 export const paraFormatla = (deger) => {
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(deger)
 }
-
-export const aylar = ['May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki']
-export const gelirSerisi = [92000, 108000, 104000, 121000, 129000, 137000]
-export const giderSerisi = [76000, 82000, 79000, 96000, 102000, 101000]
-export const aylikSatilanUrun = [360, 245, 278, 332, 406, 452]
 
 export const cizgiNoktalari = (degerler, maksimumDeger) => {
   const maxDeger = maksimumDeger || Math.max(...degerler, 1)
@@ -158,7 +147,7 @@ export const cizgiNoktalari = (degerler, maksimumDeger) => {
 }
 
 export const durumSinifi = (durum) => {
-  if (durum === 'Yolda') return 'durum-yolda'
+  if (durum === 'Yolda' || durum === 'Kargoda') return 'durum-yolda'
   if (durum === 'Hazırlanıyor') return 'durum-hazirlaniyor'
   if (durum === 'Teslim Edildi') return 'durum-teslim'
   return ''
@@ -167,6 +156,48 @@ export const durumSinifi = (durum) => {
 export const teslimatGununuCoz = (metin) => {
   const eslesme = String(metin).match(/(\d+)/)
   return eslesme ? Number(eslesme[1]) : 0
+}
+
+export const siparisMiktariniGetir = (siparis) => {
+  const miktar = Number(siparis?.miktar)
+  return Number.isFinite(miktar) && miktar > 0 ? miktar : 1
+}
+
+export const siparisTamamlandiMi = (siparis) =>
+  siparis?.teslimatDurumu === 'Teslim Edildi' ||
+  siparis?.durum === 'Teslim Edildi' ||
+  siparis?.durum === 'Tamamlandı'
+
+export const odemeDurumunuStandartlastir = (durum) => {
+  const normalize = String(durum ?? '').trim().toLocaleLowerCase('tr-TR')
+  if (normalize === 'tahsil edildi' || normalize === 'ödendi') return 'Ödendi'
+  if (normalize === 'beklemede') return 'Beklemede'
+  if (normalize === 'iptal') return 'İptal'
+  if (normalize === 'kısmi' || normalize === 'kismi') return 'Kısmi'
+  return 'Beklemede'
+}
+
+export const gerceklesenOdemeTutari = (kayit) => {
+  const durum = odemeDurumunuStandartlastir(kayit?.durum)
+  const odemeTutari = Number(kayit?.odenenTutar ?? kayit?.tutar ?? 0)
+  return durum === 'Ödendi' || durum === 'Kısmi' ? odemeTutari : 0
+}
+
+export const enCokSatilanUrunleriHesapla = (siparisler, limit = 6) => {
+  const satisOzetleri = siparisler.reduce((harita, siparis) => {
+    if (!siparisTamamlandiMi(siparis)) return harita
+
+    const urunAdi = String(siparis.urun ?? '').trim()
+    if (!urunAdi) return harita
+
+    harita.set(urunAdi, (harita.get(urunAdi) ?? 0) + siparisMiktariniGetir(siparis))
+    return harita
+  }, new Map())
+
+  return Array.from(satisOzetleri.entries())
+    .map(([ad, miktar]) => ({ ad, miktar }))
+    .sort((a, b) => b.miktar - a.miktar || a.ad.localeCompare(b.ad, 'tr'))
+    .slice(0, limit)
 }
 
 export const telefonuNormalizeEt = (telefon) => telefon.replace(/\D/g, '')
@@ -199,8 +230,6 @@ export const bosMusteriFormu = {
   ad: '',
   telefon: '',
   sonAlim: '',
-  toplamSiparis: '',
-  toplamHarcama: '',
   not: '',
 }
 
@@ -226,7 +255,7 @@ export const bosTedarikciSiparisFormu = {
 }
 
 export const bosSiparisFormu = {
-  musteri: '',
+  musteriUid: '',
   urun: '',
   toplamTutar: '',
   siparisTarihi: '',
@@ -422,6 +451,7 @@ export const pdfSatirOlustur = (metin, x, y, fontBoyutu = 12) =>
   `BT /F1 ${fontBoyutu} Tf 1 0 0 1 ${x} ${y} Tm (${pdfGuvenliMetin(metin)}) Tj ET`
 
 export const faturaBelgeHtmlOlustur = (fatura, karsiTaraf) => {
+  const guvenliKarsiTaraf = karsiTaraf ?? {}
   const logoUrl = `${window.location.origin}/ytu-logo.png`
   const gibLogoUrl = `${window.location.origin}/gib-logo.png`
   const yedekLogoUrl = `${window.location.origin}/ytu-logo.svg`
@@ -431,9 +461,9 @@ export const faturaBelgeHtmlOlustur = (fatura, karsiTaraf) => {
   const guvenliTarih = htmlGuvenliMetin(tarihFormatla(fatura.tarih))
   const guvenliOdemeTarihi = htmlGuvenliMetin(tarihFormatla(fatura.odemeTarihi))
   const guvenliKarsiTarafAdi = htmlGuvenliMetin(fatura.karsiTarafAdi)
-  const guvenliTelefon = htmlGuvenliMetin(karsiTaraf.telefon || '0532 000 00 00')
-  const guvenliAdres = htmlGuvenliMetin(karsiTaraf.adres || 'Malatya Ye?ilyurt / Malatya')
-  const guvenliVergiNo = htmlGuvenliMetin(karsiTaraf.vergiNumarasi || karsiTaraf.vergiNo || '1111111111')
+  const guvenliTelefon = htmlGuvenliMetin(guvenliKarsiTaraf?.telefon ?? '0532 000 00 00')
+  const guvenliAdres = htmlGuvenliMetin(guvenliKarsiTaraf?.adres ?? 'Malatya Yeşilyurt / Malatya')
+  const guvenliVergiNo = htmlGuvenliMetin(guvenliKarsiTaraf?.vergiNumarasi ?? guvenliKarsiTaraf?.vergiNo ?? '1111111111')
   const guvenliDurum = htmlGuvenliMetin(fatura.durum)
   const guvenliNot = htmlGuvenliMetin(fatura.not || 'Standart ödeme ve teslimat koşulları geçerlidir.')
 
@@ -562,5 +592,6 @@ export const pdfKutuphaneleriniYukle = async () => {
 
   return pdfKutuphaneleriPromise
 }
+
 
 

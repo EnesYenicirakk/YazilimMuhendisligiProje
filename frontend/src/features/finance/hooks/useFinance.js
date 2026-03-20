@@ -1,16 +1,28 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
 import { gelenNakitKayitlari, gidenNakitKayitlari } from '../../../components/common/Ikonlar'
-import { favorileriOneTasi, negatifSayiVarMi } from '../../../shared/utils/constantsAndHelpers'
+import {
+  favorileriOneTasi,
+  gerceklesenOdemeTutari,
+  negatifSayiVarMi,
+  odemeDurumunuStandartlastir,
+} from '../../../shared/utils/constantsAndHelpers'
 
 const ODEME_SAYFA_BASINA = 10
 const BOS_ODEME_FORMU = { taraf: '', tarih: '', durum: '', tutar: '' }
-
 export default function useFinance({ toastGoster }) {
   const [gelenNakitListesi, setGelenNakitListesi] = useState(() =>
-    gelenNakitKayitlari.map((kayit) => ({ ...kayit, favori: false })),
+    gelenNakitKayitlari.map((kayit) => ({
+      ...kayit,
+      durum: odemeDurumunuStandartlastir(kayit.durum),
+      favori: false,
+    })),
   )
   const [gidenNakitListesi, setGidenNakitListesi] = useState(() =>
-    gidenNakitKayitlari.map((kayit) => ({ ...kayit, favori: false })),
+    gidenNakitKayitlari.map((kayit) => ({
+      ...kayit,
+      durum: odemeDurumunuStandartlastir(kayit.durum),
+      favori: false,
+    })),
   )
   const [odemeSekmesi, setOdemeSekmesi] = useState('gelen')
   const [gelenSayfa, setGelenSayfa] = useState(1)
@@ -30,12 +42,12 @@ export default function useFinance({ toastGoster }) {
   )
 
   const toplamGelenNakit = useMemo(
-    () => siraliGelenNakit.reduce((toplam, kayit) => toplam + kayit.tutar, 0),
+    () => siraliGelenNakit.reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0),
     [siraliGelenNakit],
   )
 
   const toplamGidenNakit = useMemo(
-    () => siraliGidenNakit.reduce((toplam, kayit) => toplam + kayit.tutar, 0),
+    () => siraliGidenNakit.reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0),
     [siraliGidenNakit],
   )
 
@@ -102,7 +114,7 @@ export default function useFinance({ toastGoster }) {
     const tutar = Number(String(odemeFormu.tutar).replace(/[^\d.-]/g, ''))
     const taraf = odemeFormu.taraf.trim()
     const tarih = odemeFormu.tarih.trim()
-    const durum = odemeFormu.durum.trim()
+    const durum = odemeDurumunuStandartlastir(odemeFormu.durum)
 
     if (!taraf || !tarih || !durum || Number.isNaN(tutar)) {
       toastGoster?.('hata', 'Finansal akış kaydında eksik veya hatalı bilgi var.')
@@ -182,6 +194,8 @@ export default function useFinance({ toastGoster }) {
     toplamGelenNakit,
     toplamGidenNakit,
     aySonuKari,
+    siraliGelenNakit,
+    siraliGidenNakit,
     finansFavoriDegistir,
     odemeDuzenlemeAc,
     odemeDuzenlemeKapat,

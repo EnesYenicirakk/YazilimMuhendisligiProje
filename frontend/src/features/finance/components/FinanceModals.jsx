@@ -1,4 +1,4 @@
-export default function FinanceModals({ financeData }) {
+﻿export default function FinanceModals({ financeData }) {
   const {
     duzenlenenOdeme,
     odemeFormu,
@@ -22,7 +22,12 @@ export default function FinanceModals({ financeData }) {
               <label>Tarih</label>
               <input type="date" value={odemeFormu.tarih} onChange={(event) => odemeFormuGuncelle('tarih', event.target.value)} />
               <label>Durum</label>
-              <input value={odemeFormu.durum} onChange={(event) => odemeFormuGuncelle('durum', event.target.value)} />
+              <select value={odemeFormu.durum} onChange={(event) => odemeFormuGuncelle('durum', event.target.value)}>
+                <option value="Ödendi">Ödendi</option>
+                <option value="Beklemede">Beklemede</option>
+                <option value="İptal">İptal</option>
+                <option value="Kısmi">Kısmi</option>
+              </select>
               <label>Tutar</label>
               <input type="number" value={odemeFormu.tutar} onChange={(event) => odemeFormuGuncelle('tutar', event.target.value)} />
             </div>
@@ -49,3 +54,4 @@ export default function FinanceModals({ financeData }) {
     </>
   )
 }
+

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, memo } from 'react'
+﻿import { useEffect, useRef, useState, memo } from 'react'
 
 const KAPALI_KONUM = 0
 const AKSIYON_ESIGI = 68
@@ -168,3 +168,4 @@ function MobilKart({
 }
 
 export default memo(MobilKart)
+

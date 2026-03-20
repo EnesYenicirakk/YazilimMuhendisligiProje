@@ -1,4 +1,4 @@
-import { SayfaIkonu } from '../common/Ikonlar'
+﻿import { SayfaIkonu } from '../common/Ikonlar'
 
 const HIZLI_GECIS_OGELERI = [
   { sayfa: 'dashboard', etiket: 'Dashboard' },
@@ -26,3 +26,4 @@ export default function BottomNav({ aktifSayfa, sayfaDegistir }) {
     </nav>
   )
 }
+

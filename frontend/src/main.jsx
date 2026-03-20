@@ -1,6 +1,5 @@
-import { Component, StrictMode } from 'react'
+﻿import { Component, StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import App from './App.jsx'
 import { ToastProvider } from './core/contexts/ToastContext.jsx'
 
@@ -48,3 +47,4 @@ createRoot(document.getElementById('root')).render(
     </UygulamaHataSiniri>
   </StrictMode>,
 )
+

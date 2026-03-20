@@ -1,4 +1,4 @@
-const tedarikciOlustur = (uid, firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, toplamAlisSayisi, ortalamaTeslimSuresi, toplamHarcama, not, alinanUrunler, siparisler, fiyatGecmisi, favori = false) => ({
+﻿const tedarikciOlustur = (uid, firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, toplamAlisSayisi, ortalamaTeslimSuresi, toplamHarcama, not, alinanUrunler, siparisler, fiyatGecmisi, favori = false) => ({
   uid,
   firmaAdi,
   yetkiliKisi,
@@ -31,3 +31,4 @@ const baslangicTedarikcileri = [
 ]
 
 export { baslangicTedarikcileri }
+

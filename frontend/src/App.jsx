@@ -1,5 +1,6 @@
-import { Suspense, lazy, useState } from 'react'
+﻿import { Suspense, lazy, useState } from 'react'
 import './App.css'
+import { useMemo } from 'react'
 import IndexPage from './features/home/components/IndexPage'
 import DashboardPage from './features/dashboard/components/DashboardPage'
 import OdemelerPage from './features/finance/components/OdemelerPage'
@@ -24,7 +25,12 @@ import useSuppliers from './features/suppliers/hooks/useSuppliers'
 import useGlobalSearch from './core/hooks/useGlobalSearch'
 import useAppNotifications from './core/hooks/useAppNotifications'
 import { useToast } from './core/contexts/ToastContext'
-import { paraFormatla, durumSinifi, merkezMenusu } from './shared/utils/constantsAndHelpers'
+import {
+  paraFormatla,
+  durumSinifi,
+  merkezMenusu,
+  siparisTamamlandiMi,
+} from './shared/utils/constantsAndHelpers'
 
 const BildirimPaneli = lazy(() => import('./BildirimPaneli'))
 const AiPanel = lazy(() => import('./AiPanel'))
@@ -131,6 +137,37 @@ function App() {
     },
   })
 
+  const customersViewData = useMemo(() => {
+    const musteriIstatistikleri = ordersData.siparisler.reduce((harita, siparis) => {
+      if (!siparisTamamlandiMi(siparis) || siparis.musteriUid == null) return harita
+
+      const uid = String(siparis.musteriUid)
+      const onceki = harita.get(uid) ?? { toplamSiparis: 0, toplamHarcama: 0 }
+      harita.set(uid, {
+        toplamSiparis: onceki.toplamSiparis + 1,
+        toplamHarcama: onceki.toplamHarcama + Number(siparis.toplamTutar || 0),
+      })
+      return harita
+    }, new Map())
+
+    const zenginlestir = (liste) =>
+      liste.map((musteri) => {
+        const istatistik = musteriIstatistikleri.get(String(musteri.uid))
+        return {
+          ...musteri,
+          toplamSiparis: istatistik?.toplamSiparis ?? 0,
+          toplamHarcama: istatistik?.toplamHarcama ?? 0,
+        }
+      })
+
+    return {
+      ...customersData,
+      musteriler: zenginlestir(customersData.musteriler),
+      filtreliMusteriler: zenginlestir(customersData.filtreliMusteriler),
+      sayfadakiMusteriler: zenginlestir(customersData.sayfadakiMusteriler),
+    }
+  }, [customersData, ordersData.siparisler])
+
   const { urunler, stokDegisimLoglari } = inventoryData
 
   const invoicesData = useInvoices({
@@ -144,6 +181,8 @@ function App() {
     siparisler: ordersData.siparisler,
     siraliSiparisler: ordersData.siraliSiparisler,
     urunler: inventoryData.urunler,
+    gelenNakitKayitlari: financeData.siraliGelenNakit,
+    gidenNakitKayitlari: financeData.siraliGidenNakit,
     aySonuKari: financeData.aySonuKari,
     toastGoster,
   })
@@ -153,7 +192,7 @@ function App() {
     urunler: inventoryData.urunler,
     siparisler: ordersData.siraliSiparisler,
     gecmisSiparisler: ordersData.gecmisSiparisler,
-    musteriler: customersData.musteriler,
+    musteriler: customersViewData.musteriler,
     tedarikciler: suppliersData.tedarikciler,
     faturalar: invoicesData.faturalar,
     paraFormatla,
@@ -244,7 +283,6 @@ function App() {
               KucukIkon={KucukIkon}
               sayfaDegistir={sayfaDegistir}
               dashboardData={dashboardData}
-              urunler={urunler}
             />
           )}
 
@@ -262,7 +300,7 @@ function App() {
           {aktifSayfa === 'musteriler' && (
             <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Müşteriler yükleniyor...</section>}>
               <CustomersPanel
-                customersData={customersData}
+                customersData={customersViewData}
                 paraFormatla={paraFormatla}
                 tarihFormatla={tarihFormatla}
                 telefonAramasiBaslat={telefonAramasiBaslat}
@@ -526,3 +564,4 @@ function App() {
 }
 
 export default App
+

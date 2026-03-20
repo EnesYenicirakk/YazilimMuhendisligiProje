@@ -1,4 +1,4 @@
-const stokDegisimLoglari = [
+﻿const stokDegisimLoglari = [
   { id: 1, tarih: '2026-03-16 09:10', urun: 'Fren Balatası Ön Takım', urunId: 'FRN-2101', islem: 'Stok düşüşü', eskiStok: 12, yeniStok: 7, kullanici: 'Admin', aciklama: 'Servis siparişi için 5 adet çıkış yapıldı.' },
   { id: 2, tarih: '2026-03-16 08:32', urun: 'Akü 72Ah', urunId: 'ELK-2301', islem: 'Stok düşüşü', eskiStok: 11, yeniStok: 8, kullanici: 'Admin', aciklama: '3 adet perakende satış işlendi.' },
   { id: 3, tarih: '2026-03-15 18:05', urun: 'Debriyaj Seti', urunId: 'SAN-2401', islem: 'Stok artışı', eskiStok: 11, yeniStok: 15, kullanici: 'Admin', aciklama: 'Yeni tedarik girişinden 4 adet eklendi.' },
@@ -18,3 +18,4 @@ const stokDegisimLoglari = [
 ]
 
 export { stokDegisimLoglari }
+

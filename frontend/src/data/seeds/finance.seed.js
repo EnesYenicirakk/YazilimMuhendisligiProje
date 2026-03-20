@@ -1,4 +1,4 @@
-const gelenNakitKayitlari = [
+﻿const gelenNakitKayitlari = [
   { odemeNo: 'GN-5001', taraf: 'Yıldız Oto', tarih: '2026-03-11', durum: 'Tahsil Edildi', tutar: 94500 },
   { odemeNo: 'GN-5002', taraf: 'Tekin Otomotiv', tarih: '2026-03-10', durum: 'Tahsil Edildi', tutar: 88200 },
   { odemeNo: 'GN-5003', taraf: 'Mert Motor', tarih: '2026-03-10', durum: 'Tahsil Edildi', tutar: 76400 },
@@ -48,3 +48,4 @@ export {
   gelenNakitKayitlari,
   gidenNakitKayitlari,
 }
+

@@ -1,4 +1,4 @@
-export default function InventoryModals({ inventoryData }) {
+﻿export default function InventoryModals({ inventoryData }) {
   const {
     eklemeAcik,
     duzenlemeAcik,
@@ -124,3 +124,4 @@ export default function InventoryModals({ inventoryData }) {
     </>
   )
 }
+

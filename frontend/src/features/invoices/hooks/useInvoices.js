@@ -167,16 +167,30 @@ export default function useInvoices({ musteriler, tedarikciler, urunler, toastGo
     setFaturaDetayAcik(true)
   }
 
+  const faturaKarsiTarafiniBul = (fatura) => {
+    const bulunanKayit =
+      fatura.tur === 'Satış Faturası'
+        ? musteriler.find((musteri) => String(musteri.uid) === String(fatura.karsiTarafUid))
+        : tedarikciler.find((tedarikci) => String(tedarikci.uid) === String(fatura.karsiTarafUid))
+
+    return bulunanKayit ?? {
+      uid: null,
+      ad: fatura.karsiTarafAdi ?? 'Bilinmeyen Kayıt',
+      firmaAdi: fatura.karsiTarafAdi ?? 'Bilinmeyen Kayıt',
+      telefon: '',
+      adres: '',
+      vergiNumarasi: '',
+      vergiNo: '',
+    }
+  }
+
   const faturayiYazdir = (fatura) => {
     if (!fatura.satirlar.length || !fatura.karsiTarafAdi) {
       toastGoster?.('hata', 'Yazdırma için önce fatura bilgilerini tamamlayın.')
       return
     }
 
-    const karsiTaraf =
-      fatura.tur === 'Satış Faturası'
-        ? musteriler.find((musteri) => String(musteri.uid) === String(fatura.karsiTarafUid))
-        : tedarikciler.find((tedarikci) => String(tedarikci.uid) === String(fatura.karsiTarafUid))
+    const karsiTaraf = faturaKarsiTarafiniBul(fatura)
 
     const iframe = document.createElement('iframe')
     iframe.style.position = 'fixed'
@@ -219,10 +233,7 @@ export default function useInvoices({ musteriler, tedarikciler, urunler, toastGo
       return
     }
 
-    const karsiTaraf =
-      fatura.tur === 'Satış Faturası'
-        ? musteriler.find((musteri) => String(musteri.uid) === String(fatura.karsiTarafUid))
-        : tedarikciler.find((tedarikci) => String(tedarikci.uid) === String(fatura.karsiTarafUid))
+    const karsiTaraf = faturaKarsiTarafiniBul(fatura)
 
     const kap = document.createElement('div')
     kap.style.position = 'fixed'

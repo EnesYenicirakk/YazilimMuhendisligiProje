@@ -1,4 +1,43 @@
-﻿/* Tedarikçiler stilleri için feature katmanı */
+﻿/* Customers and suppliers feature styles */
+
+/* Customer avatars */
+.musteri-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #eef5ff 0%, #d3e6fb 100%);
+  color: #2b5ea4;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #c7dcf7;
+  flex-shrink: 0;
+}
+
+.musteri-avatar svg {
+  width: 23px;
+  height: 23px;
+}
+
+.musteri-not-ozet {
+  max-width: 220px;
+  white-space: normal;
+  line-height: 1.35;
+  color: #526981;
+}
+
+/* Large customer avatar */
+.musteri-avatar.buyuk {
+  width: 48px;
+  height: 48px;
+}
+
+.musteriler-kart {
+  padding: 14px;
+}
+
+.musteri-mobil-kart .swipe-aksiyon-buton {
+  min-width: 74px;
+}
 
 .tedarikci-mobil-kart .swipe-aksiyon-buton {
   min-width: 74px;
@@ -13,11 +52,6 @@
   align-items: center;
   gap: 8px;
 }
-
-
-.tedarikci-arama-alani {
-    width: 100%;
-  }
 
 .tedarikci-avatar {
   font-size: 1rem;
@@ -34,12 +68,6 @@
   gap: 14px;
   margin-bottom: 14px;
 }
-
-
-.tedarikci-detay-ust {
-    flex-direction: column;
-    align-items: stretch;
-  }
 
 .tedarikci-detay-kimlik {
   display: flex;
@@ -87,11 +115,6 @@
 .tedarikci-analiz-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-
-
-.tedarikci-analiz-grid {
-    grid-template-columns: 1fr;
-  }
 
 .tedarikci-detay-not {
   margin: 0;
@@ -145,14 +168,45 @@
   display: none;
 }
 
+@media (max-width: 900px) {
+  .musteriler-kart {
+    padding: 12px;
+  }
+}
 
-.tedarikci-detay-mobil {
-    display: grid;
-    gap: 12px;
+@media (max-width: 640px) {
+  .musteri-not-ozet {
+    max-width: 180px;
+    font-size: 0.82rem;
   }
 
-.tedarikci-arama-alani input {
+  .urun-avatar,
+  .musteri-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tedarikci-arama-alani {
     width: 100%;
   }
 
+  .tedarikci-arama-alani input {
+    width: 100%;
+  }
 
+  .tedarikci-detay-ust {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tedarikci-analiz-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tedarikci-detay-mobil {
+    display: grid;
+    gap: 12px;
+  }
+}

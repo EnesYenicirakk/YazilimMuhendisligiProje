@@ -1,4 +1,4 @@
-export default function CustomerModals({ customersData }) {
+﻿export default function CustomerModals({ customersData }) {
   const {
     musteriEklemeAcik,
     musteriDuzenlemeAcik,
@@ -30,10 +30,6 @@ export default function CustomerModals({ customersData }) {
               <input value={musteriFormu.telefon} onChange={(event) => musteriFormuGuncelle('telefon', event.target.value)} />
               <label>Son Satın Alım</label>
               <input type="date" value={musteriFormu.sonAlim} onChange={(event) => musteriFormuGuncelle('sonAlim', event.target.value)} />
-              <label>Sipariş Sayısı</label>
-              <input type="number" value={musteriFormu.toplamSiparis} onChange={(event) => musteriFormuGuncelle('toplamSiparis', event.target.value)} />
-              <label>Toplam Harcama</label>
-              <input type="number" value={musteriFormu.toplamHarcama} onChange={(event) => musteriFormuGuncelle('toplamHarcama', event.target.value)} />
               <label>Not</label>
               <textarea value={musteriFormu.not} onChange={(event) => musteriFormuGuncelle('not', event.target.value)} />
             </div>
@@ -56,10 +52,6 @@ export default function CustomerModals({ customersData }) {
               <input value={musteriFormu.telefon} onChange={(event) => musteriFormuGuncelle('telefon', event.target.value)} />
               <label>Son Satın Alım</label>
               <input type="date" value={musteriFormu.sonAlim} onChange={(event) => musteriFormuGuncelle('sonAlim', event.target.value)} />
-              <label>Sipariş Sayısı</label>
-              <input type="number" value={musteriFormu.toplamSiparis} onChange={(event) => musteriFormuGuncelle('toplamSiparis', event.target.value)} />
-              <label>Toplam Harcama</label>
-              <input type="number" value={musteriFormu.toplamHarcama} onChange={(event) => musteriFormuGuncelle('toplamHarcama', event.target.value)} />
               <label>Not</label>
               <textarea value={musteriFormu.not} onChange={(event) => musteriFormuGuncelle('not', event.target.value)} />
             </div>
@@ -102,3 +94,4 @@ export default function CustomerModals({ customersData }) {
     </>
   )
 }
+

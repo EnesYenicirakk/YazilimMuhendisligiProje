@@ -20,6 +20,8 @@
     silinecekSiparis,
     setSilinecekSiparis,
     siparisSil,
+    musteriSecenekleri,
+    siparisMusteriAdiniGetir,
     siparisTelefonunuGetir,
   } = ordersData
 
@@ -31,7 +33,14 @@
             <h3>Yeni Sipariş Oluştur</h3>
             <div className="modal-form">
               <label>Müşteri</label>
-              <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
+              <select value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
+                <option value="">Müşteri seçin</option>
+                {musteriSecenekleri.map((musteri) => (
+                  <option key={musteri.uid} value={musteri.uid}>
+                    {musteri.ad}
+                  </option>
+                ))}
+              </select>
               <label>Ürün</label>
               <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
               <label>Toplam Tutar</label>
@@ -52,7 +61,6 @@
               <label>Teslimat Durumu</label>
               <select value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)}>
                 <option>Hazırlanıyor</option>
-                <option>Kargoda</option>
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
@@ -73,7 +81,7 @@
             <h3>Sipariş Detayı</h3>
             <div className="modal-form siparis-detay-icerik">
               <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detaySiparis.siparisNo}</strong></div>
-              <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{detaySiparis.musteri}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{siparisMusteriAdiniGetir(detaySiparis)}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Telefon</span><strong>{siparisTelefonunuGetir(detaySiparis)}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Ürün</span><strong>{detaySiparis.urun}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(detaySiparis.toplamTutar)}</strong></div>
@@ -119,7 +127,14 @@
             <h3>Siparişi Düzenle</h3>
             <div className="modal-form">
               <label>Müşteri</label>
-              <input value={siparisFormu.musteri} onChange={(event) => siparisFormuGuncelle('musteri', event.target.value)} />
+              <select value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
+                <option value="">Müşteri seçin</option>
+                {musteriSecenekleri.map((musteri) => (
+                  <option key={musteri.uid} value={musteri.uid}>
+                    {musteri.ad}
+                  </option>
+                ))}
+              </select>
               <label>Ürün</label>
               <input value={siparisFormu.urun} onChange={(event) => siparisFormuGuncelle('urun', event.target.value)} />
               <label>Toplam Tutar</label>
@@ -140,7 +155,6 @@
               <label>Teslimat Durumu</label>
               <select value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)}>
                 <option>Hazırlanıyor</option>
-                <option>Kargoda</option>
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
@@ -174,7 +188,6 @@
               <label>Teslimat Durumu</label>
               <select value={siparisDurumFormu.teslimatDurumu} onChange={(event) => siparisDurumFormuGuncelle('teslimatDurumu', event.target.value)}>
                 <option>Hazırlanıyor</option>
-                <option>Kargoda</option>
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>

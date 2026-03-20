@@ -1,0 +1,351 @@
+﻿/* Reusable button styles */
+
+.sifre-goster-buton {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #2b67ab;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+
+.sifre-goster-buton:hover {
+  background: rgba(47, 125, 214, 0.08);
+}
+
+.login-giris-buton {
+  margin-top: 12px;
+  border: 0;
+  border-radius: 8px;
+  padding: 12px;
+  background: linear-gradient(90deg, #0d4f95, #2f7dd6);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 180ms ease;
+}
+
+.login-giris-buton:hover {
+  box-shadow: 0 14px 28px rgba(37, 96, 168, 0.22);
+}
+
+.login-giris-buton:active {
+  transform: scale(0.98);
+  filter: brightness(0.98);
+}
+
+.siparis-yeni-buton {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(90deg, #1f61b8, #2f7dd6);
+  cursor: pointer;
+}
+
+.odeme-sekme-alani {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.kategori-sekme-alani {
+  flex-wrap: wrap;
+}
+
+.odeme-sekme {
+  border: 1px solid #cde0f7;
+  background: #f3f8ff;
+  color: #315273;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.odeme-sekme.aktif {
+  background: linear-gradient(90deg, #1f61b8 0%, #2f7dd6 100%);
+  border-color: #1f61b8;
+  color: #fff;
+}
+
+.urun-ekle-karti {
+  width: 150px;
+  min-height: 108px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #2f72c4;
+  background: linear-gradient(180deg, #347ed6 0%, #245fab 100%);
+  box-shadow: 0 12px 26px rgba(34, 93, 171, 0.18);
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+}
+
+.urun-ekle-ikon {
+  width: 56px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #d5e5f8;
+  background: #fff;
+  color: #2f7dd6;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+}
+
+.urun-ekle-ikon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.urun-ekle-metin {
+  width: 100%;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #2f7dd6 0%, #1f61b8 100%);
+}
+
+.ozet-menu {
+  border: 0;
+  background: transparent;
+  color: #7d8fa5;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+}
+
+.ozet-menu svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ozet-menu-sarmal {
+  position: relative;
+}
+
+.ozet-menu-acilir {
+  position: absolute;
+  top: 26px;
+  right: 0;
+  min-width: 118px;
+  padding: 6px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #d9e7f7;
+  box-shadow: 0 14px 28px rgba(31, 48, 68, 0.12);
+  z-index: 5;
+}
+
+.ozet-menu-acilir button {
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px 10px;
+  text-align: left;
+  color: #c43b45;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ozet-menu-acilir button:hover {
+  background: #fff0f2;
+}
+
+.bos-durum-buton {
+  border: 1px solid #cfe0f7;
+  background: linear-gradient(180deg, #f7fbff 0%, #e8f1fe 100%);
+  color: #245ea2;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mobil-arama-dugmesi {
+  border: 1px solid #cfe0f7;
+  background: linear-gradient(180deg, #f8fbff 0%, #edf4ff 100%);
+  color: #2d578a;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ikon-dugme {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.85rem;
+}
+
+.ikon-dugme svg,
+.odeme-ikon svg,
+.mobil-arama-dugmesi svg {
+  width: 15px;
+  height: 15px;
+}
+
+.ikon-dugme.duzenle {
+  background: #dff0ff;
+  color: #1a66b2;
+}
+
+.ikon-dugme.not {
+  background: #eef7ff;
+  color: #2d78c4;
+}
+
+.ikon-dugme.telefon {
+  background: #e7f2ff;
+  color: #236fc0;
+}
+
+.ikon-dugme.favori {
+  background: #eef2f7;
+  color: #7a8796;
+}
+
+.ikon-dugme.favori.aktif {
+  background: #fff3c9;
+  color: #d39b00;
+}
+
+.ikon-dugme.sil {
+  background: #ffe6e8;
+  color: #b72837;
+}
+
+.siparis-aksiyon-buton {
+  border: 1px solid #cfe0f7;
+  background: linear-gradient(180deg, #f8fbff 0%, #edf4ff 100%);
+  color: #2d578a;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.siparis-aksiyon-buton.ikincil {
+  background: #fff;
+}
+
+.siparis-aksiyon-buton.tehlike {
+  border-color: #f1c5cb;
+  background: #fff0f2;
+  color: #ba3340;
+}
+
+.sayfa-buton,
+.sayfa-ok {
+  min-width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #d6e4f5;
+  background: #fff;
+  color: #355173;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.sayfa-buton.aktif {
+  background: #e7f1ff;
+  border-color: #b7d3fa;
+  color: #1d5fad;
+  font-weight: 700;
+}
+
+.sayfa-ok:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.modal-aksiyon button {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(90deg, var(--mavi-koyu), var(--mavi-orta));
+}
+
+.modal-aksiyon .ikinci {
+  background: #e8f0fb;
+  color: #355173;
+}
+
+.modal-aksiyon .tehlike {
+  background: var(--tehlike);
+}
+
+.toast-eylem {
+  width: fit-content;
+  margin-top: 4px;
+  padding: 6px 10px;
+  border: 1px solid #cfe0f6;
+  border-radius: 999px;
+  background: #eef5ff;
+  color: #2a5f9f;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.toast-eylem:hover {
+  background: #e2efff;
+}
+
+.toast-kapat {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #f3f7fc;
+  color: #6a7f97;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+  .ikon-dugme,
+  .odeme-ikon {
+    width: 26px;
+    height: 26px;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .sayfa-buton,
+  .sayfa-ok {
+    min-width: 26px;
+    height: 26px;
+  }
+}

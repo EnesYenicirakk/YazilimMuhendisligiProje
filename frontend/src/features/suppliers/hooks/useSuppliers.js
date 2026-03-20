@@ -191,23 +191,44 @@ export default function useSuppliers({ toastGoster }) {
   }
 
   const tedarikciSiparisFormuGuncelle = (alan, deger) => setTedarikciSiparisFormu((onceki) => ({ ...onceki, [alan]: deger }))
-  const genelTedarikSiparisFormuGuncelle = (alan, deger) => setGenelTedarikSiparisFormu((onceki) => ({ ...onceki, [alan]: deger }))
+
+  const tedarikciSiparisNoOlustur = (tedarikciUid) => {
+    const secili = tedarikciler.find((tedarikci) => tedarikci.uid === Number(tedarikciUid))
+    if (!secili) return ''
+
+    const onEk = secili.firmaAdi.split(' ').map((parca) => parca[0] || '').join('').slice(0, 2).toUpperCase() || 'TD'
+    const sonNumara = secili.siparisler.reduce((maksimum, siparis) => {
+      const sayi = Number(String(siparis.siparisNo).replace(/[^\d]/g, ''))
+      return Number.isNaN(sayi) ? maksimum : Math.max(maksimum, sayi)
+    }, 100)
+
+    return `${onEk}-${sonNumara + 1}`
+  }
+
+  const genelTedarikSiparisFormuGuncelle = (alan, deger) => {
+    setGenelTedarikSiparisFormu((onceki) => (
+      alan === 'tedarikciUid'
+        ? { ...onceki, tedarikciUid: deger, siparisNo: tedarikciSiparisNoOlustur(deger), tarih: onceki.tarih, tutar: onceki.tutar, durum: onceki.durum }
+        : { ...onceki, [alan]: deger }
+    ))
+  }
 
   const tedarikciSiparisEklemeAc = () => {
     const secili = tedarikciler.find((tedarikci) => tedarikci.uid === seciliTedarikciUid)
     if (!secili) return
-    const sonSiparis = secili.siparisler[0]
-    const onEk = secili.firmaAdi.split(' ').map((parca) => parca[0] || '').join('').slice(0, 2).toUpperCase() || 'TD'
-    const sonNumara = sonSiparis ? Number(String(sonSiparis.siparisNo).replace(/[^\d]/g, '')) : 100
-    setTedarikciSiparisFormu({ siparisNo: `${onEk}-${sonNumara + 1}`, tarih: new Date().toISOString().slice(0, 10), tutar: '', durum: 'Bekliyor' })
+    setTedarikciSiparisFormu({ siparisNo: tedarikciSiparisNoOlustur(secili.uid), tarih: new Date().toISOString().slice(0, 10), tutar: '', durum: 'Bekliyor' })
     setTedarikciSiparisEklemeAcik(true)
   }
 
   const genelTedarikSiparisEklemeAc = () => {
     const ilkTedarikci = tedarikciler[0]
-    const onEk = ilkTedarikci ? ilkTedarikci.firmaAdi.split(' ').map((parca) => parca[0] || '').join('').slice(0, 2).toUpperCase() : 'TD'
-    const sonNumara = tumTedarikSiparisleri[0] ? Number(String(tumTedarikSiparisleri[0].siparisNo).replace(/[^\d]/g, '')) : 100
-    setGenelTedarikSiparisFormu({ tedarikciUid: ilkTedarikci ? String(ilkTedarikci.uid) : '', siparisNo: `${onEk}-${sonNumara + 1}`, tarih: new Date().toISOString().slice(0, 10), tutar: '', durum: 'Bekliyor' })
+    setGenelTedarikSiparisFormu({
+      tedarikciUid: ilkTedarikci ? String(ilkTedarikci.uid) : '',
+      siparisNo: ilkTedarikci ? tedarikciSiparisNoOlustur(ilkTedarikci.uid) : '',
+      tarih: new Date().toISOString().slice(0, 10),
+      tutar: '',
+      durum: 'Bekliyor',
+    })
     setGenelTedarikSiparisAcik(true)
   }
 

@@ -1,13 +1,97 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   dashboardBolumSablonu,
-  dashboardOzetSablon,
+  enCokSatilanUrunleriHesapla,
+  gerceklesenOdemeTutari,
   kritikStoktaMi,
   paraFormatla,
+  siparisMiktariniGetir,
+  siparisTamamlandiMi,
   teslimatGununuCoz,
 } from '../../../shared/utils/constantsAndHelpers'
 
-export default function useDashboard({ siparisler, siraliSiparisler, urunler, aySonuKari, toastGoster }) {
+const formatYmd = (tarih) => {
+  const yil = tarih.getFullYear()
+  const ay = String(tarih.getMonth() + 1).padStart(2, '0')
+  const gun = String(tarih.getDate()).padStart(2, '0')
+  return `${yil}-${ay}-${gun}`
+}
+
+const formatAyAnahtari = (tarih) => {
+  const yil = tarih.getFullYear()
+  const ay = String(tarih.getMonth() + 1).padStart(2, '0')
+  return `${yil}-${ay}`
+}
+
+const formatAyEtiketi = (tarih) => {
+  const etiket = new Intl.DateTimeFormat('tr-TR', { month: 'short' }).format(tarih).replace('.', '')
+  return etiket.charAt(0).toLocaleUpperCase('tr-TR') + etiket.slice(1)
+}
+
+const bugununBaslangiciniGetir = () => {
+  const tarih = new Date()
+  tarih.setHours(0, 0, 0, 0)
+  return tarih
+}
+
+const ayniGunMu = (sol, sag) => sol.toDateString() === sag.toDateString()
+
+const ayniAydaMi = (tarih, referans) =>
+  tarih.getMonth() === referans.getMonth() && tarih.getFullYear() === referans.getFullYear()
+
+const yuzdeselDegisimMetni = (mevcutDeger, oncekiDeger) => {
+  const mevcut = Number(mevcutDeger || 0)
+  const onceki = Number(oncekiDeger || 0)
+
+  if (mevcut === 0 && onceki === 0) return '+%0'
+  if (onceki === 0) return `+%${mevcut > 0 ? 100 : 0}`
+
+  const yuzde = Math.round((Math.abs(mevcut - onceki) / Math.abs(onceki)) * 100)
+  return `${mevcut >= onceki ? '+' : '-'}%${yuzde}`
+}
+
+const tersYuzdeselDegisimMetni = (mevcutDeger, oncekiDeger) => {
+  const mevcut = Number(mevcutDeger || 0)
+  const onceki = Number(oncekiDeger || 0)
+
+  if (mevcut === 0 && onceki === 0) return '+%0'
+  if (onceki === 0) return `+%${mevcut > 0 ? 100 : 0}`
+
+  const yuzde = Math.round((Math.abs(mevcut - onceki) / Math.abs(onceki)) * 100)
+  return `${mevcut <= onceki ? '+' : '-'}%${yuzde}`
+}
+
+const ortalamaHesapla = (liste) => {
+  if (liste.length === 0) return 0
+  return liste.reduce((toplam, deger) => toplam + deger, 0) / liste.length
+}
+
+const siparisAcilMi = (siparis, referansGun) => {
+  if (siparisTamamlandiMi(siparis)) return false
+
+  const siparisTarihi = new Date(`${siparis.siparisTarihi}T00:00:00`)
+  const teslimatGunu = teslimatGununuCoz(siparis.teslimatSuresi)
+  const gecenGun = Math.max(
+    0,
+    Math.floor((referansGun.getTime() - siparisTarihi.getTime()) / 86400000),
+  )
+  const kalanGun = teslimatGunu - gecenGun
+
+  return (
+    siparis.urunHazirlik === 'Tedarik Bekleniyor' ||
+    siparis.teslimatDurumu === 'Hazırlanıyor' ||
+    (teslimatGunu > 0 && kalanGun <= 1)
+  )
+}
+
+export default function useDashboard({
+  siparisler,
+  siraliSiparisler,
+  urunler,
+  gelenNakitKayitlari = [],
+  gidenNakitKayitlari = [],
+  toastGoster,
+}) {
   const [gizlenenOzetKartlari, setGizlenenOzetKartlari] = useState([])
   const [acikOzetMenusu, setAcikOzetMenusu] = useState('')
   const [dashboardBolumMenusuAcik, setDashboardBolumMenusuAcik] = useState(false)
@@ -15,9 +99,14 @@ export default function useDashboard({ siparisler, siraliSiparisler, urunler, ay
     dashboardBolumSablonu.reduce((acc, bolum) => ({ ...acc, [bolum.anahtar]: true }), {}),
   )
 
+  const tamamlananSiparisler = useMemo(
+    () => siraliSiparisler.filter((siparis) => siparisTamamlandiMi(siparis)),
+    [siraliSiparisler],
+  )
+
   const dashboardYakinSatislar = useMemo(
     () =>
-      siraliSiparisler.slice(0, 4).map((siparis) => ({
+      tamamlananSiparisler.slice(0, 4).map((siparis) => ({
         siparis: siparis.siparisNo,
         urun: siparis.urun,
         musteri: siparis.musteri,
@@ -25,19 +114,21 @@ export default function useDashboard({ siparisler, siraliSiparisler, urunler, ay
         tutar: paraFormatla(siparis.toplamTutar),
         durum: siparis.teslimatDurumu,
       })),
-    [siraliSiparisler],
+    [tamamlananSiparisler],
   )
 
   const dashboardCanliOzetler = useMemo(() => {
-    const referansSiparis = siraliSiparisler[0]
-    const bugun = referansSiparis ? new Date(`${referansSiparis.siparisTarihi}T00:00:00`) : new Date()
+    const bugun = bugununBaslangiciniGetir()
 
     const bugunkuSiparisler = siraliSiparisler.filter((siparis) => {
       const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
-      return tarih.toDateString() === bugun.toDateString()
+      tarih.setHours(0, 0, 0, 0)
+      return ayniGunMu(tarih, bugun)
     })
 
-    const bekleyenTahsilatlar = siraliSiparisler.filter((siparis) => siparis.odemeDurumu === 'Beklemede')
+    const bekleyenTahsilatlar = siraliSiparisler.filter(
+      (siparis) => siparis.odemeDurumu === 'Beklemede',
+    )
     const kritikStokluUrunler = [...urunler]
       .filter((urun) => kritikStoktaMi(urun))
       .sort((a, b) => a.magazaStok - b.magazaStok)
@@ -46,14 +137,24 @@ export default function useDashboard({ siparisler, siraliSiparisler, urunler, ay
       const siparisTarihi = new Date(`${siparis.siparisTarihi}T00:00:00`)
       const teslimatGunu = teslimatGununuCoz(siparis.teslimatSuresi)
       const gunFarki = Math.floor((bugun.getTime() - siparisTarihi.getTime()) / 86400000)
-      return siparis.teslimatDurumu !== 'Teslim Edildi' && teslimatGunu > 0 && gunFarki > teslimatGunu
+      return (
+        siparis.teslimatDurumu !== 'Teslim Edildi' &&
+        teslimatGunu > 0 &&
+        gunFarki > teslimatGunu
+      )
     })
 
     return {
       bugunkuSiparisAdedi: bugunkuSiparisler.length,
-      bugunkuSiparisTutari: bugunkuSiparisler.reduce((toplam, siparis) => toplam + siparis.toplamTutar, 0),
+      bugunkuSiparisTutari: bugunkuSiparisler.reduce(
+        (toplam, siparis) => toplam + siparis.toplamTutar,
+        0,
+      ),
       bekleyenTahsilatAdedi: bekleyenTahsilatlar.length,
-      bekleyenTahsilatTutari: bekleyenTahsilatlar.reduce((toplam, siparis) => toplam + siparis.toplamTutar, 0),
+      bekleyenTahsilatTutari: bekleyenTahsilatlar.reduce(
+        (toplam, siparis) => toplam + siparis.toplamTutar,
+        0,
+      ),
       kritikStokAdedi: kritikStokluUrunler.length,
       kritikStokluUrunler,
       gecikenSiparisAdedi: gecikenSiparisler.length,
@@ -61,36 +162,126 @@ export default function useDashboard({ siparisler, siraliSiparisler, urunler, ay
     }
   }, [siraliSiparisler, urunler])
 
-  const dashboardOzet = useMemo(
-    () => [
-      { baslik: 'Toplam Gelir', deger: paraFormatla(aySonuKari), degisim: '+%14', ikon: 'cuzdan' },
-      ...dashboardOzetSablon,
-    ].filter((kart) => !gizlenenOzetKartlari.includes(kart.baslik)),
-    [aySonuKari, gizlenenOzetKartlari],
-  )
+  const enCokSatilanUrunler = useMemo(() => {
+    const referansGun = bugununBaslangiciniGetir()
+    const buAyTamamlananSiparisler = tamamlananSiparisler.filter((siparis) =>
+      ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), referansGun),
+    )
+
+    return enCokSatilanUrunleriHesapla(buAyTamamlananSiparisler, 6)
+  }, [tamamlananSiparisler])
+
+  const dashboardOzet = useMemo(() => {
+    const referansGun = bugununBaslangiciniGetir()
+    const oncekiAyReferansi = new Date(referansGun)
+    oncekiAyReferansi.setMonth(oncekiAyReferansi.getMonth() - 1)
+
+    const toplamGelir = gelenNakitKayitlari.reduce(
+      (toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit),
+      0,
+    )
+    const toplamGider = gidenNakitKayitlari.reduce(
+      (toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit),
+      0,
+    )
+    const netKar = toplamGelir - toplamGider
+
+    const buAyGelir = gelenNakitKayitlari
+      .filter((kayit) => ayniAydaMi(new Date(`${kayit.tarih}T00:00:00`), referansGun))
+      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0)
+    const oncekiAyGelir = gelenNakitKayitlari
+      .filter((kayit) => ayniAydaMi(new Date(`${kayit.tarih}T00:00:00`), oncekiAyReferansi))
+      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0)
+
+    const buAyGider = gidenNakitKayitlari
+      .filter((kayit) => ayniAydaMi(new Date(`${kayit.tarih}T00:00:00`), referansGun))
+      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0)
+    const oncekiAyGider = gidenNakitKayitlari
+      .filter((kayit) => ayniAydaMi(new Date(`${kayit.tarih}T00:00:00`), oncekiAyReferansi))
+      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0)
+
+    const buAySiparisSayisi = siparisler.filter((siparis) =>
+      ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), referansGun),
+    ).length
+    const oncekiAySiparisSayisi = siparisler.filter((siparis) =>
+      ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), oncekiAyReferansi),
+    ).length
+
+    const acilSiparisSayisi = siparisler.filter((siparis) => siparisAcilMi(siparis, referansGun)).length
+    const oncekiAyAcilSiparisSayisi = siparisler.filter((siparis) => {
+      const siparisTarihi = new Date(`${siparis.siparisTarihi}T00:00:00`)
+      return ayniAydaMi(siparisTarihi, oncekiAyReferansi) && siparisAcilMi(siparis, referansGun)
+    }).length
+
+    const teslimatGunleri = tamamlananSiparisler
+      .map((siparis) => teslimatGununuCoz(siparis.teslimatSuresi))
+      .filter((gun) => gun > 0)
+    const oncekiAyTeslimatGunleri = tamamlananSiparisler
+      .filter((siparis) =>
+        ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), oncekiAyReferansi),
+      )
+      .map((siparis) => teslimatGununuCoz(siparis.teslimatSuresi))
+      .filter((gun) => gun > 0)
+
+    const ortalamaTeslimat = ortalamaHesapla(teslimatGunleri)
+    const oncekiAyOrtalamaTeslimat = ortalamaHesapla(oncekiAyTeslimatGunleri)
+
+    return [
+      {
+        baslik: 'Toplam Gelir',
+        deger: paraFormatla(toplamGelir),
+        degisim: yuzdeselDegisimMetni(buAyGelir, oncekiAyGelir),
+        ikon: 'cuzdan',
+      },
+      {
+        baslik: 'Net Kar',
+        deger: paraFormatla(netKar),
+        degisim: yuzdeselDegisimMetni(buAyGelir - buAyGider, oncekiAyGelir - oncekiAyGider),
+        ikon: 'cuzdan',
+      },
+      {
+        baslik: 'Toplam Sipariş',
+        deger: String(siparisler.length),
+        degisim: yuzdeselDegisimMetni(buAySiparisSayisi, oncekiAySiparisSayisi),
+        ikon: 'liste',
+      },
+      {
+        baslik: 'Acil Sipariş',
+        deger: String(acilSiparisSayisi),
+        degisim: yuzdeselDegisimMetni(acilSiparisSayisi, oncekiAyAcilSiparisSayisi),
+        ikon: 'kutu',
+      },
+      {
+        baslik: 'Ortalama Teslimat',
+        deger: `${ortalamaTeslimat.toFixed(1).replace('.', ',')} Gün`,
+        degisim: tersYuzdeselDegisimMetni(ortalamaTeslimat, oncekiAyOrtalamaTeslimat),
+        ikon: 'saat',
+      },
+    ].filter((kart) => !gizlenenOzetKartlari.includes(kart.baslik))
+  }, [gelenNakitKayitlari, gidenNakitKayitlari, gizlenenOzetKartlari, siparisler, tamamlananSiparisler])
 
   const haftalikSatisVerisi = useMemo(() => {
-    const formatYmd = (tarih) => {
-      const yil = tarih.getFullYear()
-      const ay = String(tarih.getMonth() + 1).padStart(2, '0')
-      const gun = String(tarih.getDate()).padStart(2, '0')
-      return `${yil}-${ay}-${gun}`
-    }
-
-    const tumTarihler = siparisler.map((siparis) => new Date(`${siparis.siparisTarihi}T00:00:00`))
-    const enGuncel = new Date(Math.max(...tumTarihler.map((tarih) => tarih.getTime())))
+    const referansGun = bugununBaslangiciniGetir()
     const siparisToplamlari = new Map()
 
-    siparisler.forEach((siparis) => {
-      siparisToplamlari.set(siparis.siparisTarihi, (siparisToplamlari.get(siparis.siparisTarihi) || 0) + siparis.toplamTutar)
+    tamamlananSiparisler.forEach((siparis) => {
+      const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
+      tarih.setHours(0, 0, 0, 0)
+      const gunFarki = Math.floor((referansGun.getTime() - tarih.getTime()) / 86400000)
+      if (gunFarki < 0 || gunFarki > 6) return
+
+      const ymd = formatYmd(tarih)
+      siparisToplamlari.set(ymd, (siparisToplamlari.get(ymd) || 0) + siparis.toplamTutar)
     })
 
     const gunler = Array.from({ length: 7 }, (_, index) => {
-      const tarih = new Date(enGuncel)
-      tarih.setDate(enGuncel.getDate() - 6 + index)
+      const tarih = new Date(referansGun)
+      tarih.setDate(referansGun.getDate() - 6 + index)
       const ymd = formatYmd(tarih)
       const toplam = siparisToplamlari.get(ymd) || 0
-      const etiket = new Intl.DateTimeFormat('tr-TR', { weekday: 'short' }).format(tarih).replace('.', '')
+      const etiket = new Intl.DateTimeFormat('tr-TR', { weekday: 'short' })
+        .format(tarih)
+        .replace('.', '')
       return { etiket, toplam }
     })
 
@@ -101,12 +292,80 @@ export default function useDashboard({ siparisler, siraliSiparisler, urunler, ay
       const altOran = Math.max(oran - ustOran, 6)
       return { ...gun, altOran, ustOran }
     })
-  }, [siparisler])
+  }, [tamamlananSiparisler])
 
   const haftalikSatisGrafikUstSinir = useMemo(() => {
     const enYuksek = Math.max(...haftalikSatisVerisi.map((veri) => veri.toplam), 0)
     return Math.max(Math.ceil(enYuksek / 10000) * 10000, 40000)
   }, [haftalikSatisVerisi])
+
+  const altGrafikVerileri = useMemo(() => {
+    const referansAy = bugununBaslangiciniGetir()
+    referansAy.setDate(1)
+
+    const ayPenceresi = Array.from({ length: 6 }, (_, index) => {
+      const tarih = new Date(referansAy)
+      tarih.setMonth(referansAy.getMonth() - 5 + index)
+      return {
+        anahtar: formatAyAnahtari(tarih),
+        etiket: formatAyEtiketi(tarih),
+      }
+    })
+
+    const gecerliAylar = new Set(ayPenceresi.map((ay) => ay.anahtar))
+    const gelirHaritasi = new Map()
+    const giderHaritasi = new Map()
+    const satilanUrunHaritasi = new Map()
+
+    gelenNakitKayitlari.forEach((kayit) => {
+      const tarih = new Date(`${kayit.tarih}T00:00:00`)
+      const anahtar = formatAyAnahtari(tarih)
+      if (!gecerliAylar.has(anahtar)) return
+
+      gelirHaritasi.set(
+        anahtar,
+        (gelirHaritasi.get(anahtar) || 0) + gerceklesenOdemeTutari(kayit),
+      )
+    })
+
+    gidenNakitKayitlari.forEach((kayit) => {
+      const tarih = new Date(`${kayit.tarih}T00:00:00`)
+      const anahtar = formatAyAnahtari(tarih)
+      if (!gecerliAylar.has(anahtar)) return
+
+      giderHaritasi.set(
+        anahtar,
+        (giderHaritasi.get(anahtar) || 0) + gerceklesenOdemeTutari(kayit),
+      )
+    })
+
+    siparisler.forEach((siparis) => {
+      if (!siparisTamamlandiMi(siparis)) return
+      const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
+      const anahtar = formatAyAnahtari(tarih)
+      if (!gecerliAylar.has(anahtar)) return
+
+      satilanUrunHaritasi.set(
+        anahtar,
+        (satilanUrunHaritasi.get(anahtar) || 0) + siparisMiktariniGetir(siparis),
+      )
+    })
+
+    const etiketler = ayPenceresi.map((ay) => ay.etiket)
+    const gelirSerisi = ayPenceresi.map((ay) => gelirHaritasi.get(ay.anahtar) || 0)
+    const giderSerisi = ayPenceresi.map((ay) => giderHaritasi.get(ay.anahtar) || 0)
+    const aylikSatilanUrunSerisi = ayPenceresi.map(
+      (ay) => satilanUrunHaritasi.get(ay.anahtar) || 0,
+    )
+
+    return {
+      etiketler,
+      gelirSerisi,
+      giderSerisi,
+      aylikSatilanUrunSerisi,
+      gelirGiderGrafikUstSinir: Math.max(...gelirSerisi, ...giderSerisi, 1),
+    }
+  }, [gelenNakitKayitlari, gidenNakitKayitlari, siparisler])
 
   const ozetKartiniSil = (baslik) => {
     setGizlenenOzetKartlari((onceki) => [...onceki, baslik])
@@ -130,11 +389,17 @@ export default function useDashboard({ siparisler, siraliSiparisler, urunler, ay
 
   return {
     acikOzetMenusu,
+    altGrafikAyEtiketleri: altGrafikVerileri.etiketler,
+    aylikGelirSerisi: altGrafikVerileri.gelirSerisi,
+    aylikGiderSerisi: altGrafikVerileri.giderSerisi,
+    aylikSatilanUrunSerisi: altGrafikVerileri.aylikSatilanUrunSerisi,
     dashboardBolumGorunurlukDegistir,
     dashboardBolumMenusuAcik,
     dashboardCanliOzetler,
     dashboardOzet,
     dashboardYakinSatislar,
+    enCokSatilanUrunler,
+    gelirGiderGrafikUstSinir: altGrafikVerileri.gelirGiderGrafikUstSinir,
     gorunenDashboardBolumleri,
     haftalikSatisGrafikUstSinir,
     haftalikSatisVerisi,

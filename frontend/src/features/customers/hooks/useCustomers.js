@@ -3,7 +3,6 @@ import { baslangicMusterileri } from '../../../components/common/Ikonlar'
 import {
   bosMusteriFormu,
   favorileriOneTasi,
-  negatifSayiVarMi,
   telefonGecerliMi,
 } from '../../../shared/utils/constantsAndHelpers'
 
@@ -91,8 +90,6 @@ export default function useCustomers({ toastGoster }) {
       ad: musteri.ad,
       telefon: musteri.telefon,
       sonAlim: musteri.sonAlim,
-      toplamSiparis: String(musteri.toplamSiparis),
-      toplamHarcama: String(musteri.toplamHarcama),
       not: musteri.not,
     })
     setMusteriDuzenlemeAcik(true)
@@ -120,22 +117,15 @@ export default function useCustomers({ toastGoster }) {
     const ad = musteriFormu.ad.trim()
     const telefon = musteriFormu.telefon.trim()
     const sonAlim = musteriFormu.sonAlim
-    const toplamSiparis = Number(musteriFormu.toplamSiparis)
-    const toplamHarcama = Number(musteriFormu.toplamHarcama)
     const not = musteriFormu.not.trim()
 
-    if (!ad || !telefon || !sonAlim || !not || Number.isNaN(toplamSiparis) || Number.isNaN(toplamHarcama)) {
+    if (!ad || !telefon || !sonAlim || !not) {
       toastGoster?.('hata', 'Müşteri formunda eksik veya hatalı alan var.')
       return
     }
 
     if (!telefonGecerliMi(telefon)) {
       toastGoster?.('hata', 'Telefon numarası 0 ile başlamalı ve 11 haneli olmalı.')
-      return
-    }
-
-    if (negatifSayiVarMi(toplamSiparis, toplamHarcama)) {
-      toastGoster?.('hata', 'Sipariş sayısı ve harcama negatif olamaz.')
       return
     }
 
@@ -146,8 +136,6 @@ export default function useCustomers({ toastGoster }) {
           ad,
           telefon,
           sonAlim,
-          toplamSiparis,
-          toplamHarcama,
           not,
           favori: false,
         },
@@ -162,7 +150,7 @@ export default function useCustomers({ toastGoster }) {
     setMusteriler((onceki) =>
       onceki.map((musteri) =>
         musteri.uid === seciliMusteriUid
-          ? { ...musteri, ad, telefon, sonAlim, toplamSiparis, toplamHarcama, not }
+          ? { ...musteri, ad, telefon, sonAlim, not }
           : musteri,
       ),
     )

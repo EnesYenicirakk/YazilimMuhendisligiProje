@@ -1,0 +1,73 @@
+﻿/* Shared modal shells */
+
+.modal-kaplama {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 23, 36, 0.46);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 60;
+}
+
+.modal-kutu {
+  width: 100%;
+  max-width: 430px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #dce8f5;
+  padding: 16px;
+}
+
+.modal-kutu.kucuk {
+  max-width: 380px;
+}
+
+.modal-kutu.buyuk {
+  max-width: 980px;
+}
+
+.modal-kutu h3 {
+  margin: 0 0 12px;
+  color: var(--metin);
+}
+
+.modal-kutu p {
+  margin: 0 0 10px;
+  color: #5b6f88;
+}
+
+
+.modal-aksiyon {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .modal-kaplama {
+    padding: 10px;
+    align-items: end;
+  }
+
+  .modal-kutu,
+  .modal-kutu.kucuk {
+    max-width: none;
+    border-radius: 16px 16px 0 0;
+    padding: 14px;
+  }
+
+  .modal-kutu.buyuk {
+    width: 100%;
+  }
+
+
+  .modal-aksiyon {
+    flex-direction: column-reverse;
+  }
+
+  .modal-aksiyon button {
+    width: 100%;
+  }
+}

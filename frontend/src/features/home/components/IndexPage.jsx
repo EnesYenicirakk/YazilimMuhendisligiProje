@@ -1,4 +1,4 @@
-import { merkezMenusu } from '../../../shared/utils/constantsAndHelpers';
+﻿import { merkezMenusu } from '../../../shared/utils/constantsAndHelpers';
 import { SayfaIkonu } from '../../../components/common/Ikonlar';
 
 export default function IndexPage({
@@ -132,4 +132,5 @@ export default function IndexPage({
     </>
   );
 }
+
 

@@ -1,4 +1,6 @@
-﻿* {
+﻿/* Base reset and document styles */
+
+* {
   box-sizing: border-box;
 }
 
@@ -8,4 +10,8 @@ body {
   min-width: 320px;
   min-height: 100%;
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
 }

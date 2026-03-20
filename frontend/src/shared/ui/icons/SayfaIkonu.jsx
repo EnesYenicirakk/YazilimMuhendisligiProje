@@ -1,4 +1,4 @@
-function SayfaIkonu({ sayfa, className = 'menu-ikon' }) {
+﻿function SayfaIkonu({ sayfa, className = 'menu-ikon' }) {
   if (sayfa === 'dashboard') {
     return (
       <span className={className} aria-hidden="true">
@@ -97,3 +97,4 @@ function SayfaIkonu({ sayfa, className = 'menu-ikon' }) {
 }
 
 export { SayfaIkonu }
+

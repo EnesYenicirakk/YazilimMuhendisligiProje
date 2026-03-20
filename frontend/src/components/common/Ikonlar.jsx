@@ -9,7 +9,6 @@ export {
 export {
   baslangicSiparisleri,
   baslangicGecmisSiparisleri,
-  siparisMusteriTelefonlari,
 } from '../../data/seeds/orders.seed'
 
 export {

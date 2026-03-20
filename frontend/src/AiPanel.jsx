@@ -1,4 +1,4 @@
-export default function AiPanel({
+﻿export default function AiPanel({
   KucukIkon,
   TemaIkonu,
   aiHizliKonular,
@@ -124,3 +124,4 @@ export default function AiPanel({
     </section>
   )
 }
+

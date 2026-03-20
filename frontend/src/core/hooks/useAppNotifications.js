@@ -1,10 +1,10 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
-import { aiHizliKonular, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
+import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
 
 export default function useAppNotifications({
   aktifSayfa,
   dashboardCanliOzetler,
-  stokDegisimLoglari,
+  stokDegisimLoglari = [],
   siraliSiparisler,
   urunler,
   paraFormatla,
@@ -90,7 +90,7 @@ export default function useAppNotifications({
 
   const aiHazirCevaplar = useMemo(() => {
     const enSonSiparis = siraliSiparisler[0]
-    const referansTarih = enSonSiparis ? new Date(`${enSonSiparis.siparisTarihi}T00:00:00`) : new Date()
+    const referansTarih = new Date()
     const buAySiparisleri = siraliSiparisler.filter((siparis) => {
       const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
       return tarih.getMonth() === referansTarih.getMonth() && tarih.getFullYear() === referansTarih.getFullYear()
@@ -103,22 +103,20 @@ export default function useAppNotifications({
       .sort((a, b) => a.magazaStok - b.magazaStok)
       .slice(0, 4)
     const kargolananSiparisler = siraliSiparisler.filter(
-      (siparis) => siparis.teslimatDurumu === 'Yolda' || siparis.teslimatDurumu === 'Teslim Edildi',
+      (siparis) =>
+        siparis.teslimatDurumu === 'Yolda' ||
+        siparis.teslimatDurumu === 'Kargoda' ||
+        siparis.teslimatDurumu === 'Teslim Edildi',
     )
     const teslimEdilenler = kargolananSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Teslim Edildi')
-    const yoldakiler = kargolananSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Yolda')
+    const yoldakiler = kargolananSiparisler.filter(
+      (siparis) => siparis.teslimatDurumu === 'Yolda' || siparis.teslimatDurumu === 'Kargoda',
+    )
     const kargolanmayanSiparisler = siraliSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Hazırlanıyor')
     const kargolanmayanOzet = kargolanmayanSiparisler.slice(0, 3).map((siparis) => `${siparis.siparisNo} - ${siparis.urun}`).join(', ')
 
-    const urunSatisOzeti = siraliSiparisler.reduce((harita, siparis) => {
-      harita[siparis.urun] = (harita[siparis.urun] ?? 0) + 1
-      return harita
-    }, {})
-
-    const enCokSatanlar = Object.entries(urunSatisOzeti)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([urun, adet]) => `${urun} (${adet} sipariş)`)
+    const enCokSatanlar = enCokSatilanUrunleriHesapla(siraliSiparisler, 3)
+      .map((urun) => `${urun.ad} (${urun.miktar} adet)`)
       .join(', ')
 
     return {
@@ -135,7 +133,9 @@ export default function useAppNotifications({
           ? `Şu an ${kargolanmayanSiparisler.length} sipariş henüz kargolanmadı. Öne çıkan kayıtlar: ${kargolanmayanOzet}. Bu siparişlerin durumu siparişler ekranında "Hazırlanıyor" olarak işaretli.`
           : 'Şu anda kargolanmamış açık sipariş görünmüyor. Tüm kayıtlar ya yolda ya da teslim edilmiş durumda.',
       [metniNormalizeEt('En çok satan ürünlerimizden bana bahset.')]:
-        `Sipariş kaydına göre öne çıkan ürünler: ${enCokSatanlar}. Bu ürünler aynı zamanda dashboarddaki "En Çok Satılan Ürünler" alanıyla da uyumlu ilerliyor.`,
+        enCokSatanlar
+          ? `Sipariş kaydına göre öne çıkan ürünler: ${enCokSatanlar}. Bu ürünler dashboarddaki "En Çok Satılan Ürünler" alanıyla aynı veriden hesaplanıyor.`
+          : 'Teslim edilmiş siparişlere göre öne çıkan bir ürün verisi henüz oluşmadı.',
       [metniNormalizeEt('En son gerçekleşen satışın ayrıntılarını anlat.')]:
         enSonSiparis
           ? `En son satış ${enSonSiparis.siparisNo} numarasıyla ${tarihFormatla(enSonSiparis.siparisTarihi)} tarihinde oluşturuldu. Ürün ${enSonSiparis.urun}, müşteri ${enSonSiparis.musteri}, tutar ${paraFormatla(enSonSiparis.toplamTutar)} ve teslimat durumu ${enSonSiparis.teslimatDurumu.toLocaleLowerCase('tr-TR')} olarak kayıtlı.`

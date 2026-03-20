@@ -1,10 +1,9 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   baslangicGecmisSiparisleri,
   baslangicSiparisleri,
-  siparisMusteriTelefonlari,
 } from '../../../components/common/Ikonlar'
-import { bosSiparisFormu, metniNormalizeEt, negatifSayiVarMi } from '../../../shared/utils/constantsAndHelpers'
+import { bosSiparisFormu, negatifSayiVarMi } from '../../../shared/utils/constantsAndHelpers'
 
 const SIPARIS_SAYFA_BASINA = 8
 const BOS_DURUM_FORMU = {
@@ -14,7 +13,19 @@ const BOS_DURUM_FORMU = {
   teslimatSuresi: '',
 }
 
+const siparisIcinMusteriBul = (kayit, musteriListesi) => {
+  if (kayit?.musteriUid == null || kayit?.musteriUid === '') return null
+
+  return (
+    musteriListesi.find((musteri) => String(musteri.uid) === String(kayit.musteriUid)) ??
+    null
+  )
+}
+
 export default function useOrders({ musteriler, toastGoster, telefonAramasiBaslat }) {
+  const siparisMusteriAdiniGetir = (kayit) =>
+    siparisIcinMusteriBul(kayit, musteriler)?.ad ?? kayit?.musteri ?? 'Bilinmiyor'
+
   const [siparisler, setSiparisler] = useState(baslangicSiparisleri)
   const [siparisArama, setSiparisArama] = useState('')
   const [siparisOdemeFiltresi, setSiparisOdemeFiltresi] = useState('Tüm Siparişler')
@@ -32,6 +43,15 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   const [siparisDurumFormu, setSiparisDurumFormu] = useState(BOS_DURUM_FORMU)
   const [gecmisSiparisler] = useState(baslangicGecmisSiparisleri)
 
+  const musteriSecenekleri = useMemo(
+    () =>
+      musteriler.map((musteri) => ({
+        uid: musteri.uid,
+        ad: musteri.ad,
+      })),
+    [musteriler],
+  )
+
   const siraliSiparisler = useMemo(
     () => [...siparisler].sort((a, b) => new Date(b.siparisTarihi).getTime() - new Date(a.siparisTarihi).getTime()),
     [siparisler],
@@ -40,17 +60,20 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   const filtreliSiparisler = useMemo(() => {
     const arama = siparisArama.trim().toLowerCase()
     return siraliSiparisler.filter((siparis) => {
-      const filtreUygun = siparisOdemeFiltresi === 'Tüm Siparişler' || siparis.odemeDurumu === siparisOdemeFiltresi
+      const filtreUygun =
+        siparisOdemeFiltresi === 'Tüm Siparişler' || siparis.odemeDurumu === siparisOdemeFiltresi
       if (!filtreUygun) return false
       if (!arama) return true
 
+      const musteriAdi =
+        (siparisIcinMusteriBul(siparis, musteriler)?.ad ?? siparis.musteri ?? '').toLowerCase()
       return (
         siparis.siparisNo.toLowerCase().includes(arama) ||
-        siparis.musteri.toLowerCase().includes(arama) ||
+        musteriAdi.includes(arama) ||
         siparis.urun.toLowerCase().includes(arama)
       )
     })
-  }, [siparisArama, siparisOdemeFiltresi, siraliSiparisler])
+  }, [siraliSiparisler, siparisArama, siparisOdemeFiltresi, musteriler])
 
   const toplamSiparisSayfa = Math.max(1, Math.ceil(filtreliSiparisler.length / SIPARIS_SAYFA_BASINA))
   const sayfadakiSiparisler = useMemo(() => {
@@ -62,15 +85,18 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     const metin = gecmisSiparisArama.trim().toLowerCase()
     if (!metin) return gecmisSiparisler
 
-    return gecmisSiparisler.filter(
-      (siparis) =>
+    return gecmisSiparisler.filter((siparis) => {
+      const musteriAdi =
+        (siparisIcinMusteriBul(siparis, musteriler)?.ad ?? siparis.musteri ?? '').toLowerCase()
+      return (
         siparis.siparisNo.toLowerCase().includes(metin) ||
         siparis.logNo.toLowerCase().includes(metin) ||
-        siparis.musteri.toLowerCase().includes(metin) ||
+        musteriAdi.includes(metin) ||
         siparis.urun.toLowerCase().includes(metin) ||
-        siparis.durum.toLowerCase().includes(metin),
-    )
-  }, [gecmisSiparisArama, gecmisSiparisler])
+        siparis.durum.toLowerCase().includes(metin)
+      )
+    })
+  }, [gecmisSiparisArama, gecmisSiparisler, musteriler])
 
   const toplamGecmisSiparisSayfa = Math.max(1, Math.ceil(filtreliGecmisSiparisler.length / SIPARIS_SAYFA_BASINA))
   const sayfadakiGecmisSiparisler = useMemo(() => {
@@ -80,10 +106,15 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
 
   const siparisAktivitesi = useMemo(() => {
     const paketlenecek = filtreliSiparisler.filter(
-      (siparis) => siparis.urunHazirlik === 'Hazırlanıyor' || siparis.urunHazirlik === 'Tedarik Bekleniyor',
+      (siparis) =>
+        siparis.urunHazirlik === 'Hazırlanıyor' || siparis.urunHazirlik === 'Tedarik Bekleniyor',
     ).length
-    const sevkEdilecek = filtreliSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Hazırlanıyor').length
-    const teslimEdilecek = filtreliSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Yolda').length
+    const sevkEdilecek = filtreliSiparisler.filter(
+      (siparis) => siparis.teslimatDurumu === 'Hazırlanıyor',
+    ).length
+    const teslimEdilecek = filtreliSiparisler.filter(
+      (siparis) => siparis.teslimatDurumu === 'Yolda' || siparis.teslimatDurumu === 'Kargoda',
+    ).length
     return { paketlenecek, sevkEdilecek, teslimEdilecek }
   }, [filtreliSiparisler])
 
@@ -99,23 +130,35 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     setSiparisSayfa(1)
   }, [siparisArama, siparisOdemeFiltresi])
 
-  const siparisTelefonunuGetir = (kayit) => {
-    if (!kayit.musteri) return 'Bilinmiyor'
-    const musteriKaydi = musteriler.find(
-      (musteri) => metniNormalizeEt(musteri.ad) === metniNormalizeEt(kayit.musteri),
+  useEffect(() => {
+    setSiparisler((onceki) =>
+      onceki.map((siparis) => {
+        const musteriKaydi = siparisIcinMusteriBul(siparis, musteriler)
+        if (!musteriKaydi || siparis.musteri === musteriKaydi.ad) return siparis
+
+        return {
+          ...siparis,
+          musteri: musteriKaydi.ad,
+        }
+      }),
     )
-    return musteriKaydi?.telefon ?? siparisMusteriTelefonlari[kayit.musteri] ?? 'Bilinmiyor'
-  }
+  }, [musteriler])
+
+  const siparisTelefonunuGetir = (kayit) =>
+    siparisIcinMusteriBul(kayit, musteriler)?.telefon ?? 'Bilinmiyor'
 
   const siparisMusteriAra = (siparis) => {
     const telefon = siparisTelefonunuGetir(siparis)
-    telefonAramasiBaslat?.(telefon === 'Bilinmiyor' ? '' : telefon, siparis.musteri)
+    telefonAramasiBaslat?.(
+      telefon === 'Bilinmiyor' ? '' : telefon,
+      siparisMusteriAdiniGetir(siparis),
+    )
   }
 
   const siparisDuzenlemeAc = (siparis) => {
     setDuzenlenenSiparisNo(siparis.siparisNo)
     setSiparisFormu({
-      musteri: siparis.musteri,
+      musteriUid: String(siparis.musteriUid ?? ''),
       urun: siparis.urun,
       toplamTutar: String(siparis.toplamTutar),
       siparisTarihi: siparis.siparisTarihi,
@@ -147,6 +190,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   const yeniSiparisPenceresiniAc = () => {
     setSiparisFormu({
       ...bosSiparisFormu,
+      musteriUid: String(musteriSecenekleri[0]?.uid ?? ''),
       siparisTarihi: new Date().toISOString().slice(0, 10),
       teslimatSuresi: '2 iş günü',
     })
@@ -154,7 +198,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   }
 
   const yeniSiparisKaydet = () => {
-    const musteri = siparisFormu.musteri.trim()
+    const musteriUid = String(siparisFormu.musteriUid ?? '').trim()
     const urun = siparisFormu.urun.trim()
     const siparisTarihi = siparisFormu.siparisTarihi
     const toplamTutar = Number(siparisFormu.toplamTutar)
@@ -162,8 +206,20 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     const urunHazirlik = siparisFormu.urunHazirlik.trim()
     const teslimatDurumu = siparisFormu.teslimatDurumu.trim()
     const teslimatSuresi = siparisFormu.teslimatSuresi.trim()
+    const seciliMusteri =
+      musteriler.find((kayit) => String(kayit.uid) === musteriUid) ?? null
 
-    if (!musteri || !urun || !siparisTarihi || !odemeDurumu || !urunHazirlik || !teslimatDurumu || !teslimatSuresi || Number.isNaN(toplamTutar)) {
+    if (
+      !musteriUid ||
+      !seciliMusteri ||
+      !urun ||
+      !siparisTarihi ||
+      !odemeDurumu ||
+      !urunHazirlik ||
+      !teslimatDurumu ||
+      !teslimatSuresi ||
+      Number.isNaN(toplamTutar)
+    ) {
       toastGoster?.('hata', 'Yeni sipariş formunda eksik veya hatalı bilgi var.')
       return
     }
@@ -179,7 +235,18 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     const yeniSiparisNo = `#SP-${enYuksekNo + 1}`
 
     setSiparisler((onceki) => [
-      { siparisNo: yeniSiparisNo, musteri, urun, toplamTutar, siparisTarihi, odemeDurumu, urunHazirlik, teslimatDurumu, teslimatSuresi },
+      {
+        siparisNo: yeniSiparisNo,
+        musteriUid: seciliMusteri.uid,
+        musteri: seciliMusteri.ad,
+        urun,
+        toplamTutar,
+        siparisTarihi,
+        odemeDurumu,
+        urunHazirlik,
+        teslimatDurumu,
+        teslimatSuresi,
+      },
       ...onceki,
     ])
     setYeniSiparisAcik(false)
@@ -189,7 +256,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   }
 
   const siparisDuzenlemeKaydet = () => {
-    const musteri = siparisFormu.musteri.trim()
+    const musteriUid = String(siparisFormu.musteriUid ?? '').trim()
     const urun = siparisFormu.urun.trim()
     const siparisTarihi = siparisFormu.siparisTarihi
     const toplamTutar = Number(siparisFormu.toplamTutar)
@@ -197,8 +264,20 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     const urunHazirlik = siparisFormu.urunHazirlik.trim()
     const teslimatDurumu = siparisFormu.teslimatDurumu.trim()
     const teslimatSuresi = siparisFormu.teslimatSuresi.trim()
+    const seciliMusteri =
+      musteriler.find((kayit) => String(kayit.uid) === musteriUid) ?? null
 
-    if (!musteri || !urun || !siparisTarihi || !odemeDurumu || !urunHazirlik || !teslimatDurumu || !teslimatSuresi || Number.isNaN(toplamTutar)) {
+    if (
+      !musteriUid ||
+      !seciliMusteri ||
+      !urun ||
+      !siparisTarihi ||
+      !odemeDurumu ||
+      !urunHazirlik ||
+      !teslimatDurumu ||
+      !teslimatSuresi ||
+      Number.isNaN(toplamTutar)
+    ) {
       toastGoster?.('hata', 'Sipariş düzenleme alanlarında eksik veya hatalı bilgi var.')
       return
     }
@@ -210,14 +289,25 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     setSiparisler((onceki) =>
       onceki.map((siparis) =>
         siparis.siparisNo === duzenlenenSiparisNo
-          ? { ...siparis, musteri, urun, toplamTutar, siparisTarihi, odemeDurumu, urunHazirlik, teslimatDurumu, teslimatSuresi }
+          ? {
+              ...siparis,
+              musteriUid: seciliMusteri.uid,
+              musteri: seciliMusteri.ad,
+              urun,
+              toplamTutar,
+              siparisTarihi,
+              odemeDurumu,
+              urunHazirlik,
+              teslimatDurumu,
+              teslimatSuresi,
+            }
           : siparis,
       ),
     )
 
     setDuzenlenenSiparisNo(null)
     setSiparisFormu(bosSiparisFormu)
-    toastGoster?.('basari', `${musteri} için sipariş kaydı güncellendi.`)
+    toastGoster?.('basari', `${seciliMusteri.ad} için sipariş kaydı güncellendi.`)
   }
 
   const siparisDurumKaydet = () => {
@@ -302,6 +392,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     toplamGecmisSiparisSayfa,
     sayfadakiGecmisSiparisler,
     siparisAktivitesi,
+    musteriSecenekleri,
     siparisFormuGuncelle,
     siparisDurumFormuGuncelle,
     yeniSiparisPenceresiniAc,
@@ -312,6 +403,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
     siparisDurumKaydet,
     siparisSil,
     siparisMusteriAra,
+    siparisMusteriAdiniGetir,
     siparisTelefonunuGetir,
   }
 }

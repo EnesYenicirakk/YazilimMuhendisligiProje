@@ -1,0 +1,122 @@
+/* Desktop sidebar */
+.yan-menu {
+  border-right: 1px solid var(--cizgi);
+  padding: 20px 14px;
+  background: #fff;
+}
+
+.menu-logo {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 8px;
+}
+
+.yan-menu h2 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--metin);
+}
+
+.yan-menu nav {
+  display: grid;
+  gap: 6px;
+}
+
+.yan-menu nav::-webkit-scrollbar {
+  height: 8px;
+}
+
+.yan-menu nav::-webkit-scrollbar-track {
+  background: #edf4fe;
+  border-radius: 999px;
+}
+
+.yan-menu nav::-webkit-scrollbar-thumb {
+  background: #bfd6f6;
+  border-radius: 999px;
+}
+
+.menu-link {
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #33455a;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-ikon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid #d7e4f5;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.72rem;
+  color: #4b6888;
+  background: #f8fbff;
+  flex-shrink: 0;
+}
+
+.menu-ikon svg,
+.menu-ikon-cuzdan svg,
+.menu-ikon-envanter svg,
+.menu-ikon-telefon svg,
+.menu-ikon-telefon2 svg {
+  width: 13px;
+  height: 13px;
+}
+
+.menu-link.aktif,
+.menu-link:hover {
+  background: var(--mavi-acik);
+  border-color: #cbe0fb;
+  color: #1f56a4;
+}
+
+.menu-link.pasif {
+  opacity: 0.72;
+}
+
+@media (max-width: 1100px) {
+  .yan-menu {
+    border-right: 0;
+    border-bottom: 1px solid var(--cizgi);
+  }
+}
+
+@media (max-width: 900px) {
+  .menu-link {
+    min-width: 0;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 640px) {
+  .menu-logo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .yan-menu h2 {
+    font-size: 0.95rem;
+  }
+
+  .menu-link {
+    padding: 10px;
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .menu-link {
+    padding: 9px 10px;
+    font-size: 0.86rem;
+  }
+}

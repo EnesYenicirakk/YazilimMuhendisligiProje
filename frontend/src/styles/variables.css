@@ -1,0 +1,14 @@
+﻿/* Design tokens */
+
+:root {
+  --mavi-koyu: #0d4f95;
+  --mavi: #2f7dd6;
+  --ikincil: #6b819a;
+  --mavi-orta: #2f7dd6;
+  --mavi-acik: #e9f3ff;
+  --zemin: #f3f7fc;
+  --kart: #ffffff;
+  --metin: #1f3044;
+  --cizgi: #dce7f4;
+  --tehlike: #d63b45;
+}

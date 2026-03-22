@@ -277,6 +277,7 @@
   .geri-buton,
   .global-arama-mobil-dugme,
   .bildirim-dugmesi,
+  .barkod-dugmesi,
   .ai-yardim-buton,
   .odeme-sekme,
   .urun-ekle-karti,
@@ -313,6 +314,7 @@
   .geri-buton:active,
   .global-arama-mobil-dugme:active,
   .bildirim-dugmesi:active,
+  .barkod-dugmesi:active,
   .ai-yardim-buton:active,
   .odeme-sekme:active,
   .urun-ekle-karti:active,
@@ -348,6 +350,7 @@
 
   .urun-ekle-karti:active,
   .login-giris-buton:active,
+  .barkod-dugmesi:active,
   .ai-yardim-buton:active {
     box-shadow: 0 10px 18px rgba(34, 103, 184, 0.14);
   }

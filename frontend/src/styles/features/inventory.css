@@ -270,6 +270,602 @@
   background: linear-gradient(90deg, #2f7dd6 0%, #1f61b8 100%);
 }
 
+.barkod-kaplama {
+  background: rgba(16, 25, 38, 0.34);
+  backdrop-filter: blur(10px);
+}
+
+.barkod-kutu {
+  max-width: min(860px, calc(100vw - 40px));
+  width: 100%;
+  max-height: calc(100dvh - 28px);
+  padding: 18px;
+  border-radius: 26px;
+  border: 1px solid #d7e6f8;
+  box-shadow: 0 28px 60px rgba(18, 35, 60, 0.22);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 18px;
+  overflow: hidden;
+  animation: barkod-panel-acil 220ms ease both;
+}
+
+.barkod-kutu.alis-modu {
+  background: linear-gradient(180deg, #f7fffb 0%, #ffffff 30%, #f5fff8 100%);
+  border-color: #cfead9;
+}
+
+.barkod-kutu.satis-modu {
+  background: linear-gradient(180deg, #fff8f8 0%, #ffffff 30%, #fff5f5 100%);
+  border-color: #f1d3d6;
+}
+
+.barkod-modal-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.barkod-modal-etiket {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.barkod-kutu.alis-modu .barkod-modal-etiket {
+  background: #e5f8ed;
+  color: #1d7a48;
+}
+
+.barkod-kutu.satis-modu .barkod-modal-etiket {
+  background: #ffe8eb;
+  color: #bb3f4d;
+}
+
+.barkod-modal-ust h3 {
+  margin: 10px 0 6px;
+  font-size: 1.65rem;
+}
+
+.barkod-modal-ust p {
+  margin: 0;
+  max-width: 620px;
+}
+
+.barkod-modal-kapat {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #d7e6f8;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #496582;
+  display: inline-grid;
+  place-items: center;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.barkod-islem-anahtari {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 8px;
+  border-radius: 20px;
+  background: #f4f8fd;
+  border: 1px solid #dbe8f8;
+}
+
+.barkod-islem-anahtari button {
+  border: 0;
+  border-radius: 16px;
+  padding: 16px 14px;
+  background: transparent;
+  color: #607891;
+  display: grid;
+  gap: 3px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.barkod-islem-anahtari button strong {
+  font-size: 1.05rem;
+}
+
+.barkod-islem-anahtari button span {
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.barkod-kutu.alis-modu .barkod-islem-anahtari button.aktif {
+  background: linear-gradient(180deg, #e7f8ee 0%, #d2f0de 100%);
+  color: #196f40;
+  box-shadow: inset 0 0 0 1px #b9e4c9;
+}
+
+.barkod-kutu.satis-modu .barkod-islem-anahtari button.aktif {
+  background: linear-gradient(180deg, #ffe9ec 0%, #ffd8de 100%);
+  color: #b13a49;
+  box-shadow: inset 0 0 0 1px #f0bcc5;
+}
+
+.barkod-icerik {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 16px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.barkod-paneli {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid #dbe8f8;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.barkod-alan-baslik {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.barkod-alan-baslik-kamera {
+  align-items: flex-start;
+}
+
+.barkod-alan-baslik-kamera > div {
+  display: grid;
+  gap: 6px;
+}
+
+.barkod-alan-baslik h4 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.barkod-alan-baslik span,
+.barkod-link-buton {
+  color: #5b7188;
+  font-size: 0.8rem;
+}
+
+.barkod-link-buton {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.barkod-kamera-dugmesi {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid #d7e6f8;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+  color: #285f9f;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.barkod-kamera-dugmesi svg {
+  width: 18px;
+  height: 18px;
+}
+
+.barkod-kutu.alis-modu .barkod-kamera-dugmesi.aktif {
+  background: linear-gradient(180deg, #e7f8ee 0%, #d3f0df 100%);
+  border-color: #b6e4c8;
+  color: #197043;
+}
+
+.barkod-kutu.satis-modu .barkod-kamera-dugmesi.aktif {
+  background: linear-gradient(180deg, #ffe9ec 0%, #ffd9de 100%);
+  border-color: #f0c0c7;
+  color: #b23e4d;
+}
+
+.barkod-kamera-alani {
+  position: relative;
+  min-height: 214px;
+  margin-bottom: 14px;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 44%),
+    linear-gradient(180deg, #111f31 0%, #09111c 100%);
+  border: 1px solid rgba(208, 223, 243, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.barkod-kamera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.9;
+}
+
+.barkod-kamera-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.barkod-kamera-hedef {
+  position: relative;
+  width: min(76%, 340px);
+  aspect-ratio: 1.38 / 1;
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 999px rgba(8, 14, 24, 0.18),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.barkod-kamera-hedef::before,
+.barkod-kamera-hedef::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.24);
+}
+
+.barkod-kamera-hedef::after {
+  inset: 0;
+  border: 0;
+  background:
+    linear-gradient(90deg, #ffffff 0 18px, transparent 18px calc(100% - 18px), #ffffff calc(100% - 18px)),
+    linear-gradient(180deg, #ffffff 0 18px, transparent 18px calc(100% - 18px), #ffffff calc(100% - 18px));
+  mask:
+    radial-gradient(circle at top left, transparent 0 14px, #000 15px),
+    radial-gradient(circle at top right, transparent 0 14px, #000 15px),
+    radial-gradient(circle at bottom left, transparent 0 14px, #000 15px),
+    radial-gradient(circle at bottom right, transparent 0 14px, #000 15px);
+  mask-composite: intersect;
+  opacity: 0.94;
+}
+
+.barkod-kamera-lazer {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 14%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 92, 92, 0), #ff4a4a 18%, #ff6a6a 50%, #ff4a4a 82%, rgba(255, 92, 92, 0));
+  box-shadow:
+    0 0 18px rgba(255, 74, 74, 0.78),
+    0 0 32px rgba(255, 74, 74, 0.36);
+  animation: barkod-lazer-tarama 2.1s ease-in-out infinite;
+}
+
+.barkod-kamera-durum {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: rgba(8, 14, 24, 0.6);
+  color: #eef5ff;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.barkod-kamera-durum strong {
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.barkod-kamera-alani.parladi::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.04) 55%, transparent 70%);
+  animation: barkod-parlama 240ms ease-out both;
+  pointer-events: none;
+}
+
+.barkod-girdi-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px 148px;
+  gap: 10px;
+  align-items: end;
+}
+
+.barkod-girdi-alani {
+  display: grid;
+  gap: 7px;
+}
+
+.barkod-girdi-alani span {
+  color: #36506b;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.barkod-girdi-alani input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d8e6f7;
+  background: #f8fbff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: #24405d;
+  font: inherit;
+}
+
+.barkod-sepete-ekle,
+.barkod-onay-buton {
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 800;
+}
+
+.barkod-kutu.alis-modu .barkod-sepete-ekle,
+.barkod-kutu.alis-modu .barkod-onay-buton {
+  background: linear-gradient(180deg, #1fa45f 0%, #16844b 100%);
+}
+
+.barkod-kutu.satis-modu .barkod-sepete-ekle,
+.barkod-kutu.satis-modu .barkod-onay-buton {
+  background: linear-gradient(180deg, #de5564 0%, #bc3d4d 100%);
+}
+
+.barkod-sepete-ekle {
+  height: 48px;
+  border-radius: 14px;
+  padding: 0 16px;
+}
+
+.barkod-urun-onizleme {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f9fbff;
+  border: 1px solid #dce9f8;
+  display: grid;
+  gap: 12px;
+}
+
+.barkod-urun-kimlik,
+.barkod-kalem-kimlik {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barkod-urun-kimlik strong,
+.barkod-kalem-kimlik strong {
+  display: block;
+  color: #213549;
+}
+
+.barkod-urun-kimlik span:last-child,
+.barkod-kalem-kimlik span:last-child {
+  color: #64809a;
+  font-size: 0.84rem;
+}
+
+.barkod-urun-ozet {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.barkod-urun-ozet div,
+.barkod-kalem-stok {
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e1ebf7;
+  display: grid;
+  gap: 4px;
+}
+
+.barkod-urun-ozet span,
+.barkod-kalem-stok span {
+  color: #68819a;
+  font-size: 0.77rem;
+  font-weight: 700;
+}
+
+.barkod-eslesmeler {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  max-height: 184px;
+  overflow-y: auto;
+}
+
+.barkod-eslesme-buton {
+  border: 1px solid #d8e6f7;
+  border-radius: 14px;
+  background: #f9fbff;
+  padding: 11px 12px;
+  text-align: left;
+  display: grid;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.barkod-eslesme-buton strong {
+  color: #22384f;
+}
+
+.barkod-eslesme-buton span {
+  color: #69839d;
+  font-size: 0.8rem;
+}
+
+.barkod-eslesme-buton.aktif {
+  box-shadow: inset 0 0 0 1px #8eb9eb;
+  background: #eef6ff;
+}
+
+.barkod-bos-durum {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  text-align: center;
+  color: #60748a;
+}
+
+.barkod-bos-durum strong {
+  color: #24374d;
+}
+
+.barkod-sepet-listesi {
+  display: grid;
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.barkod-sepet-kalem {
+  border: 1px solid #dbe8f8;
+  border-radius: 18px;
+  background: #fbfdff;
+  padding: 13px;
+  display: grid;
+  gap: 12px;
+}
+
+.barkod-kalem-aksiyon {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.barkod-kalem-aksiyon label {
+  display: grid;
+  gap: 7px;
+}
+
+.barkod-kalem-aksiyon label span {
+  color: #54708b;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.barkod-kalem-aksiyon input {
+  width: 100%;
+  border: 1px solid #d8e6f7;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.barkod-kalem-sil {
+  min-width: 92px;
+  height: 44px;
+  border: 1px solid #efc7cd;
+  border-radius: 12px;
+  background: #fff4f5;
+  color: #c34755;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.barkod-alt-ozet {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid #dbe8f8;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.barkod-alt-bilgi {
+  display: grid;
+  gap: 4px;
+}
+
+.barkod-alt-bilgi strong {
+  color: #20364b;
+  font-size: 1rem;
+}
+
+.barkod-alt-bilgi span {
+  color: #60748a;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.barkod-onay-buton {
+  min-width: 260px;
+  min-height: 58px;
+  padding: 0 24px;
+  border-radius: 18px;
+  font-size: 1rem;
+  box-shadow: 0 18px 28px rgba(27, 87, 61, 0.16);
+}
+
+.barkod-onay-buton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@keyframes barkod-panel-acil {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes barkod-lazer-tarama {
+  0%,
+  100% {
+    top: 14%;
+    opacity: 0.86;
+  }
+  50% {
+    top: 78%;
+    opacity: 1;
+  }
+}
+
+@keyframes barkod-parlama {
+  from {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .ust-baslik,
   .siparisler-baslik,
@@ -288,6 +884,10 @@
 @media (max-width: 900px) {
   .envanter-kart {
     padding: 12px;
+  }
+
+  .barkod-icerik {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -313,6 +913,220 @@
     width: 32px;
     height: 32px;
   }
+
+  .barkod-kaplama {
+    padding: 12px;
+    align-items: center;
+  }
+
+  .barkod-kutu {
+    max-width: none;
+    max-height: calc(100dvh - 18px);
+    border-radius: 22px;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .barkod-modal-ust {
+    gap: 10px;
+  }
+
+  .barkod-modal-ust h3 {
+    font-size: 1.22rem;
+    margin: 8px 0 4px;
+  }
+
+  .barkod-modal-ust p {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .barkod-modal-etiket {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+
+  .barkod-modal-kapat {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+  }
+
+  .barkod-islem-anahtari {
+    gap: 8px;
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .barkod-islem-anahtari button {
+    padding: 12px 10px;
+    border-radius: 12px;
+  }
+
+  .barkod-islem-anahtari button strong {
+    font-size: 0.96rem;
+  }
+
+  .barkod-islem-anahtari button span {
+    font-size: 0.76rem;
+  }
+
+  .barkod-girdi-grid,
+  .barkod-kalem-aksiyon,
+  .barkod-alt-ozet {
+    grid-template-columns: 1fr;
+  }
+
+  .barkod-paneli {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .barkod-alan-baslik {
+    margin-bottom: 10px;
+  }
+
+  .barkod-alan-baslik-kamera {
+    grid-template-columns: 1fr;
+  }
+
+  .barkod-alan-baslik h4 {
+    font-size: 0.96rem;
+  }
+
+  .barkod-alan-baslik span,
+  .barkod-link-buton {
+    font-size: 0.74rem;
+  }
+
+  .barkod-girdi-alani span {
+    font-size: 0.78rem;
+  }
+
+  .barkod-kamera-dugmesi {
+    width: 100%;
+    justify-content: center;
+    min-height: 42px;
+    border-radius: 12px;
+    padding: 9px 12px;
+    font-size: 0.84rem;
+  }
+
+  .barkod-kamera-alani {
+    min-height: 178px;
+    margin-bottom: 10px;
+    border-radius: 18px;
+  }
+
+  .barkod-kamera-hedef {
+    width: min(82%, 300px);
+    border-radius: 18px;
+  }
+
+  .barkod-kamera-durum {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    padding: 9px 11px;
+    border-radius: 12px;
+  }
+
+  .barkod-kamera-durum strong {
+    font-size: 0.76rem;
+  }
+
+  .barkod-girdi-alani input {
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .barkod-sepete-ekle {
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .barkod-sepete-ekle,
+  .barkod-onay-buton {
+    width: 100%;
+  }
+
+  .barkod-urun-onizleme {
+    margin-top: 10px;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .barkod-urun-ozet {
+    gap: 8px;
+  }
+
+  .barkod-urun-ozet div,
+  .barkod-kalem-stok {
+    padding: 10px;
+  }
+
+  .barkod-eslesmeler {
+    margin-top: 10px;
+    max-height: 128px;
+  }
+
+  .barkod-eslesme-buton {
+    padding: 10px 11px;
+    border-radius: 12px;
+  }
+
+  .barkod-bos-durum {
+    min-height: 140px;
+    gap: 6px;
+  }
+
+  .barkod-sepet-listesi {
+    gap: 8px;
+    max-height: 240px;
+  }
+
+  .barkod-sepet-kalem {
+    padding: 11px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .barkod-kalem-aksiyon label span {
+    font-size: 0.72rem;
+  }
+
+  .barkod-kalem-aksiyon input {
+    padding: 9px 11px;
+  }
+
+  .barkod-kalem-sil {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .barkod-alt-ozet {
+    padding: 12px;
+    border-radius: 16px;
+    gap: 10px;
+  }
+
+  .barkod-alt-bilgi strong {
+    font-size: 0.94rem;
+  }
+
+  .barkod-alt-bilgi span {
+    font-size: 0.8rem;
+  }
+
+  .barkod-onay-buton {
+    min-width: 0;
+    min-height: 50px;
+    border-radius: 14px;
+    font-size: 0.94rem;
+  }
 }
 
 @media (max-width: 420px) {
@@ -325,6 +1139,51 @@
   .siparisler-baslik,
   .envanter-baslik {
     gap: 12px;
+  }
+
+  .barkod-kutu {
+    max-height: calc(100dvh - 12px);
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .barkod-paneli,
+  .barkod-alt-ozet {
+    padding: 11px;
+    border-radius: 14px;
+  }
+
+  .barkod-modal-ust h3 {
+    font-size: 1.1rem;
+  }
+
+  .barkod-modal-ust p {
+    font-size: 0.84rem;
+  }
+
+  .barkod-islem-anahtari button {
+    padding: 10px 8px;
+  }
+
+  .barkod-islem-anahtari button strong {
+    font-size: 0.9rem;
+  }
+
+  .barkod-islem-anahtari button span {
+    font-size: 0.72rem;
+  }
+
+  .barkod-sepet-listesi {
+    max-height: 208px;
+  }
+
+  .barkod-kamera-alani {
+    min-height: 152px;
+  }
+
+  .barkod-kamera-hedef {
+    width: min(86%, 250px);
+    border-radius: 16px;
   }
 }
 

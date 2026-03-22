@@ -1,4 +1,31 @@
 /* AI assistant */
+.barkod-dugmesi {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  width: 58px;
+  height: 58px;
+  border: 1px solid #c7defb;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f8fbff 0%, #deebff 100%);
+  color: #245b9f;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 18px 34px rgba(39, 97, 171, 0.16);
+  cursor: pointer;
+  z-index: 40;
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+.barkod-dugmesi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 36px rgba(39, 97, 171, 0.22);
+  filter: saturate(1.05);
+}
+.barkod-dugmesi svg {
+  width: 28px;
+  height: 28px;
+}
+
 .ai-yardim-buton {
   position: fixed;
   right: 18px;
@@ -236,6 +263,7 @@
     width: auto;
     height: min(520px, calc(100vh - 110px));
   }
+  .barkod-dugmesi { left: 12px; bottom: 82px; }
   .ai-yardim-buton { right: 12px; bottom: 82px; }
   .ai-hizli-konular { gap: 7px; }
   .ai-hizli-konu { padding: 7px 11px; font-size: 0.72rem; }
@@ -244,6 +272,11 @@
 @media (max-width: 420px) {
   .ai-panel {
     height: min(500px, calc(100vh - 96px));
+    border-radius: 18px;
+  }
+  .barkod-dugmesi {
+    width: 54px;
+    height: 54px;
     border-radius: 18px;
   }
 }

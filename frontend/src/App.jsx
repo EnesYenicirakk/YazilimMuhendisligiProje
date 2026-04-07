@@ -1,6 +1,7 @@
 ﻿import { Suspense, lazy, useState } from 'react'
 import './App.css'
 import { useMemo } from 'react'
+import { useEffect } from 'react'
 import IndexPage from './features/home/components/IndexPage'
 import DashboardPage from './features/dashboard/components/DashboardPage'
 import OdemelerPage from './features/finance/components/OdemelerPage'
@@ -29,6 +30,7 @@ import { useToast } from './core/contexts/ToastContext'
 import {
   paraFormatla,
   durumSinifi,
+  kritikStoktaMi,
   merkezMenusu,
   siparisTamamlandiMi,
 } from './shared/utils/constantsAndHelpers'
@@ -188,6 +190,39 @@ function App() {
     toastGoster,
   })
 
+  useEffect(() => {
+    if (!auth.isLoggedIn) return
+
+    const kritikFavoriUrunler = inventoryData.urunler.filter((urun) => urun.favori && kritikStoktaMi(urun))
+    if (kritikFavoriUrunler.length === 0) return
+
+    kritikFavoriUrunler.forEach((urun) => {
+      const minimumStok = Number(urun.minimumStok ?? 0)
+      const mevcutStok = Number(urun.magazaStok ?? 0)
+      const hedefStok = Math.max(minimumStok * 2, minimumStok + 6)
+      const siparisMiktari = hedefStok - mevcutStok
+
+      if (siparisMiktari <= 0) return
+
+      const acikOtomatikSiparisVar = suppliersData.tumTedarikSiparisleri.some(
+        (siparis) =>
+          siparis.otomatik &&
+          siparis.kaynak === 'stok-koruma' &&
+          siparis.urunId === urun.urunId &&
+          siparis.durum !== 'Teslim alındı',
+      )
+
+      if (acikOtomatikSiparisVar) return
+
+      suppliersData.otomatikTedarikSiparisiOlustur({
+        urun,
+        miktar: siparisMiktari,
+        hedefStok,
+        oncekiStok: mevcutStok,
+      })
+    })
+  }, [auth.isLoggedIn, inventoryData.urunler, suppliersData.tumTedarikSiparisleri, suppliersData.tedarikciler])
+
   const searchData = useGlobalSearch({
     aktifSayfa,
     urunler: inventoryData.urunler,
@@ -210,12 +245,14 @@ function App() {
     dashboardCanliOzetler: dashboardData.dashboardCanliOzetler,
     stokDegisimLoglari,
     siraliSiparisler: ordersData.siraliSiparisler,
+    tedarikSiparisleri: suppliersData.tumTedarikSiparisleri,
     urunler,
     paraFormatla,
     tarihFormatla,
     sayfaDegistir,
     onUrunDuzenlemeSekmeDegistir: inventoryData.setUrunDuzenlemeSekmesi,
     onOdemeSekmeDegistir: financeData.setOdemeSekmesi,
+    onTedarikciSekmeDegistir: suppliersData.setTedarikciSekmesi,
     toastGoster,
   })
 

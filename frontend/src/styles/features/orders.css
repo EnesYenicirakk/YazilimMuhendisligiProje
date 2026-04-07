@@ -46,9 +46,14 @@
 .siparis-kontrol select {
   border: 1px solid #d6e4f5;
   background: #f8fbff;
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 12px 14px;
   color: #324a65;
+  font: inherit;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .siparis-kontrol input {
@@ -57,6 +62,23 @@
 
 .siparis-kontrol select {
   width: 190px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3 5.25L7 9.25L11 5.25' stroke='%235f7793' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+  padding-right: 42px;
+  cursor: pointer;
+}
+
+.siparis-kontrol input:focus,
+.siparis-kontrol select:focus {
+  outline: none;
+  border-color: #b9d3f1;
+  box-shadow: 0 0 0 4px rgba(47, 125, 214, 0.12);
+  background-color: #ffffff;
 }
 
 /* Order mobile cards */

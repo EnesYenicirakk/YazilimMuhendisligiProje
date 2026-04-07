@@ -809,6 +809,121 @@
   gap: 8px;
 }
 
+.bugunku-oncelikler-paneli {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.oncelik-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.oncelik-karti {
+  border: 1px solid #d8e5f5;
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  min-height: 132px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.oncelik-karti.mavi {
+  background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+}
+
+.oncelik-karti.turuncu {
+  background: linear-gradient(180deg, #fffaf5 0%, #fff1e2 100%);
+}
+
+.oncelik-karti.yesil {
+  background: linear-gradient(180deg, #f7fcf8 0%, #ebf8ef 100%);
+}
+
+.oncelik-karti.kirmizi {
+  background: linear-gradient(180deg, #fff9fa 0%, #fff0f2 100%);
+}
+
+.oncelik-ust {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.oncelik-ikon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid transparent;
+}
+
+.oncelik-karti.mavi .oncelik-ikon {
+  color: #2f7dd6;
+  background: #e8f2ff;
+  border-color: #cfe0f7;
+}
+
+.oncelik-karti.turuncu .oncelik-ikon {
+  color: #d07a1e;
+  background: #ffefdc;
+  border-color: #f4dbc0;
+}
+
+.oncelik-karti.yesil .oncelik-ikon {
+  color: #23925e;
+  background: #e6f6ec;
+  border-color: #c9e9d5;
+}
+
+.oncelik-karti.kirmizi .oncelik-ikon {
+  color: #d14650;
+  background: #ffe7ea;
+  border-color: #f3cdd3;
+}
+
+.oncelik-ikon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.oncelik-rozet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(255, 255, 255, 0.76);
+  color: #516881;
+  font-size: 0.74rem;
+  font-weight: 800;
+  border: 1px solid rgba(207, 224, 247, 0.95);
+}
+
+.oncelik-karti strong {
+  color: #1e3248;
+  font-size: 1.85rem;
+  line-height: 1;
+}
+
+.oncelik-karti p {
+  margin: 0;
+  color: #29435f;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.oncelik-karti small {
+  color: #69809a;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
 /* Shared panel surfaces */
 .panel-kart {
   background: #fff;
@@ -1199,7 +1314,8 @@
   }
 
   .dashboard-canli-grid,
-  .kritik-stok-liste {
+  .kritik-stok-liste,
+  .oncelik-grid {
     grid-template-columns: 1fr;
   }
 

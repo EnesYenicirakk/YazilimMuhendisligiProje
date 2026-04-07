@@ -27,6 +27,25 @@
   max-width: 980px;
 }
 
+.modal-kutu.modal-kutu-form-buyuk {
+  max-width: 780px;
+  max-height: min(88vh, 920px);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-kutu.modal-kutu-form-buyuk .modal-form {
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.modal-kutu.modal-kutu-form-buyuk .modal-aksiyon {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e3edf8;
+  flex-shrink: 0;
+}
+
 .modal-kutu h3 {
   margin: 0 0 12px;
   color: var(--metin);
@@ -60,6 +79,10 @@
 
   .modal-kutu.buyuk {
     width: 100%;
+  }
+
+  .modal-kutu.modal-kutu-form-buyuk {
+    max-height: calc(100vh - 20px);
   }
 
 

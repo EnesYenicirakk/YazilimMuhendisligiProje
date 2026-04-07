@@ -6,12 +6,14 @@ export default function useAppNotifications({
   dashboardCanliOzetler,
   stokDegisimLoglari = [],
   siraliSiparisler,
+  tedarikSiparisleri = [],
   urunler,
   paraFormatla,
   tarihFormatla,
   sayfaDegistir,
   onUrunDuzenlemeSekmeDegistir,
   onOdemeSekmeDegistir,
+  onTedarikciSekmeDegistir,
   toastGoster,
 }) {
   const [aiPanelAcik, setAiPanelAcik] = useState(false)
@@ -29,6 +31,21 @@ export default function useAppNotifications({
   ])
 
   const tumBildirimler = useMemo(() => {
+    const otomatikTedarikBildirimleri = tedarikSiparisleri
+      .filter((siparis) => siparis.otomatik && siparis.kaynak === 'stok-koruma')
+      .slice(0, 3)
+      .map((siparis) => ({
+        id: `tedarik-${siparis.tedarikciUid}-${siparis.siparisNo}`,
+        tur: 'stok',
+        baslik: `${siparis.urun} için otomatik sipariş açıldı`,
+        detay:
+          `${siparis.firmaAdi} üzerinden ${siparis.miktar} adet sipariş oluşturuldu. ` +
+          `Sipariş no ${siparis.siparisNo}, durum ${siparis.durum.toLocaleLowerCase('tr-TR')} olarak izleniyor.`,
+        zaman: tarihFormatla(siparis.tarih),
+        sayfa: 'alicilar',
+        sekme: 'siparisler',
+      }))
+
     const kritikStokBildirimleri = dashboardCanliOzetler.kritikStokluUrunler.slice(0, 3).map((urun) => ({
       id: `kritik-${urun.uid}`,
       tur: 'kritik',
@@ -71,12 +88,13 @@ export default function useAppNotifications({
       }))
 
     return [
+      ...otomatikTedarikBildirimleri,
       ...kritikStokBildirimleri,
       ...stokLogBildirimleri,
       ...sonSatisBildirimleri,
       ...bekleyenTahsilatBildirimleri,
     ].slice(0, 8)
-  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, stokDegisimLoglari, tarihFormatla])
+  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, stokDegisimLoglari, tedarikSiparisleri, tarihFormatla])
 
   const bildirimler = useMemo(
     () => tumBildirimler.filter((bildirim) => !temizlenenBildirimler.includes(bildirim.id)),
@@ -254,9 +272,23 @@ export default function useAppNotifications({
   const bildirimdenSayfayaGit = (bildirim) => {
     bildirimiOkunduYap(bildirim.id)
     bildirimPaneliKapat()
-    if (bildirim.sayfa === 'urun-duzenleme' && bildirim.sekme) onUrunDuzenlemeSekmeDegistir?.(bildirim.sekme)
-    if (bildirim.sayfa === 'odemeler' && bildirim.sekme) onOdemeSekmeDegistir?.(bildirim.sekme)
     sayfaDegistir?.(bildirim.sayfa)
+
+    if (!bildirim.sekme) return
+
+    if (bildirim.sayfa === 'urun-duzenleme') {
+      window.setTimeout(() => onUrunDuzenlemeSekmeDegistir?.(bildirim.sekme), 0)
+      return
+    }
+
+    if (bildirim.sayfa === 'odemeler') {
+      window.setTimeout(() => onOdemeSekmeDegistir?.(bildirim.sekme), 0)
+      return
+    }
+
+    if (bildirim.sayfa === 'alicilar') {
+      window.setTimeout(() => onTedarikciSekmeDegistir?.(bildirim.sekme), 0)
+    }
   }
 
   return {

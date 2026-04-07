@@ -54,35 +54,63 @@
         .join(' | ')
     : '-'
 
+  const renderTedarikciFormAlanlari = () => (
+    <>
+      <label className="modal-form-grup">
+        <span>Firma Adı</span>
+        <input value={tedarikciFormu.firmaAdi} onChange={(event) => tedarikciFormuGuncelle('firmaAdi', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>Yetkili Kişi</span>
+        <input value={tedarikciFormu.yetkiliKisi} onChange={(event) => tedarikciFormuGuncelle('yetkiliKisi', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>Telefon</span>
+        <input value={tedarikciFormu.telefon} onChange={(event) => tedarikciFormuGuncelle('telefon', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>E-posta</span>
+        <input value={tedarikciFormu.email} onChange={(event) => tedarikciFormuGuncelle('email', event.target.value)} />
+      </label>
+      <label className="modal-form-grup modal-form-grup-tam">
+        <span>Adres</span>
+        <textarea value={tedarikciFormu.adres} onChange={(event) => tedarikciFormuGuncelle('adres', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>Vergi Numarası</span>
+        <input value={tedarikciFormu.vergiNumarasi} onChange={(event) => tedarikciFormuGuncelle('vergiNumarasi', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>Ürün Grubu</span>
+        <input value={tedarikciFormu.urunGrubu} onChange={(event) => tedarikciFormuGuncelle('urunGrubu', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>Toplam Alış Sayısı</span>
+        <input type="number" value={tedarikciFormu.toplamAlisSayisi} onChange={(event) => tedarikciFormuGuncelle('toplamAlisSayisi', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>Ortalama Teslim Süresi</span>
+        <input value={tedarikciFormu.ortalamaTeslimSuresi} onChange={(event) => tedarikciFormuGuncelle('ortalamaTeslimSuresi', event.target.value)} />
+      </label>
+      <label className="modal-form-grup">
+        <span>Toplam Harcama</span>
+        <input type="number" value={tedarikciFormu.toplamHarcama} onChange={(event) => tedarikciFormuGuncelle('toplamHarcama', event.target.value)} />
+      </label>
+      <label className="modal-form-grup modal-form-grup-tam">
+        <span>Not</span>
+        <textarea value={tedarikciFormu.not} onChange={(event) => tedarikciFormuGuncelle('not', event.target.value)} />
+      </label>
+    </>
+  )
+
   return (
     <>
       {tedarikciEklemeAcik && (
         <div className="modal-kaplama">
-          <div className="modal-kutu">
+          <div className="modal-kutu modal-kutu-form-buyuk">
             <h3>Tedarikçi Ekle</h3>
-            <div className="modal-form">
-              <label>Firma Adı</label>
-              <input value={tedarikciFormu.firmaAdi} onChange={(event) => tedarikciFormuGuncelle('firmaAdi', event.target.value)} />
-              <label>Yetkili Kişi</label>
-              <input value={tedarikciFormu.yetkiliKisi} onChange={(event) => tedarikciFormuGuncelle('yetkiliKisi', event.target.value)} />
-              <label>Telefon</label>
-              <input value={tedarikciFormu.telefon} onChange={(event) => tedarikciFormuGuncelle('telefon', event.target.value)} />
-              <label>E-posta</label>
-              <input value={tedarikciFormu.email} onChange={(event) => tedarikciFormuGuncelle('email', event.target.value)} />
-              <label>Adres</label>
-              <textarea value={tedarikciFormu.adres} onChange={(event) => tedarikciFormuGuncelle('adres', event.target.value)} />
-              <label>Vergi Numarası</label>
-              <input value={tedarikciFormu.vergiNumarasi} onChange={(event) => tedarikciFormuGuncelle('vergiNumarasi', event.target.value)} />
-              <label>Ürün Grubu</label>
-              <input value={tedarikciFormu.urunGrubu} onChange={(event) => tedarikciFormuGuncelle('urunGrubu', event.target.value)} />
-              <label>Toplam Alış Sayısı</label>
-              <input type="number" value={tedarikciFormu.toplamAlisSayisi} onChange={(event) => tedarikciFormuGuncelle('toplamAlisSayisi', event.target.value)} />
-              <label>Ortalama Teslim Süresi</label>
-              <input value={tedarikciFormu.ortalamaTeslimSuresi} onChange={(event) => tedarikciFormuGuncelle('ortalamaTeslimSuresi', event.target.value)} />
-              <label>Toplam Harcama</label>
-              <input type="number" value={tedarikciFormu.toplamHarcama} onChange={(event) => tedarikciFormuGuncelle('toplamHarcama', event.target.value)} />
-              <label>Not</label>
-              <textarea value={tedarikciFormu.not} onChange={(event) => tedarikciFormuGuncelle('not', event.target.value)} />
+            <div className="modal-form modal-form-iki-kolonlu">
+              {renderTedarikciFormAlanlari()}
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={tedarikciEklemeKapat}>İptal</button>
@@ -94,31 +122,10 @@
 
       {tedarikciDuzenlemeAcik && (
         <div className="modal-kaplama">
-          <div className="modal-kutu">
+          <div className="modal-kutu modal-kutu-form-buyuk">
             <h3>Tedarikçiyi Düzenle</h3>
-            <div className="modal-form">
-              <label>Firma Adı</label>
-              <input value={tedarikciFormu.firmaAdi} onChange={(event) => tedarikciFormuGuncelle('firmaAdi', event.target.value)} />
-              <label>Yetkili Kişi</label>
-              <input value={tedarikciFormu.yetkiliKisi} onChange={(event) => tedarikciFormuGuncelle('yetkiliKisi', event.target.value)} />
-              <label>Telefon</label>
-              <input value={tedarikciFormu.telefon} onChange={(event) => tedarikciFormuGuncelle('telefon', event.target.value)} />
-              <label>E-posta</label>
-              <input value={tedarikciFormu.email} onChange={(event) => tedarikciFormuGuncelle('email', event.target.value)} />
-              <label>Adres</label>
-              <textarea value={tedarikciFormu.adres} onChange={(event) => tedarikciFormuGuncelle('adres', event.target.value)} />
-              <label>Vergi Numarası</label>
-              <input value={tedarikciFormu.vergiNumarasi} onChange={(event) => tedarikciFormuGuncelle('vergiNumarasi', event.target.value)} />
-              <label>Ürün Grubu</label>
-              <input value={tedarikciFormu.urunGrubu} onChange={(event) => tedarikciFormuGuncelle('urunGrubu', event.target.value)} />
-              <label>Toplam Alış Sayısı</label>
-              <input type="number" value={tedarikciFormu.toplamAlisSayisi} onChange={(event) => tedarikciFormuGuncelle('toplamAlisSayisi', event.target.value)} />
-              <label>Ortalama Teslim Süresi</label>
-              <input value={tedarikciFormu.ortalamaTeslimSuresi} onChange={(event) => tedarikciFormuGuncelle('ortalamaTeslimSuresi', event.target.value)} />
-              <label>Toplam Harcama</label>
-              <input type="number" value={tedarikciFormu.toplamHarcama} onChange={(event) => tedarikciFormuGuncelle('toplamHarcama', event.target.value)} />
-              <label>Not</label>
-              <textarea value={tedarikciFormu.not} onChange={(event) => tedarikciFormuGuncelle('not', event.target.value)} />
+            <div className="modal-form modal-form-iki-kolonlu">
+              {renderTedarikciFormAlanlari()}
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={tedarikciDuzenlemeKapat}>İptal</button>

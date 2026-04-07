@@ -115,7 +115,7 @@ export default function UrunDuzenlemePage({
                           <td>{urun.magazaStok}</td>
                           <td>
                             <div className="islem-dugmeleri">
-                              <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Favori" onClick={() => favoriDegistir(urun.uid)}><KucukIkon tip="favori" /></button>
+                              <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Otomatik Tedarik" onClick={() => favoriDegistir(urun.uid)}><KucukIkon tip="otomatik-tedarik" /></button>
                               <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => urunDuzenlemeModaliniAc(urun)}><KucukIkon tip="duzenle" /></button>
                               <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekDuzenlemeUrunu(urun)}><KucukIkon tip="sil" /></button>
                             </div>
@@ -132,12 +132,12 @@ export default function UrunDuzenlemePage({
                       key={`mobil-duzenleme-${urun.uid}`}
                       className="envanter-mobil-kart"
                       solaEtiket="Sil"
-                      sagaEtiket="Favori ve düzenle"
+                      sagaEtiket="Otomatik tedarik ve düzenle"
                       solaAksiyonlar={[
                         { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekDuzenlemeUrunu(urun) },
                       ]}
                       sagaAksiyonlar={[
-                        { id: 'favori', etiket: 'Favori', varyant: 'favori', aktif: urun.favori, onClick: () => favoriDegistir(urun.uid) },
+                        { id: 'favori', etiket: 'Otomatik Tedarik', varyant: 'favori', aktif: urun.favori, onClick: () => favoriDegistir(urun.uid) },
                         { id: 'duzenle', etiket: 'Düzenle', varyant: 'ikincil', onClick: () => urunDuzenlemeModaliniAc(urun) },
                       ]}
                       ust={(

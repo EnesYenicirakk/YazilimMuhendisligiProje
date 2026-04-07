@@ -66,6 +66,19 @@ const ortalamaHesapla = (liste) => {
   return liste.reduce((toplam, deger) => toplam + deger, 0) / liste.length
 }
 
+const tohumluSayiUret = (tohum, min, max) => {
+  const altSinir = Math.min(min, max)
+  const ustSinir = Math.max(min, max)
+  const aralik = ustSinir - altSinir + 1
+  let toplam = 0
+
+  for (let index = 0; index < tohum.length; index += 1) {
+    toplam = (toplam * 31 + tohum.charCodeAt(index)) % 2147483647
+  }
+
+  return altSinir + (toplam % aralik)
+}
+
 const siparisAcilMi = (siparis, referansGun) => {
   if (siparisTamamlandiMi(siparis)) return false
 
@@ -170,6 +183,64 @@ export default function useDashboard({
 
     return enCokSatilanUrunleriHesapla(buAyTamamlananSiparisler, 6)
   }, [tamamlananSiparisler])
+
+  const bugunkuOncelikler = useMemo(() => {
+    const bugun = bugununBaslangiciniGetir()
+    const gunAnahtari = formatYmd(bugun)
+    const tohumGovdesi = `${gunAnahtari}-${siparisler.length}-${urunler.length}-${gelenNakitKayitlari.length}-${gidenNakitKayitlari.length}`
+
+    const bekleyenSiparis = Math.max(4, Math.round(siparisler.length * 0.07))
+      + tohumluSayiUret(`${tohumGovdesi}-bekleyen-siparis`, 1, 6)
+    const vadesiYakinOdeme = Math.max(2, Math.round(gelenNakitKayitlari.length * 0.08))
+      + tohumluSayiUret(`${tohumGovdesi}-vadesi-yakin-odeme`, 1, 4)
+    const hazirlanacakUrun = Math.max(6, Math.round(urunler.length * 0.09))
+      + tohumluSayiUret(`${tohumGovdesi}-hazirlanacak-urun`, 2, 7)
+    const tedarikBekleyen = Math.max(2, Math.round(siparisler.length * 0.03))
+      + tohumluSayiUret(`${tohumGovdesi}-tedarik-bekleyen`, 1, 3)
+
+    const vadesiYakinTutar = (
+      vadesiYakinOdeme * tohumluSayiUret(`${tohumGovdesi}-odeme-tutar`, 4800, 12300)
+    )
+
+    return [
+      {
+        anahtar: 'bekleyenSiparis',
+        baslik: 'Bekleyen Sipariş',
+        deger: bekleyenSiparis,
+        ikon: 'liste',
+        ton: 'mavi',
+        rozet: 'Yoğun',
+        detay: `${tohumluSayiUret(`${tohumGovdesi}-bekleyen-detay`, 2, 5)} sipariş bugün onay bekliyor`,
+      },
+      {
+        anahtar: 'vadesiYakinOdeme',
+        baslik: 'Vadesi Yaklaşan Ödeme',
+        deger: vadesiYakinOdeme,
+        ikon: 'cuzdan',
+        ton: 'turuncu',
+        rozet: 'Takip',
+        detay: `${paraFormatla(vadesiYakinTutar)} tahsilat pencerede`,
+      },
+      {
+        anahtar: 'hazirlanacakUrun',
+        baslik: 'Hazırlanmayı Bekleyen Ürün',
+        deger: hazirlanacakUrun,
+        ikon: 'kutu',
+        ton: 'yesil',
+        rozet: 'Depo',
+        detay: `${tohumluSayiUret(`${tohumGovdesi}-hazirlik-detay`, 3, 8)} ürün raf toplamaya girecek`,
+      },
+      {
+        anahtar: 'tedarikBekleyenSiparis',
+        baslik: 'Tedarik Bekleyen Sipariş',
+        deger: tedarikBekleyen,
+        ikon: 'fabrika',
+        ton: 'kirmizi',
+        rozet: 'Tedarik',
+        detay: `${tohumluSayiUret(`${tohumGovdesi}-tedarik-detay`, 1, 4)} sipariş tedarik onayında`,
+      },
+    ]
+  }, [gelenNakitKayitlari.length, gidenNakitKayitlari.length, siparisler.length, urunler.length])
 
   const dashboardOzet = useMemo(() => {
     const referansGun = bugununBaslangiciniGetir()
@@ -396,6 +467,7 @@ export default function useDashboard({
     dashboardBolumGorunurlukDegistir,
     dashboardBolumMenusuAcik,
     dashboardCanliOzetler,
+    bugunkuOncelikler,
     dashboardOzet,
     dashboardYakinSatislar,
     enCokSatilanUrunler,

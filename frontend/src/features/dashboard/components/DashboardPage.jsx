@@ -21,6 +21,7 @@ export default function DashboardPage({
     acikOzetMenusu,
     ozetKartiniSil,
     dashboardCanliOzetler,
+    bugunkuOncelikler,
     enCokSatilanUrunler,
     haftalikSatisGrafikUstSinir,
     haftalikSatisVerisi,
@@ -144,7 +145,7 @@ export default function DashboardPage({
           </section>
         )}
 
-        {(gorunenDashboardBolumleri.haftalik || gorunenDashboardBolumleri.kritik) && (
+        {(gorunenDashboardBolumleri.haftalik || gorunenDashboardBolumleri.kritik || gorunenDashboardBolumleri.oncelikler) && (
           <section className="dashboard-orta-grid">
             {gorunenDashboardBolumleri.haftalik && (
               <>
@@ -243,6 +244,31 @@ export default function DashboardPage({
                         <span>Minimum stok: <strong>{urun.minimumStok}</strong></span>
                         <span>Mevcut: <strong>{urun.magazaStok}</strong></span>
                       </div>
+                    </article>
+                  ))}
+                </div>
+              </article>
+            )}
+
+            {gorunenDashboardBolumleri.oncelikler && (
+              <article className="panel-kart bugunku-oncelikler-paneli">
+                <div className="panel-baslik">
+                  <h2>Bugünkü Öncelikler</h2>
+                  <small>Günlük akış</small>
+                </div>
+
+                <div className="oncelik-grid">
+                  {bugunkuOncelikler.map((oncelik) => (
+                    <article key={oncelik.anahtar} className={`oncelik-karti ${oncelik.ton}`}>
+                      <div className="oncelik-ust">
+                        <span className="oncelik-ikon" aria-hidden="true">
+                          <KucukIkon tip={oncelik.ikon} />
+                        </span>
+                        <span className="oncelik-rozet">{oncelik.rozet}</span>
+                      </div>
+                      <strong>{oncelik.deger}</strong>
+                      <p>{oncelik.baslik}</p>
+                      <small>{oncelik.detay}</small>
                     </article>
                   ))}
                 </div>

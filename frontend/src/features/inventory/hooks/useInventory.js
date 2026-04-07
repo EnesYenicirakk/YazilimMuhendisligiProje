@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { stokDegisimLoglari as baslangicStokDegisimLoglari } from '../../../data/seeds/stockLogs.seed'
 import {
   avatarOlustur,
+  barkodOlustur,
   baslangicUrunleri,
   bosForm,
   bosUrunDuzenlemeFormu,
@@ -11,6 +12,7 @@ import {
 
 const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
+const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, '').toLocaleLowerCase('tr-TR')
 
 export default function useInventory({ toastGoster }) {
   const [urunler, setUrunler] = useState(baslangicUrunleri)
@@ -47,7 +49,7 @@ export default function useInventory({ toastGoster }) {
     return `${yil}-${ay}-${gun} ${saat}:${dakika}`
   }
 
-  const stokLoguEkle = ({ urun, urunId, eskiStok, yeniStok, islem, aciklama }) => {
+  const stokLoguEkle = ({ urun, urunId, eskiStok, yeniStok, islem, aciklama, kullanici = 'Admin' }) => {
     setStokDegisimLoglari((onceki) => [
       {
         id: Date.now() + Math.random(),
@@ -57,7 +59,7 @@ export default function useInventory({ toastGoster }) {
         islem,
         eskiStok,
         yeniStok,
-        kullanici: 'Admin',
+        kullanici,
         aciklama,
       },
       ...onceki,
@@ -89,7 +91,8 @@ export default function useInventory({ toastGoster }) {
       : kategoriyeGore.filter(
           (urun) =>
             urun.ad.toLowerCase().includes(metin) ||
-            urun.urunId.toLowerCase().includes(metin),
+            urun.urunId.toLowerCase().includes(metin) ||
+            barkodMetniniNormalizeEt(urun.barkod).includes(metin),
         )
 
     return favorileriOneTasi(sonuc)
@@ -106,13 +109,14 @@ export default function useInventory({ toastGoster }) {
       : urunler.filter(
           (urun) =>
             urun.ad.toLowerCase().includes(metin) ||
-            urun.urunId.toLowerCase().includes(metin),
+            urun.urunId.toLowerCase().includes(metin) ||
+            barkodMetniniNormalizeEt(urun.barkod).includes(metin),
         )
 
     return favorileriOneTasi(sonuc)
   }, [urunDuzenlemeArama, urunler])
 
-  const barkodAramaMetni = barkodMetni.trim().toLowerCase()
+  const barkodAramaMetni = barkodMetniniNormalizeEt(barkodMetni)
 
   const barkodEslesmeleri = useMemo(() => {
     if (!barkodAramaMetni) return []
@@ -120,6 +124,7 @@ export default function useInventory({ toastGoster }) {
     return urunler
       .filter(
         (urun) =>
+          barkodMetniniNormalizeEt(urun.barkod).includes(barkodAramaMetni) ||
           urun.urunId.toLowerCase().includes(barkodAramaMetni) ||
           urun.ad.toLowerCase().includes(barkodAramaMetni),
       )
@@ -127,7 +132,12 @@ export default function useInventory({ toastGoster }) {
   }, [barkodAramaMetni, urunler])
 
   const barkodSeciliUrun = useMemo(
-    () => barkodEslesmeleri.find((urun) => urun.urunId.toLowerCase() === barkodAramaMetni) ?? barkodEslesmeleri[0] ?? null,
+    () =>
+      barkodEslesmeleri.find(
+        (urun) =>
+          barkodMetniniNormalizeEt(urun.barkod) === barkodAramaMetni ||
+          urun.urunId.toLowerCase() === barkodAramaMetni,
+      ) ?? barkodEslesmeleri[0] ?? null,
     [barkodAramaMetni, barkodEslesmeleri],
   )
 
@@ -228,9 +238,11 @@ export default function useInventory({ toastGoster }) {
     }
 
     if (mod === 'ekle') {
+      const yeniUid = Date.now()
       const yeniUrun = {
-        uid: Date.now(),
+        uid: yeniUid,
         urunId,
+        barkod: barkodOlustur(yeniUid),
         kategori: 'Diğer',
         ad,
         avatar: avatarOlustur(ad),
@@ -261,6 +273,7 @@ export default function useInventory({ toastGoster }) {
     const guncellenenUrun = {
       ...(mevcutUrun ?? {}),
       urunId,
+      barkod: mevcutUrun?.barkod ?? barkodOlustur(seciliUid),
       ad,
       urunAdedi,
       magazaStok,
@@ -377,6 +390,7 @@ export default function useInventory({ toastGoster }) {
     const guncellenenUrun = {
       ...(mevcutUrun ?? {}),
       urunId,
+      barkod: mevcutUrun?.barkod ?? barkodOlustur(urunDuzenlemeUid),
       kategori: mevcutUrun?.kategori ?? 'Diğer',
       ad,
       urunAdedi,
@@ -449,6 +463,42 @@ export default function useInventory({ toastGoster }) {
     )
   }
 
+  const otomatikStokKorumasiniUygula = ({ urunUid, miktar, hedefStok, tedarikciAdi, siparisNo }) => {
+    const siparisMiktari = Number(miktar)
+    if (!Number.isFinite(siparisMiktari) || siparisMiktari <= 0) return null
+
+    const ilgiliUrun = urunler.find((urun) => urun.uid === urunUid)
+    if (!ilgiliUrun) return null
+
+    const yeniStok = ilgiliUrun.magazaStok + siparisMiktari
+
+    setUrunler((onceki) =>
+      onceki.map((urun) =>
+        urun.uid === urunUid
+          ? { ...urun, magazaStok: yeniStok }
+          : urun,
+      ),
+    )
+
+    stokLoguEkle({
+      urun: ilgiliUrun.ad,
+      urunId: ilgiliUrun.urunId,
+      eskiStok: ilgiliUrun.magazaStok,
+      yeniStok,
+      islem: 'Stok artışı',
+      kullanici: 'Sistem',
+      aciklama:
+        `${ilgiliUrun.ad} otomatik tedarik ürünü olduğu için otomatik stok koruması devreye girdi. ` +
+        `${tedarikciAdi ?? 'Atanan tedarikçi'} üzerinden ${siparisMiktari} adet sipariş işlendi` +
+        `${siparisNo ? ` (${siparisNo})` : ''}; stok ${hedefStok ?? yeniStok} seviyesine tamamlandı.`,
+    })
+
+    return {
+      ...ilgiliUrun,
+      magazaStok: yeniStok,
+    }
+  }
+
   const envanterSayfayaGit = (sayfa) => {
     if (sayfa < 1 || sayfa > toplamEnvanterSayfa) return
     setEnvanterSayfa(sayfa)
@@ -499,12 +549,12 @@ export default function useInventory({ toastGoster }) {
     setBarkodMiktari(deger.replace(/[^\d]/g, ''))
   }
 
-  const barkodAdayiniSec = (urun) => {
+  const barkodAdayiniSec = (urun, secenekler = {}) => {
     if (!urun) return
-    setBarkodMetni(urun.urunId)
+    setBarkodMetni(secenekler.barkodMetni ?? urun.urunId ?? urun.barkod)
   }
 
-  const barkodSepeteEkle = (adayUrun = barkodSeciliUrun) => {
+  const barkodSepeteEkle = (adayUrun = barkodSeciliUrun, secenekler = {}) => {
     const miktar = Number(barkodMiktari)
 
     if (!adayUrun) {
@@ -538,6 +588,7 @@ export default function useInventory({ toastGoster }) {
         {
           uid: adayUrun.uid,
           urunId: adayUrun.urunId,
+          barkod: adayUrun.barkod,
           ad: adayUrun.ad,
           kategori: adayUrun.kategori,
           avatar: adayUrun.avatar,
@@ -547,7 +598,11 @@ export default function useInventory({ toastGoster }) {
       ]
     })
 
-    barkodAlanlariniTemizle()
+    if (secenekler.metniKoru) {
+      setBarkodMiktari('1')
+    } else {
+      barkodAlanlariniTemizle()
+    }
     toastGoster?.('basari', `${adayUrun.ad} sepete eklendi.`)
   }
 
@@ -722,6 +777,7 @@ export default function useInventory({ toastGoster }) {
     barkodSepetiniTemizle,
     barkodStoklariniGuncelle,
     favoriDegistir,
+    otomatikStokKorumasiniUygula,
     envanterSayfayaGit,
     urunDuzenlemeSayfayaGit,
     inventoryModallariniKapat,

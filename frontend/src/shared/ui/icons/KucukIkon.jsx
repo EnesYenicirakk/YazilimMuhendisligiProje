@@ -7,6 +7,16 @@ function KucukIkon({ tip }) {
     )
   }
 
+  if (tip === 'otomatik-tedarik') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="m12 3 7 4v5c0 4.4-2.9 7.9-7 9-4.1-1.1-7-4.6-7-9V7l7-4Z" />
+        <path d="M9 12h4" />
+        <path d="m11 10 2 2-2 2" />
+      </svg>
+    )
+  }
+
   if (tip === 'not') {
     return (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

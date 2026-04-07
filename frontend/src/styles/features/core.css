@@ -269,6 +269,90 @@
   }
 }
 
+.login-giris-buton,
+.mobil-menu-dugmesi,
+.mobil-alt-menu-ogesi,
+.menu-link,
+.geri-buton,
+.global-arama-mobil-dugme,
+.bildirim-dugmesi,
+.barkod-dugmesi,
+.ai-yardim-buton,
+.odeme-sekme,
+.urun-ekle-karti,
+.ikon-dugme,
+.siparis-aksiyon-buton,
+.sayfa-buton,
+.sayfa-ok,
+.modal-aksiyon button,
+.fatura-aksiyonlari button,
+.fatura-onizleme-alt button,
+.ozet-menu,
+.ozet-menu-acilir button,
+.bildirim-mini-buton,
+.bildirim-hepsini-temizle,
+.dashboard-bolum-buton,
+.ai-tema-menu button,
+.toast-eylem,
+.toast-kapat {
+  transition:
+    transform 140ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease,
+    filter 180ms ease;
+}
+
+.login-giris-buton:active,
+.mobil-menu-dugmesi:active,
+.mobil-alt-menu-ogesi:active,
+.menu-link:active,
+.geri-buton:active,
+.global-arama-mobil-dugme:active,
+.bildirim-dugmesi:active,
+.barkod-dugmesi:active,
+.ai-yardim-buton:active,
+.odeme-sekme:active,
+.urun-ekle-karti:active,
+.siparis-aksiyon-buton:active,
+.sayfa-buton:active,
+.sayfa-ok:active,
+.modal-aksiyon button:active,
+.fatura-aksiyonlari button:active,
+.fatura-onizleme-alt button:active,
+.ozet-menu:active,
+.ozet-menu-acilir button:active,
+.bildirim-mini-buton:active,
+.bildirim-hepsini-temizle:active,
+.dashboard-bolum-buton:active,
+.ai-tema-menu button:active,
+.toast-eylem:active,
+.toast-kapat:active {
+  transform: scale(0.97);
+  filter: brightness(0.98);
+}
+
+.ikon-dugme:active {
+  transform: scale(0.9);
+  filter: brightness(0.96);
+}
+
+.menu-link:active,
+.odeme-sekme:active,
+.siparis-aksiyon-buton:active,
+.dashboard-bolum-buton:active {
+  box-shadow: inset 0 0 0 999px rgba(34, 103, 184, 0.06);
+}
+
+.urun-ekle-karti:active,
+.login-giris-buton:active,
+.barkod-dugmesi:active,
+.ai-yardim-buton:active {
+  box-shadow: 0 10px 18px rgba(34, 103, 184, 0.14);
+}
+
 @media (hover: none) and (pointer: coarse) {
   .login-giris-buton,
   .mobil-menu-dugmesi,
@@ -297,61 +381,5 @@
   .toast-eylem,
   .toast-kapat {
     -webkit-tap-highlight-color: transparent;
-    transition:
-      transform 140ms ease,
-      background-color 180ms ease,
-      box-shadow 180ms ease,
-      border-color 180ms ease,
-      color 180ms ease,
-      opacity 180ms ease,
-      filter 180ms ease;
-  }
-
-  .login-giris-buton:active,
-  .mobil-menu-dugmesi:active,
-  .mobil-alt-menu-ogesi:active,
-  .menu-link:active,
-  .geri-buton:active,
-  .global-arama-mobil-dugme:active,
-  .bildirim-dugmesi:active,
-  .barkod-dugmesi:active,
-  .ai-yardim-buton:active,
-  .odeme-sekme:active,
-  .urun-ekle-karti:active,
-  .siparis-aksiyon-buton:active,
-  .sayfa-buton:active,
-  .sayfa-ok:active,
-  .modal-aksiyon button:active,
-  .fatura-aksiyonlari button:active,
-  .fatura-onizleme-alt button:active,
-  .ozet-menu:active,
-  .ozet-menu-acilir button:active,
-  .bildirim-mini-buton:active,
-  .bildirim-hepsini-temizle:active,
-  .dashboard-bolum-buton:active,
-  .ai-tema-menu button:active,
-  .toast-eylem:active,
-  .toast-kapat:active {
-    transform: scale(0.97);
-    filter: brightness(0.98);
-  }
-
-  .ikon-dugme:active {
-    transform: scale(0.9);
-    filter: brightness(0.96);
-  }
-
-  .menu-link:active,
-  .odeme-sekme:active,
-  .siparis-aksiyon-buton:active,
-  .dashboard-bolum-buton:active {
-    box-shadow: inset 0 0 0 999px rgba(34, 103, 184, 0.06);
-  }
-
-  .urun-ekle-karti:active,
-  .login-giris-buton:active,
-  .barkod-dugmesi:active,
-  .ai-yardim-buton:active {
-    box-shadow: 0 10px 18px rgba(34, 103, 184, 0.14);
   }
 }

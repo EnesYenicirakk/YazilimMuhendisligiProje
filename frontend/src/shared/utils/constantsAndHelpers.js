@@ -26,9 +26,30 @@ export const gunEtiketiKisalt = (etiket) => {
   return harita[etiket] || etiket.charAt(0) || etiket
 }
 
-export const urunOlustur = (uid, urunId, kategori, ad, urunAdedi, magazaStok, minimumStok, alisFiyati, satisFiyati) => ({
+const barkodKontrolBasamagiHesapla = (govde) => {
+  const toplam = String(govde)
+    .split('')
+    .reduce((akumulator, rakam, index) => {
+      const katsayi = index % 2 === 0 ? 1 : 3
+      return akumulator + Number(rakam) * katsayi
+    }, 0)
+
+  return (10 - (toplam % 10)) % 10
+}
+
+export const barkodOlustur = (kaynak) => {
+  const seriNo = String(kaynak ?? '')
+    .replace(/\D/g, '')
+    .slice(-6)
+    .padStart(6, '0')
+  const govde = `869100${seriNo}`
+  return `${govde}${barkodKontrolBasamagiHesapla(govde)}`
+}
+
+export const urunOlustur = (uid, urunId, kategori, ad, urunAdedi, magazaStok, minimumStok, alisFiyati, satisFiyati, barkod = barkodOlustur(uid)) => ({
   uid,
   urunId,
+  barkod,
   kategori,
   ad,
   avatar: avatarOlustur(ad),
@@ -124,6 +145,7 @@ export const dashboardBolumSablonu = [
   { anahtar: 'canli', etiket: 'Canlı Özetler' },
   { anahtar: 'haftalik', etiket: 'Haftalık Grafik ve En Çok Satanlar' },
   { anahtar: 'kritik', etiket: 'Kritik Stok Uyarısı' },
+  { anahtar: 'oncelikler', etiket: 'Bugünkü Öncelikler' },
   { anahtar: 'yakin', etiket: 'Yakın Zamanda Satılan Ürünler' },
   { anahtar: 'altGrafikler', etiket: 'Alt Grafikler' },
 ]

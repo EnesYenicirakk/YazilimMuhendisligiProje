@@ -1,0 +1,304 @@
+﻿/* Orders feature styles */
+
+/* Order actions */
+.siparis-yeni-buton {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(90deg, #1f61b8, #2f7dd6);
+  cursor: pointer;
+}
+
+/* Order action buttons */
+.siparis-aksiyon-buton {
+  border: 1px solid #cfe0f7;
+  background: linear-gradient(180deg, #f8fbff 0%, #edf4ff 100%);
+  color: #2d578a;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.siparis-aksiyon-buton.ikincil {
+  background: #fff;
+}
+
+.siparis-aksiyon-buton.tehlike {
+  border-color: #f1c5cb;
+  background: #fff0f2;
+  color: #ba3340;
+}
+
+/* Order filters */
+.siparis-kontrol {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.siparis-kontrol input,
+.siparis-kontrol select {
+  border: 1px solid #d6e4f5;
+  background: #f8fbff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #324a65;
+  font: inherit;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.siparis-kontrol input {
+  flex: 1;
+}
+
+.siparis-kontrol select {
+  width: 190px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3 5.25L7 9.25L11 5.25' stroke='%235f7793' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+  padding-right: 42px;
+  cursor: pointer;
+}
+
+.siparis-kontrol input:focus,
+.siparis-kontrol select:focus {
+  outline: none;
+  border-color: #b9d3f1;
+  box-shadow: 0 0 0 4px rgba(47, 125, 214, 0.12);
+  background-color: #ffffff;
+}
+
+/* Order mobile cards */
+.siparis-mobil-kart .mobil-kart-govde {
+  gap: 10px;
+}
+
+.siparis-detay-satiri {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: start;
+  align-items: start;
+  gap: 4px;
+  padding-top: 10px;
+}
+
+.siparis-detay-satiri span {
+  color: #6a7f97;
+  font-size: 0.76rem;
+}
+
+.siparis-detay-satiri strong {
+  width: 100%;
+  color: #203247;
+  font-size: 0.92rem;
+  text-align: left;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.siparis-detay-satiri .odeme-durumu {
+  display: inline-flex;
+}
+
+.siparis-islemleri {
+  flex-wrap: wrap;
+}
+
+.siparis-mobil-aksiyonlari {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+
+.siparis-detay-icerik {
+  gap: 0;
+}
+
+/* Order header and activity cards */
+.siparisler-baslik {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.siparisler-kart {
+  padding: 14px;
+}
+
+.siparis-aktivite-kartlari {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.siparis-aktivite-karti {
+  border: 1px solid #d9e7f7;
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px 12px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  box-shadow: 0 2px 6px rgba(30, 68, 120, 0.06);
+}
+
+.siparis-aktivite-karti .sayi {
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.siparis-aktivite-karti .sayi.mavi {
+  color: #2f7dd6;
+}
+
+.siparis-aktivite-karti .sayi.kirmizi {
+  color: #d1434f;
+}
+
+.siparis-aktivite-karti .sayi.yesil {
+  color: #1ea96d;
+}
+
+.siparis-aktivite-karti small {
+  color: #8092a8;
+  font-size: 0.78rem;
+}
+
+.siparis-aktivite-karti p {
+  margin: 4px 0 0;
+  color: #3a4f67;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+/* Order status badges */
+.durum-baloncuk {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.durum-yolda {
+  color: #184f99;
+  background: #e6f0ff;
+  border-color: #bdd8ff;
+}
+
+.durum-hazirlaniyor {
+  color: #8a6b00;
+  background: #fff7db;
+  border-color: #f3dd90;
+}
+
+.durum-teslim {
+  color: #1d7e4f;
+  background: #e6f7ef;
+  border-color: #b9e9d1;
+}
+
+.siparis-mobil-kart .swipe-aksiyon-buton {
+  min-width: 72px;
+}
+
+@media (max-width: 900px) {
+  .siparis-aktivite-kartlari {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .siparis-aktivite-karti {
+    min-height: 96px;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'sayi birim'
+      'sayi baslik';
+    justify-items: start;
+    align-items: center;
+    align-content: center;
+    gap: 4px 14px;
+    padding: 14px 16px;
+  }
+
+  .siparis-aktivite-karti .sayi {
+    grid-area: sayi;
+    text-align: left;
+    font-size: 2rem;
+  }
+
+  .siparis-aktivite-karti small {
+    grid-area: birim;
+    text-align: left;
+    align-self: end;
+  }
+
+  .siparis-aktivite-karti p {
+    grid-area: baslik;
+    text-align: left;
+    margin: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .siparisler-kart {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .siparis-kontrol {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .siparis-aktivite-kartlari {
+    grid-template-columns: 1fr;
+  }
+
+  .siparis-aktivite-karti {
+    min-height: 88px;
+    padding: 12px 14px;
+    gap: 2px 12px;
+  }
+
+  .siparis-aktivite-karti .sayi {
+    font-size: 1.75rem;
+  }
+
+  .siparis-aktivite-karti p {
+    font-size: 0.83rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .siparis-mobil-aksiyonlari {
+    grid-template-columns: 1fr;
+  }
+
+  .ust-baslik,
+  .siparisler-baslik,
+  .envanter-baslik {
+    gap: 12px;
+  }
+}

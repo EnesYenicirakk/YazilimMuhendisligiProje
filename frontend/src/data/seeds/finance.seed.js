@@ -1,0 +1,51 @@
+﻿const gelenNakitKayitlari = [
+  { odemeNo: 'GN-5001', taraf: 'Yıldız Oto', tarih: '2026-03-11', durum: 'Tahsil Edildi', tutar: 94500 },
+  { odemeNo: 'GN-5002', taraf: 'Tekin Otomotiv', tarih: '2026-03-10', durum: 'Tahsil Edildi', tutar: 88200 },
+  { odemeNo: 'GN-5003', taraf: 'Mert Motor', tarih: '2026-03-10', durum: 'Tahsil Edildi', tutar: 76400 },
+  { odemeNo: 'GN-5004', taraf: 'Hızlı Servis', tarih: '2026-03-09', durum: 'Tahsil Edildi', tutar: 69250 },
+  { odemeNo: 'GN-5005', taraf: 'Asil Sanayi', tarih: '2026-03-09', durum: 'Tahsil Edildi', tutar: 101300 },
+  { odemeNo: 'GN-5006', taraf: 'Nehir Otomotiv', tarih: '2026-03-08', durum: 'Tahsil Edildi', tutar: 57300 },
+  { odemeNo: 'GN-5007', taraf: 'Akın Oto', tarih: '2026-03-08', durum: 'Tahsil Edildi', tutar: 66400 },
+  { odemeNo: 'GN-5008', taraf: 'Demir Oto', tarih: '2026-03-07', durum: 'Tahsil Edildi', tutar: 81250 },
+  { odemeNo: 'GN-5009', taraf: 'Kaya Oto Servis', tarih: '2026-03-07', durum: 'Tahsil Edildi', tutar: 53890 },
+  { odemeNo: 'GN-5010', taraf: 'Bora Yedek Parça', tarih: '2026-03-06', durum: 'Tahsil Edildi', tutar: 73400 },
+  { odemeNo: 'GN-5011', taraf: 'Gürkan Oto', tarih: '2026-03-06', durum: 'Tahsil Edildi', tutar: 68500 },
+  { odemeNo: 'GN-5012', taraf: 'Yaman Yedek', tarih: '2026-03-05', durum: 'Tahsil Edildi', tutar: 49700 },
+  { odemeNo: 'GN-5013', taraf: 'Volkan Oto', tarih: '2026-03-05', durum: 'Tahsil Edildi', tutar: 62900 },
+  { odemeNo: 'GN-5014', taraf: 'Acar Endüstri', tarih: '2026-03-04', durum: 'Tahsil Edildi', tutar: 91800 },
+  { odemeNo: 'GN-5015', taraf: 'Baran Ticaret', tarih: '2026-03-04', durum: 'Tahsil Edildi', tutar: 57200 },
+  { odemeNo: 'GN-5016', taraf: 'Uzman Oto', tarih: '2026-03-03', durum: 'Tahsil Edildi', tutar: 68700 },
+  { odemeNo: 'GN-5017', taraf: 'Özkan Parça', tarih: '2026-03-03', durum: 'Tahsil Edildi', tutar: 74200 },
+  { odemeNo: 'GN-5018', taraf: 'Merkez Lojistik', tarih: '2026-03-02', durum: 'Tahsil Edildi', tutar: 55650 },
+  { odemeNo: 'GN-5019', taraf: 'Delta Motor', tarih: '2026-03-02', durum: 'Tahsil Edildi', tutar: 63300 },
+  { odemeNo: 'GN-5020', taraf: 'Sistem Otomotiv', tarih: '2026-03-01', durum: 'Tahsil Edildi', tutar: 87900 },
+]
+
+const gidenNakitKayitlari = [
+  { odemeNo: 'GD-7001', taraf: 'Anadolu Çelik', tarih: '2026-03-11', durum: 'Ödendi', tutar: 26800 },
+  { odemeNo: 'GD-7002', taraf: 'Beta Lojistik', tarih: '2026-03-10', durum: 'Ödendi', tutar: 31900 },
+  { odemeNo: 'GD-7003', taraf: 'Mavi Enerji', tarih: '2026-03-10', durum: 'Ödendi', tutar: 24150 },
+  { odemeNo: 'GD-7004', taraf: 'Yıldız Plastik', tarih: '2026-03-09', durum: 'Ödendi', tutar: 37200 },
+  { odemeNo: 'GD-7005', taraf: 'Eksen Makine', tarih: '2026-03-09', durum: 'Ödendi', tutar: 29500 },
+  { odemeNo: 'GD-7006', taraf: 'Poyraz Nakliyat', tarih: '2026-03-08', durum: 'Ödendi', tutar: 28400 },
+  { odemeNo: 'GD-7007', taraf: 'Kuzey Kimya', tarih: '2026-03-08', durum: 'Ödendi', tutar: 33600 },
+  { odemeNo: 'GD-7008', taraf: 'Arel Teknik', tarih: '2026-03-07', durum: 'Ödendi', tutar: 31100 },
+  { odemeNo: 'GD-7009', taraf: 'Toros Kargo', tarih: '2026-03-07', durum: 'Ödendi', tutar: 22300 },
+  { odemeNo: 'GD-7010', taraf: 'Merkez Kira', tarih: '2026-03-06', durum: 'Ödendi', tutar: 45200 },
+  { odemeNo: 'GD-7011', taraf: 'Bilişim Destek', tarih: '2026-03-06', durum: 'Ödendi', tutar: 18800 },
+  { odemeNo: 'GD-7012', taraf: 'İş Güvenliği AŞ', tarih: '2026-03-05', durum: 'Ödendi', tutar: 21200 },
+  { odemeNo: 'GD-7013', taraf: 'Motor Test Lab', tarih: '2026-03-05', durum: 'Ödendi', tutar: 27400 },
+  { odemeNo: 'GD-7014', taraf: 'Atılım Danışmanlık', tarih: '2026-03-04', durum: 'Ödendi', tutar: 19600 },
+  { odemeNo: 'GD-7015', taraf: 'Özgür Reklam', tarih: '2026-03-04', durum: 'Ödendi', tutar: 16400 },
+  { odemeNo: 'GD-7016', taraf: 'Kule Sigorta', tarih: '2026-03-03', durum: 'Ödendi', tutar: 25750 },
+  { odemeNo: 'GD-7017', taraf: 'Duru Temizlik', tarih: '2026-03-03', durum: 'Ödendi', tutar: 14600 },
+  { odemeNo: 'GD-7018', taraf: 'Sunucu Bulut', tarih: '2026-03-02', durum: 'Ödendi', tutar: 17350 },
+  { odemeNo: 'GD-7019', taraf: 'Koçak Akaryakıt', tarih: '2026-03-02', durum: 'Ödendi', tutar: 29800 },
+  { odemeNo: 'GD-7020', taraf: 'Asya Ambalaj', tarih: '2026-03-01', durum: 'Ödendi', tutar: 20500 },
+]
+
+export {
+  gelenNakitKayitlari,
+  gidenNakitKayitlari,
+}
+

@@ -1,4 +1,4 @@
-# Yazılım Mühendisliği Projesi
+﻿# Yazılım Mühendisliği Projesi
 
 Bu proje **Laravel (Backend)** ve **React / Vite (Frontend)** kullanılarak geliştirilmektedir. Veritabanı olarak **MAMP üzerinden MySQL** kullanılmaktadır.
 
@@ -102,3 +102,12 @@ Terminal'de size verilen yerel adresi (Genellikle `http://localhost:5173/`) tara
 3. Diğer bir terminal sekmesinde `frontend` klasörüne gidip **`npm run dev`** komutuyla React'i başlatın.
 
 Kodlamaya hazırsınız! İyi çalışmalar ekibim! 🎉
+
+---
+
+## Frontend Giris Bilgileri
+
+Login ekrani test bilgileri:
+
+- Kullanici adi: `admin`
+- Sifre: `admin123`

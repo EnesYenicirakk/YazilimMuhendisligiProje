@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="56" fill="#1f2d66"/>
+  <circle cx="60" cy="60" r="41" fill="#0b1b40" stroke="#1eb1df" stroke-width="2"/>
+  <polygon points="60,28 82,50 60,72 38,50" fill="#2a3f87" stroke="#1eb1df" stroke-width="1.5"/>
+  <text x="60" y="56" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#e9f3ff" font-weight="700">YTÜ</text>
+  <text x="60" y="105" text-anchor="middle" font-size="8" font-family="Segoe UI, Arial, sans-serif" fill="#f3f7ff" font-weight="700">MALATYA TURGUT ÖZAL ÜNİVERSİTESİ</text>
+</svg>

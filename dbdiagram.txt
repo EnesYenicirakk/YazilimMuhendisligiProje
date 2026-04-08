@@ -1,0 +1,138 @@
+// 1. Projenin Amacı:
+// Otomotiv Yedek Parça Envanter, Satış, Tedarik ve Faturalama Yönetim Sistemi
+// (Freelancer iş takip platformu şablonu yerine kendi projenize en uygun sanayi/stok otomasyonu için uyarlandı.)
+
+// 2. Temel Aktörler ve Nesneler:
+// Aktörler: Kullanıcılar (Sistem Yönetimi), Müşteriler, Tedarikçiler
+// Nesneler: Ürünler (Envanter), Siparişler (Müşteri ve Tedarik), Faturalar (Alış ve Satış), Ödemeler (Gelen/Giden Nakit)
+
+// 3. Kritik Akış (İlişkisel Mantık):
+// - Bir müşteri birden fazla sipariş verebilir (1:N).
+// - Bir siparişte birden fazla ürün bulunabilir, bir ürün birden fazla siparişte olabilir (Sipariş Detayları tablosu üzerinden N:M).
+// - Müşterilere satış faturası, tedarikçilere alış faturası kesilir.
+// - Her fatura birden çok kalem/satır içerebilir (1:N).
+// - Bir ödeme bir faturayı karşılıyorsa 1:1 ilişki kurulur.
+
+// 4. dbdiagram.io (DSL) Kodu:
+
+Table Users {
+  id int [pk, increment]
+  username varchar [not null, unique]
+  password_hash varchar [not null]
+  role varchar [not null, default: "admin"]
+  created_at timestamp [default: `now()`]
+}
+
+Table Customers {
+  id int [pk, increment]
+  full_name varchar [not null]
+  phone varchar [unique]
+  email varchar
+  address text
+  tax_number varchar
+  last_purchase_date date
+  notes text
+  created_at timestamp [default: `now()`]
+}
+
+Table Suppliers {
+  id int [pk, increment]
+  company_name varchar [not null]
+  contact_person varchar
+  phone varchar [unique]
+  email varchar
+  address text
+  tax_number varchar
+  product_group varchar
+  created_at timestamp [default: `now()`]
+}
+
+Table Categories {
+  id int [pk, increment]
+  name varchar [not null, unique]
+}
+
+Table Products {
+  id int [pk, increment]
+  sku varchar [not null, unique, note: "Stok kodu örn: MTR-2001"]
+  category_id int [ref: > Categories.id]
+  name varchar [not null]
+  stock_quantity int [default: 0]
+  store_stock int [default: 0]
+  minimum_stock int [default: 10]
+  purchase_price decimal [not null]
+  sale_price decimal [not null]
+  is_favorite boolean [default: false]
+  created_at timestamp [default: `now()`]
+}
+
+Table CustomerOrders {
+  id int [pk, increment]
+  customer_id int [not null, ref: > Customers.id]
+  total_amount decimal [not null]
+  order_date timestamp [default: `now()`]
+  payment_status varchar [note: "Beklemede, Ödendi vb."]
+  preparation_status varchar [note: "Hazırlanıyor, Sevk Edildi vb."]
+  delivery_status varchar
+}
+
+Table CustomerOrderItems {
+  id int [pk, increment]
+  order_id int [ref: > CustomerOrders.id]
+  product_id int [ref: > Products.id]
+  quantity int [not null, default: 1]
+  unit_price decimal [not null]
+}
+
+Table SupplierOrders {
+  id int [pk, increment]
+  supplier_id int [ref: > Suppliers.id]
+  order_number varchar [unique]
+  total_amount decimal
+  order_date date
+  status varchar [default: "Bekliyor"]
+}
+
+Table SupplierOrderItems {
+  id int [pk, increment]
+  supplier_order_id int [ref: > SupplierOrders.id]
+  product_id int [ref: > Products.id]
+  quantity int [not null]
+  unit_price decimal [not null]
+}
+
+Table Invoices {
+  id int [pk, increment]
+  invoice_number varchar [unique, not null]
+  type varchar [not null, note: "Satış Faturası veya Alış Faturası"]
+  customer_id int [ref: > Customers.id, note: "Eğer Satış ise dolu"]
+  supplier_id int [ref: > Suppliers.id, note: "Eğer Alış ise dolu"]
+  issue_date date [not null]
+  due_date date
+  status varchar [default: "Taslak"]
+  sub_total decimal
+  tax_total decimal
+  grand_total decimal
+  notes text
+}
+
+Table InvoiceItems {
+  id int [pk, increment]
+  invoice_id int [ref: > Invoices.id]
+  product_id int [ref: > Products.id]
+  quantity int [not null]
+  unit_price decimal [not null]
+  tax_rate decimal [default: 0.2]
+}
+
+Table Payments {
+  id int [pk, increment]
+  type varchar [not null, note: "Gelen veya Giden"]
+  amount decimal [not null]
+  payment_date date [not null]
+  customer_id int [ref: > Customers.id]
+  supplier_id int [ref: > Suppliers.id]
+  invoice_id int [unique, ref: - Invoices.id, note: "1:1 ilişki, ödeme hangi faturaya ait"]
+  status varchar
+  description text
+}

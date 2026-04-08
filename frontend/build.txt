@@ -1,0 +1,118 @@
+﻿
+> frontend@0.0.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 12 modules transformed.
+node.exe : [31mx[39m 
+Build failed in 165ms
+At line:1 char:1
++ & "C:\Program Files\n
+odejs/node.exe" "C:\Pro
+gram Files\nodejs/node_
+mo ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([31mx[39m B   
+ uild failed in 165    
+ms:String) [], Rem    o
+teException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[31merror during build
+:
+[31m[vite]: Rollup fai
+led to resolve import "
+html2canvas" from "C:/U
+sers/enes_/OneDrive/Mas
+a├╝st├╝/Project/Yazilim
+MuhendisligiProje/front
+end/src/App.jsx".
+This is most likely uni
+ntended because it can 
+break your application 
+at runtime.
+If you do want to exter
+nalize this module expl
+icitly add it to
+`build.rollupOptions.ex
+ternal`[31m
+    at viteWarn (file:/
+//C:/Users/enes_/OneDri
+ve/Masa%C3%BCst%C3%BC/P
+roject/YazilimMuhendisl
+igiProje/frontend/node_
+modules/vite/dist/node/
+chunks/dep-BK3b2jBa.js:
+65855:17)
+    at onwarn (file:///
+C:/Users/enes_/OneDrive
+/Masa%C3%BCst%C3%BC/Pro
+ject/YazilimMuhendislig
+iProje/frontend/node_mo
+dules/@vitejs/plugin-re
+act/dist/index.js:90:7)
+    at onRollupWarning 
+(file:///C:/Users/enes_
+/OneDrive/Masa%C3%BCst%
+C3%BC/Project/YazilimMu
+hendisligiProje/fronten
+d/node_modules/vite/dis
+t/node/chunks/dep-BK3b2
+jBa.js:65885:5)
+    at onwarn (file:///
+C:/Users/enes_/OneDrive
+/Masa%C3%BCst%C3%BC/Pro
+ject/YazilimMuhendislig
+iProje/frontend/node_mo
+dules/vite/dist/node/ch
+unks/dep-BK3b2jBa.js:65
+550:7)
+    at file:///C:/Users
+/enes_/OneDrive/Masa%C3
+%BCst%C3%BC/Project/Yaz
+ilimMuhendisligiProje/f
+rontend/node_modules/ro
+llup/dist/es/shared/nod
+e-entry.js:20995:13
+    at Object.logger [a
+s onLog] (file:///C:/Us
+ers/enes_/OneDrive/Masa
+%C3%BCst%C3%BC/Project/
+YazilimMuhendisligiProj
+e/frontend/node_modules
+/rollup/dist/es/shared/
+node-entry.js:22968:9)
+    at ModuleLoader.han
+dleInvalidResolvedId (f
+ile:///C:/Users/enes_/O
+neDrive/Masa%C3%BCst%C3
+%BC/Project/YazilimMuhe
+ndisligiProje/frontend/
+node_modules/rollup/dis
+t/es/shared/node-entry.
+js:21712:26)
+    at ModuleLoader.res
+olveDynamicImport (file
+:///C:/Users/enes_/OneD
+rive/Masa%C3%BCst%C3%BC
+/Project/YazilimMuhendi
+sligiProje/frontend/nod
+e_modules/rollup/dist/e
+s/shared/node-entry.js:
+21770:58)
+    at async file:///C:
+/Users/enes_/OneDrive/M
+asa%C3%BCst%C3%BC/Proje
+ct/YazilimMuhendisligiP
+roje/frontend/node_modu
+les/rollup/dist/es/shar
+ed/node-entry.js:21654:
+32[39m

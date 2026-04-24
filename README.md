@@ -1,4 +1,4 @@
-﻿# Yazılım Mühendisliği Projesi
+# Yazılım Mühendisliği Projesi
 
 Bu proje **Laravel (Backend)** ve **React / Vite (Frontend)** kullanılarak geliştirilmektedir. Veritabanı olarak **MAMP üzerinden MySQL** kullanılmaktadır.
 
@@ -111,3 +111,27 @@ Login ekrani test bilgileri:
 
 - Kullanici adi: `admin`
 - Sifre: `admin123`
+
+---
+
+## 📸 Ekran Görüntüleri
+
+Aşağıda projeye ait bazı ekran görüntülerini inceleyebilirsiniz:
+
+### 1. Giriş Ekranı (Login)
+![Login Ekranı](docs_assets/01_login.png)
+
+### 2. Merkez / Ana Menü
+![Merkez / Ana Menü](docs_assets/02_dashboard.png)
+
+### 3. Dashboard / Özet
+![Dashboard / Özet](docs_assets/03_dashboard_details.png)
+
+### 4. Envanter Yönetimi
+![Envanter Yönetimi](docs_assets/04_envanter.png)
+
+### 5. Siparişler
+![Siparişler](docs_assets/05_siparisler.png)
+
+### 6. Müşteriler
+![Müşteriler](docs_assets/06_musteriler.png)

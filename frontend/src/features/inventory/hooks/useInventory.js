@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
-import { stokDegisimLoglari as baslangicStokDegisimLoglari } from '../../../data/seeds/stockLogs.seed'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import api from '../../../core/api/apiClient'
 import {
   avatarOlustur,
   barkodOlustur,
-  baslangicUrunleri,
   bosForm,
   bosUrunDuzenlemeFormu,
   favorileriOneTasi,
@@ -14,9 +13,11 @@ const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
 const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, '').toLocaleLowerCase('tr-TR')
 
-export default function useInventory({ toastGoster }) {
-  const [urunler, setUrunler] = useState(baslangicUrunleri)
-  const [stokDegisimLoglari, setStokDegisimLoglari] = useState(() => [...baslangicStokDegisimLoglari])
+export default function useInventory({ toastGoster, isLoggedIn }) {
+  const [urunler, setUrunler] = useState([])
+  const [stokDegisimLoglari, setStokDegisimLoglari] = useState([])
+  const [yukleniyor, setYukleniyor] = useState(true)
+
   const [aramaMetni, setAramaMetni] = useState('')
   const [envanterKategori, setEnvanterKategori] = useState('Tümü')
   const [envanterSayfa, setEnvanterSayfa] = useState(1)
@@ -48,6 +49,59 @@ export default function useInventory({ toastGoster }) {
     const dakika = String(tarih.getMinutes()).padStart(2, '0')
     return `${yil}-${ay}-${gun} ${saat}:${dakika}`
   }
+
+  // Backend'den ürünleri ve stok loglarını yükle
+  const urunleriFetchle = useCallback(async () => {
+    try {
+      const data = await api.get('/products')
+      const urunListesi = (data?.data ?? data ?? []).map((u) => ({
+        uid: u.uid,
+        urunId: u.urunId,
+        barkod: u.barkod,
+        kategori: u.kategori ?? 'Diğer',
+        kategoriId: u.kategoriId,
+        ad: u.ad,
+        avatar: u.avatar,
+        urunAdedi: u.urunAdedi ?? 0,
+        magazaStok: u.magazaStok ?? 0,
+        minimumStok: u.minimumStok ?? 10,
+        alisFiyati: u.alisFiyati ?? 0,
+        satisFiyati: u.satisFiyati ?? 0,
+        favori: u.favori ?? false,
+      }))
+      setUrunler(urunListesi)
+    } catch {
+      toastGoster?.('hata', 'Ürünler yüklenirken hata oluştu.')
+    }
+  }, [toastGoster])
+
+  const stokLoglariFetchle = useCallback(async () => {
+    try {
+      const data = await api.get('/stock-logs')
+      const logListesi = (data?.data ?? data ?? []).map((l) => ({
+        id: l.uid,
+        tarih: l.tarih,
+        urun: l.urun,
+        urunId: l.urunId,
+        islem: l.islem,
+        eskiStok: l.eskiStok,
+        yeniStok: l.yeniStok,
+        kullanici: l.kullanici ?? 'Admin',
+        aciklama: l.aciklama,
+      }))
+      setStokDegisimLoglari(logListesi)
+    } catch {
+      // Stok log hatası sessiz geçsin
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+    setYukleniyor(true)
+    Promise.all([urunleriFetchle(), stokLoglariFetchle()]).finally(() =>
+      setYukleniyor(false),
+    )
+  }, [isLoggedIn, urunleriFetchle, stokLoglariFetchle])
 
   const stokLoguEkle = ({ urun, urunId, eskiStok, yeniStok, islem, aciklama, kullanici = 'Admin' }) => {
     setStokDegisimLoglari((onceki) => [
@@ -212,7 +266,7 @@ export default function useInventory({ toastGoster }) {
     formuTemizle()
   }
 
-  const formKaydet = (mod) => {
+  const formKaydet = async (mod) => {
     const urunId = form.urunId.trim()
     const ad = form.ad.trim()
     const urunAdedi = Number(form.urunAdedi)
@@ -223,118 +277,64 @@ export default function useInventory({ toastGoster }) {
       toastGoster?.('hata', 'Ürün bilgileri eksik veya hatalı görünüyor.')
       return
     }
-
     if (negatifSayiVarMi(urunAdedi, magazaStok, minimumStok)) {
       toastGoster?.('hata', 'Ürün adedi ve stok alanları negatif olamaz.')
       return
     }
 
-    const tekrarEdenUrunId = urunler.some(
-      (urun) => urun.urunId.toLowerCase() === urunId.toLowerCase() && (mod === 'ekle' || urun.uid !== seciliUid),
-    )
-    if (tekrarEdenUrunId) {
-      toastGoster?.('hata', `${urunId} ürün ID'si zaten kullanılıyor.`)
-      return
-    }
-
-    if (mod === 'ekle') {
-      const yeniUid = Date.now()
-      const yeniUrun = {
-        uid: yeniUid,
-        urunId,
-        barkod: barkodOlustur(yeniUid),
-        kategori: 'Diğer',
-        ad,
-        avatar: avatarOlustur(ad),
-        urunAdedi,
-        magazaStok,
-        minimumStok,
-        alisFiyati: 0,
-        satisFiyati: 0,
-        favori: false,
+    try {
+      if (mod === 'ekle') {
+        const yanit = await api.post('/products', {
+          sku: urunId, name: ad, stock_quantity: urunAdedi,
+          store_stock: magazaStok, minimum_stock: magazaStok,
+          category_id: 7, // Diğer — kullanıcı sonradan değiştirebilir
+        })
+        const yeni = yanit?.data ?? yanit
+        const yeniUrun = {
+          uid: yeni.uid, urunId: yeni.urunId, barkod: yeni.barkod,
+          kategori: yeni.kategori ?? 'Diğer', kategoriId: yeni.kategoriId,
+          ad: yeni.ad, avatar: yeni.avatar ?? avatarOlustur(ad),
+          urunAdedi: yeni.urunAdedi ?? urunAdedi, magazaStok: yeni.magazaStok ?? magazaStok,
+          minimumStok: yeni.minimumStok ?? minimumStok, alisFiyati: 0, satisFiyati: 0, favori: false,
+        }
+        setUrunler((p) => [yeniUrun, ...p])
+        eklemePenceresiniKapat()
+        setEnvanterSayfa(1)
+        toastGoster?.('basari', `${ad} envantere eklendi.`)
+      } else {
+        const mevcutUrun = urunler.find((u) => u.uid === seciliUid)
+        await api.put(`/products/${seciliUid}`, {
+          sku: urunId, name: ad, stock_quantity: urunAdedi,
+          store_stock: magazaStok, minimum_stock: minimumStok,
+        })
+        const guncellenenUrun = { ...(mevcutUrun ?? {}), urunId, ad, urunAdedi, magazaStok, minimumStok, avatar: avatarOlustur(ad) }
+        setUrunler((p) => p.map((u) => (u.uid === seciliUid ? guncellenenUrun : u)))
+        stokDegisimiLogla({
+          oncekiUrun: mevcutUrun,
+          sonrakiUrun: guncellenenUrun,
+          artisMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet artırıldı.`,
+          dususMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet azaltıldı.`,
+        })
+        duzenlemePenceresiniKapat()
+        toastGoster?.('basari', `${ad} bilgileri güncellendi.`)
       }
-
-      setUrunler((onceki) => [yeniUrun, ...onceki])
-      stokLoguEkle({
-        urun: yeniUrun.ad,
-        urunId: yeniUrun.urunId,
-        eskiStok: 0,
-        yeniStok: yeniUrun.magazaStok,
-        islem: 'Stok artışı',
-        aciklama: `${yeniUrun.magazaStok} adet başlangıç stokuyla envantere eklendi.`,
-      })
-      eklemePenceresiniKapat()
-      setEnvanterSayfa(1)
-      toastGoster?.('basari', `${ad} envantere eklendi.`)
-      return
+    } catch {
+      toastGoster?.('hata', 'İşlem sırasında hata oluştu.')
     }
-
-    const mevcutUrun = urunler.find((urun) => urun.uid === seciliUid)
-    const guncellenenUrun = {
-      ...(mevcutUrun ?? {}),
-      urunId,
-      barkod: mevcutUrun?.barkod ?? barkodOlustur(seciliUid),
-      ad,
-      urunAdedi,
-      magazaStok,
-      minimumStok,
-      avatar: avatarOlustur(ad),
-    }
-
-    setUrunler((onceki) =>
-      onceki.map((urun) => {
-        if (urun.uid !== seciliUid) return urun
-        return guncellenenUrun
-      }),
-    )
-
-    stokDegisimiLogla({
-      oncekiUrun: mevcutUrun,
-      sonrakiUrun: guncellenenUrun,
-      artisMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet artırıldı.`,
-      dususMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet azaltıldı.`,
-    })
-
-    duzenlemePenceresiniKapat()
-    toastGoster?.('basari', `${ad} bilgileri güncellendi.`)
   }
 
-  const urunSil = () => {
+  const urunSil = async () => {
     if (!silinecekUrun) return
     const silinenUrun = { ...silinecekUrun }
     const silinenAd = silinenUrun.ad
-    const silinenIndex = urunler.findIndex((urun) => urun.uid === silinenUrun.uid)
-    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinenUrun.uid))
-    stokLoguEkle({
-      urun: silinenUrun.ad,
-      urunId: silinenUrun.urunId,
-      eskiStok: silinenUrun.magazaStok,
-      yeniStok: 0,
-      islem: 'Ürün silindi',
-      aciklama: `${silinenUrun.magazaStok} adet stokla envanterden kaldırıldı.`,
-    })
-    setSilinecekUrun(null)
-    toastGoster?.('basari', `${silinenAd} envanterden silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setUrunler((onceki) => {
-          if (onceki.some((urun) => urun.uid === silinenUrun.uid)) return onceki
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenUrun)
-          return yeni
-        })
-        stokLoguEkle({
-          urun: silinenUrun.ad,
-          urunId: silinenUrun.urunId,
-          eskiStok: 0,
-          yeniStok: silinenUrun.magazaStok,
-          islem: 'Stok artışı',
-          aciklama: 'Silme işlemi geri alındı ve ürün yeniden envantere eklendi.',
-        })
-        toastGoster?.('basari', `${silinenAd} geri alındı.`)
-      },
-    })
+    try {
+      await api.delete(`/products/${silinenUrun.uid}`)
+      setUrunler((p) => p.filter((u) => u.uid !== silinenUrun.uid))
+      setSilinecekUrun(null)
+      toastGoster?.('basari', `${silinenAd} envanterden silindi.`)
+    } catch {
+      toastGoster?.('hata', 'Ürün silinirken hata oluştu.')
+    }
   }
 
   const urunDuzenlemeModaliniAc = (urun) => {
@@ -360,7 +360,7 @@ export default function useInventory({ toastGoster }) {
     setUrunDuzenlemeFormu((onceki) => ({ ...onceki, [alan]: deger }))
   }
 
-  const urunDuzenlemeKaydet = () => {
+  const urunDuzenlemeKaydet = async () => {
     const urunId = urunDuzenlemeFormu.urunId.trim()
     const ad = urunDuzenlemeFormu.ad.trim()
     const urunAdedi = Number(urunDuzenlemeFormu.urunAdedi)
@@ -781,5 +781,7 @@ export default function useInventory({ toastGoster }) {
     envanterSayfayaGit,
     urunDuzenlemeSayfayaGit,
     inventoryModallariniKapat,
+    yukleniyor,
+    urunleriFetchle,
   }
 }

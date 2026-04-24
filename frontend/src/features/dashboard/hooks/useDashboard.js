@@ -10,7 +10,10 @@ import {
   teslimatGununuCoz,
 } from '../../../shared/utils/constantsAndHelpers'
 
+const gecerliTarihMi = (t) => t && t instanceof Date && !Number.isNaN(t.getTime())
+
 const formatYmd = (tarih) => {
+  if (!gecerliTarihMi(tarih)) return '1970-01-01'
   const yil = tarih.getFullYear()
   const ay = String(tarih.getMonth() + 1).padStart(2, '0')
   const gun = String(tarih.getDate()).padStart(2, '0')
@@ -18,12 +21,14 @@ const formatYmd = (tarih) => {
 }
 
 const formatAyAnahtari = (tarih) => {
+  if (!gecerliTarihMi(tarih)) return '1970-01'
   const yil = tarih.getFullYear()
   const ay = String(tarih.getMonth() + 1).padStart(2, '0')
   return `${yil}-${ay}`
 }
 
 const formatAyEtiketi = (tarih) => {
+  if (!gecerliTarihMi(tarih)) return 'Bilinmiyor'
   const etiket = new Intl.DateTimeFormat('tr-TR', { month: 'short' }).format(tarih).replace('.', '')
   return etiket.charAt(0).toLocaleUpperCase('tr-TR') + etiket.slice(1)
 }
@@ -34,10 +39,15 @@ const bugununBaslangiciniGetir = () => {
   return tarih
 }
 
-const ayniGunMu = (sol, sag) => sol.toDateString() === sag.toDateString()
+const ayniGunMu = (sol, sag) => {
+  if (!gecerliTarihMi(sol) || !gecerliTarihMi(sag)) return false
+  return sol.toDateString() === sag.toDateString()
+}
 
-const ayniAydaMi = (tarih, referans) =>
-  tarih.getMonth() === referans.getMonth() && tarih.getFullYear() === referans.getFullYear()
+const ayniAydaMi = (tarih, referans) => {
+  if (!gecerliTarihMi(tarih) || !gecerliTarihMi(referans)) return false
+  return tarih.getMonth() === referans.getMonth() && tarih.getFullYear() === referans.getFullYear()
+}
 
 const yuzdeselDegisimMetni = (mevcutDeger, oncekiDeger) => {
   const mevcut = Number(mevcutDeger || 0)

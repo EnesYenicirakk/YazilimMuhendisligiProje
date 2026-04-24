@@ -3,23 +3,36 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
+    use \Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Admin kullanıcısı oluştur (Frontend login: admin / admin123)
+        User::firstOrCreate(
+            ['username' => 'admin'],
+            [
+                'name'     => 'Yönetici',
+                'username' => 'admin',
+                'email'    => 'admin@erp.local',
+                'password' => Hash::make('admin123'),
+                'role'     => 'admin',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seeder sırası ÖNEMLİ — yabancı anahtar bağımlılıklarına göre sıralı çalışmalı
+        $this->call([
+            CategorySeeder::class,       // 1. Önce kategoriler (Products bağımlı)
+            ProductSeeder::class,        // 2. Ürünler (Categories bağımlı)
+            CustomerSeeder::class,       // 3. Müşteriler (Orders bağımlı)
+            SupplierSeeder::class,       // 4. Tedarikçiler (SupplierOrders bağımlı)
+            CustomerOrderSeeder::class,  // 5. Müşteri siparişleri (Customers + Products bağımlı)
+            SupplierOrderSeeder::class,  // 6. Tedarikçi siparişleri (Suppliers + Products bağımlı)
+            PaymentSeeder::class,        // 7. Ödemeler (Customers + Suppliers bağımlı)
         ]);
     }
 }

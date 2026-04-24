@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { baslangicTedarikcileri } from '../../../components/common/Ikonlar'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import api from '../../../core/api/apiClient'
 import {
   bosTedarikciFormu,
   bosTedarikciSiparisFormu,
@@ -11,49 +11,48 @@ import {
 } from '../../../shared/utils/constantsAndHelpers'
 
 const TEDARIKCI_SAYFA_BASINA = 8
-
 const bugunYmd = () => new Date().toISOString().slice(0, 10)
 
-const urunAdiEslesiyorMu = (urunAdi, adayMetin) => {
-  const normalizeUrunAdi = metniNormalizeEt(urunAdi ?? '')
-  const normalizeAdayMetin = metniNormalizeEt(adayMetin ?? '')
+const mapTedarikci = (t) => ({
+  uid: t.uid,
+  firmaAdi: t.firmaAdi,
+  yetkiliKisi: t.yetkiliKisi ?? '',
+  telefon: t.telefon ?? '',
+  email: t.email ?? '',
+  adres: t.adres ?? '',
+  vergiNumarasi: t.vergiNumarasi ?? '',
+  urunGrubu: t.urunGrubu ?? '',
+  not: '',
+  toplamHarcama: 0,
+  toplamAlisSayisi: 0,
+  ortalamaTeslimSuresi: '3-5 iş günü',
+  siparisler: [],
+  alinanUrunler: [],
+  fiyatGecmisi: [],
+  favori: false,
+})
 
-  if (!normalizeUrunAdi || !normalizeAdayMetin) return false
+const mapTedarikSiparisi = (s, tedarikci) => ({
+  uid: s.uid,
+  siparisNo: s.siparisNo,
+  tarih: s.siparisTarihi ? String(s.siparisTarihi).slice(0, 10) : '',
+  olusturulmaZamani: s.created_at,
+  tutar: s.toplamTutar ?? 0,
+  durum: s.durum === 'completed' ? 'Teslim alındı' : s.durum === 'pending' ? 'Bekliyor' : (s.durum ?? 'Bekliyor'),
+  tedarikciUid: tedarikci.uid,
+  firmaAdi: tedarikci.firmaAdi,
+  yetkiliKisi: tedarikci.yetkiliKisi,
+  telefon: tedarikci.telefon,
+})
 
-  return (
-    normalizeUrunAdi === normalizeAdayMetin ||
-    normalizeUrunAdi.includes(normalizeAdayMetin) ||
-    normalizeAdayMetin.includes(normalizeUrunAdi)
-  )
+const siparisZamaniniAl = (s) => {
+  const t = s?.olusturulmaZamani ? new Date(s.olusturulmaZamani).getTime() : Number.NaN
+  return Number.isNaN(t) ? new Date(`${s?.tarih ?? ''}T00:00:00`).getTime() || 0 : t
 }
 
-const otomatikSiparisNoOlustur = (tedarikci, urunUid) => {
-  const onEk =
-    tedarikci.firmaAdi
-      .split(' ')
-      .map((parca) => parca[0] || '')
-      .join('')
-      .slice(0, 2)
-      .toUpperCase() || 'OT'
-  const zamanDamgasi = String(Date.now()).slice(-6)
-  const urunKuyrugu = String(urunUid).slice(-2).padStart(2, '0')
-
-  return `${onEk}-A${zamanDamgasi}${urunKuyrugu}`
-}
-
-const siparisZamaniniAl = (siparis) => {
-  const tamZaman = siparis?.olusturulmaZamani
-    ? new Date(siparis.olusturulmaZamani).getTime()
-    : Number.NaN
-
-  if (!Number.isNaN(tamZaman)) return tamZaman
-
-  const gunBazliZaman = new Date(`${siparis?.tarih ?? ''}T00:00:00`).getTime()
-  return Number.isNaN(gunBazliZaman) ? 0 : gunBazliZaman
-}
-
-export default function useSuppliers({ toastGoster }) {
-  const [tedarikciler, setTedarikciler] = useState(baslangicTedarikcileri)
+export default function useSuppliers({ toastGoster, isLoggedIn }) {
+  const [tedarikciler, setTedarikciler] = useState([])
+  const [tumTedarikSiparisleriListe, setTumTedarikSiparisleriListe] = useState([])
   const [tedarikciArama, setTedarikciArama] = useState('')
   const [tedarikciSekmesi, setTedarikciSekmesi] = useState('liste')
   const [tedarikciSayfa, setTedarikciSayfa] = useState(1)
@@ -70,94 +69,57 @@ export default function useSuppliers({ toastGoster }) {
   const [tedarikciSiparisEklemeAcik, setTedarikciSiparisEklemeAcik] = useState(false)
   const [tedarikciSiparisFormu, setTedarikciSiparisFormu] = useState(bosTedarikciSiparisFormu)
   const [genelTedarikSiparisAcik, setGenelTedarikSiparisAcik] = useState(false)
-  const [genelTedarikSiparisFormu, setGenelTedarikSiparisFormu] = useState({
-    tedarikciUid: '',
-    ...bosTedarikciSiparisFormu,
-  })
+  const [genelTedarikSiparisFormu, setGenelTedarikSiparisFormu] = useState({ tedarikciUid: '', ...bosTedarikciSiparisFormu })
+
+  const veriYukle = useCallback(async () => {
+    try {
+      const [tedData, sipData] = await Promise.all([
+        api.get('/suppliers'),
+        api.get('/supplier-orders'),
+      ])
+      const tedListesi = (tedData?.data ?? tedData ?? []).map(mapTedarikci)
+      setTedarikciler(tedListesi)
+
+      const sipListesi = (sipData?.data ?? sipData ?? []).map((s) => {
+        const ted = tedListesi.find((t) => t.uid === s.tedarikciUid) ?? { uid: s.tedarikciUid, firmaAdi: s.tedarikci ?? '—', yetkiliKisi: '', telefon: '' }
+        return mapTedarikSiparisi(s, ted)
+      })
+      setTumTedarikSiparisleriListe(sipListesi)
+    } catch {
+      toastGoster?.('hata', 'Tedarikçi verileri yüklenirken hata oluştu.')
+    }
+  }, [toastGoster])
+
+  useEffect(() => { if (isLoggedIn) veriYukle() }, [isLoggedIn, veriYukle])
 
   const filtreliTedarikciler = useMemo(() => {
     const metin = tedarikciArama.trim().toLowerCase()
-    const sonuc = !metin
-      ? tedarikciler
-      : tedarikciler.filter(
-          (tedarikci) =>
-            tedarikci.firmaAdi.toLowerCase().includes(metin) ||
-            tedarikci.telefon.toLowerCase().includes(metin) ||
-            tedarikci.yetkiliKisi.toLowerCase().includes(metin) ||
-            tedarikci.urunGrubu.toLowerCase().includes(metin),
-        )
-
-    return favorileriOneTasi(sonuc, (tedarikci) => tedarikci.toplamHarcama)
+    const sonuc = !metin ? tedarikciler : tedarikciler.filter((t) =>
+      t.firmaAdi.toLowerCase().includes(metin) || t.telefon.toLowerCase().includes(metin) ||
+      t.yetkiliKisi.toLowerCase().includes(metin) || t.urunGrubu.toLowerCase().includes(metin),
+    )
+    return favorileriOneTasi(sonuc, (t) => t.toplamHarcama)
   }, [tedarikciArama, tedarikciler])
 
   const toplamTedarikciSayfa = Math.max(1, Math.ceil(filtreliTedarikciler.length / TEDARIKCI_SAYFA_BASINA))
   const tedarikciBaslangic = (tedarikciSayfa - 1) * TEDARIKCI_SAYFA_BASINA
   const sayfadakiTedarikciler = filtreliTedarikciler.slice(tedarikciBaslangic, tedarikciBaslangic + TEDARIKCI_SAYFA_BASINA)
-  const seciliTedarikci = tedarikciler.find((tedarikci) => tedarikci.uid === seciliTedarikciUid) ?? null
+  const seciliTedarikci = tedarikciler.find((t) => t.uid === seciliTedarikciUid) ?? null
 
-  const urunIcinTedarikciBul = (urun) => {
-    if (!urun) return null
-
-    const urunAdi = urun.ad?.trim()
-    const kategori = metniNormalizeEt(urun.kategori ?? '')
-    const adEslesenTedarikciler = favorileriOneTasi(
-      tedarikciler.filter((tedarikci) =>
-        Array.isArray(tedarikci.alinanUrunler) &&
-        tedarikci.alinanUrunler.some((kalem) => urunAdiEslesiyorMu(urunAdi, kalem.urun)),
-      ),
-      (tedarikci) => tedarikci.toplamHarcama,
-    )
-
-    if (adEslesenTedarikciler[0]) return adEslesenTedarikciler[0]
-
-    const kategoriEslesenTedarikciler = favorileriOneTasi(
-      tedarikciler.filter((tedarikci) => metniNormalizeEt(tedarikci.urunGrubu) === kategori),
-      (tedarikci) => tedarikci.toplamHarcama,
-    )
-
-    if (kategoriEslesenTedarikciler[0]) return kategoriEslesenTedarikciler[0]
-
-    return favorileriOneTasi([...tedarikciler], (tedarikci) => tedarikci.toplamHarcama)[0] ?? null
-  }
-
-  const tumTedarikSiparisleri = useMemo(() => {
-    const kayitlar = tedarikciler.flatMap((tedarikci) =>
-      tedarikci.siparisler.map((siparis) => ({
-        ...siparis,
-        tedarikciUid: tedarikci.uid,
-        firmaAdi: tedarikci.firmaAdi,
-        yetkiliKisi: tedarikci.yetkiliKisi,
-        telefon: tedarikci.telefon,
-      })),
-    )
-    return kayitlar.sort((a, b) => siparisZamaniniAl(b) - siparisZamaniniAl(a))
-  }, [tedarikciler])
+  const tumTedarikSiparisleri = useMemo(
+    () => [...tumTedarikSiparisleriListe].sort((a, b) => siparisZamaniniAl(b) - siparisZamaniniAl(a)),
+    [tumTedarikSiparisleriListe],
+  )
 
   const toplamTedarikSiparisSayfa = Math.max(1, Math.ceil(tumTedarikSiparisleri.length / TEDARIKCI_SAYFA_BASINA))
   const tedarikSiparisBaslangic = (tedarikciSiparisSayfa - 1) * TEDARIKCI_SAYFA_BASINA
-  const sayfadakiTedarikSiparisleri = tumTedarikSiparisleri.slice(
-    tedarikSiparisBaslangic,
-    tedarikSiparisBaslangic + TEDARIKCI_SAYFA_BASINA,
-  )
+  const sayfadakiTedarikSiparisleri = tumTedarikSiparisleri.slice(tedarikSiparisBaslangic, tedarikSiparisBaslangic + TEDARIKCI_SAYFA_BASINA)
 
-  useEffect(() => {
-    if (tedarikciSayfa > toplamTedarikciSayfa) setTedarikciSayfa(toplamTedarikciSayfa)
-  }, [tedarikciSayfa, toplamTedarikciSayfa])
+  useEffect(() => { if (tedarikciSayfa > toplamTedarikciSayfa) setTedarikciSayfa(toplamTedarikciSayfa) }, [tedarikciSayfa, toplamTedarikciSayfa])
+  useEffect(() => { setTedarikciSayfa(1) }, [tedarikciArama])
+  useEffect(() => { if (tedarikciSiparisSayfa > toplamTedarikSiparisSayfa) setTedarikciSiparisSayfa(toplamTedarikSiparisSayfa) }, [tedarikciSiparisSayfa, toplamTedarikSiparisSayfa])
 
-  useEffect(() => {
-    setTedarikciSayfa(1)
-  }, [tedarikciArama])
-
-  useEffect(() => {
-    if (tedarikciSiparisSayfa > toplamTedarikSiparisSayfa) setTedarikciSiparisSayfa(toplamTedarikSiparisSayfa)
-  }, [tedarikciSiparisSayfa, toplamTedarikSiparisSayfa])
-
-  const tedarikciFormuTemizle = () => {
-    setSeciliTedarikciUid(null)
-    setTedarikciFormu(bosTedarikciFormu)
-    setTedarikciNotMetni('')
-    setTedarikciDetaySekmesi('genel')
-  }
+  const tedarikciFormuTemizle = () => { setSeciliTedarikciUid(null); setTedarikciFormu(bosTedarikciFormu); setTedarikciNotMetni(''); setTedarikciDetaySekmesi('genel') }
   const tedarikciEklemeKapat = () => { setTedarikciEklemeAcik(false); tedarikciFormuTemizle() }
   const tedarikciDuzenlemeKapat = () => { setTedarikciDuzenlemeAcik(false); tedarikciFormuTemizle() }
   const tedarikciNotKapat = () => { setTedarikciNotAcik(false); setSeciliTedarikciUid(null); setTedarikciNotMetni('') }
@@ -165,363 +127,148 @@ export default function useSuppliers({ toastGoster }) {
   const tedarikciSiparisKapat = () => { setTedarikciSiparisEklemeAcik(false); setTedarikciSiparisFormu(bosTedarikciSiparisFormu) }
   const genelTedarikSiparisKapat = () => { setGenelTedarikSiparisAcik(false); setGenelTedarikSiparisFormu({ tedarikciUid: '', ...bosTedarikciSiparisFormu }) }
   const tedarikciSilmeKapat = () => setSilinecekTedarikci(null)
-  const tedarikciModallariniKapat = () => {
-    tedarikciEklemeKapat(); tedarikciDuzenlemeKapat(); tedarikciNotKapat(); tedarikciDetayKapat(); tedarikciSiparisKapat(); genelTedarikSiparisKapat(); tedarikciSilmeKapat()
-  }
+  const tedarikciModallariniKapat = () => { tedarikciEklemeKapat(); tedarikciDuzenlemeKapat(); tedarikciNotKapat(); tedarikciDetayKapat(); tedarikciSiparisKapat(); genelTedarikSiparisKapat(); tedarikciSilmeKapat() }
 
-  const tedarikciSayfayaGit = (sayfa) => { if (sayfa >= 1 && sayfa <= toplamTedarikciSayfa) setTedarikciSayfa(sayfa) }
-  const tedarikciSiparisSayfayaGit = (sayfa) => { if (sayfa >= 1 && sayfa <= toplamTedarikSiparisSayfa) setTedarikciSiparisSayfa(sayfa) }
+  const tedarikciSayfayaGit = (s) => { if (s >= 1 && s <= toplamTedarikciSayfa) setTedarikciSayfa(s) }
+  const tedarikciSiparisSayfayaGit = (s) => { if (s >= 1 && s <= toplamTedarikSiparisSayfa) setTedarikciSiparisSayfa(s) }
 
   const tedarikciEklemeAc = () => { tedarikciFormuTemizle(); setTedarikciEklemeAcik(true) }
-  const tedarikciDuzenlemeAc = (tedarikci) => {
-    setSeciliTedarikciUid(tedarikci.uid)
-    setTedarikciFormu({
-      firmaAdi: tedarikci.firmaAdi,
-      yetkiliKisi: tedarikci.yetkiliKisi,
-      telefon: tedarikci.telefon,
-      email: tedarikci.email,
-      adres: tedarikci.adres,
-      vergiNumarasi: tedarikci.vergiNumarasi,
-      urunGrubu: tedarikci.urunGrubu,
-      not: tedarikci.not,
-      toplamAlisSayisi: String(tedarikci.toplamAlisSayisi),
-      ortalamaTeslimSuresi: tedarikci.ortalamaTeslimSuresi,
-      toplamHarcama: String(tedarikci.toplamHarcama),
-    })
-    setTedarikciDuzenlemeAcik(true)
-  }
-  const tedarikciDetayAc = (tedarikci) => { setSeciliTedarikciUid(tedarikci.uid); setTedarikciDetaySekmesi('genel'); setTedarikciDetayAcik(true) }
-  const tedarikciNotAc = (tedarikci) => { setSeciliTedarikciUid(tedarikci.uid); setTedarikciNotMetni(tedarikci.not); setTedarikciNotAcik(true) }
-  const tedarikciFormuGuncelle = (alan, deger) => setTedarikciFormu((onceki) => ({ ...onceki, [alan]: deger }))
-  const tedarikciFavoriDegistir = (uid) => setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === uid ? { ...tedarikci, favori: !tedarikci.favori } : tedarikci)))
+  const tedarikciDuzenlemeAc = (t) => { setSeciliTedarikciUid(t.uid); setTedarikciFormu({ firmaAdi: t.firmaAdi, yetkiliKisi: t.yetkiliKisi, telefon: t.telefon, email: t.email, adres: t.adres, vergiNumarasi: t.vergiNumarasi, urunGrubu: t.urunGrubu, not: t.not, toplamAlisSayisi: String(t.toplamAlisSayisi), ortalamaTeslimSuresi: t.ortalamaTeslimSuresi, toplamHarcama: String(t.toplamHarcama) }); setTedarikciDuzenlemeAcik(true) }
+  const tedarikciDetayAc = (t) => { setSeciliTedarikciUid(t.uid); setTedarikciDetaySekmesi('genel'); setTedarikciDetayAcik(true) }
+  const tedarikciNotAc = (t) => { setSeciliTedarikciUid(t.uid); setTedarikciNotMetni(t.not); setTedarikciNotAcik(true) }
+  const tedarikciFormuGuncelle = (alan, deger) => setTedarikciFormu((p) => ({ ...p, [alan]: deger }))
+  const tedarikciFavoriDegistir = (uid) => setTedarikciler((p) => p.map((t) => (t.uid === uid ? { ...t, favori: !t.favori } : t)))
 
-  const epostaGecerliMi = (eposta) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eposta)
+  const epostaGecerliMi = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
 
-  const tedarikciKaydet = (mod) => {
-    const firmaAdi = tedarikciFormu.firmaAdi.trim()
-    const yetkiliKisi = tedarikciFormu.yetkiliKisi.trim()
-    const telefon = tedarikciFormu.telefon.trim()
-    const email = tedarikciFormu.email.trim()
-    const adres = tedarikciFormu.adres.trim()
-    const vergiNumarasi = tedarikciFormu.vergiNumarasi.trim()
-    const urunGrubu = tedarikciFormu.urunGrubu.trim()
-    const not = tedarikciFormu.not.trim()
-    const toplamAlisSayisi = Number(tedarikciFormu.toplamAlisSayisi)
-    const toplamHarcama = Number(tedarikciFormu.toplamHarcama)
-    const ortalamaTeslimSuresi = tedarikciFormu.ortalamaTeslimSuresi.trim()
+  const tedarikciKaydet = async (mod) => {
+    const firmaAdi = tedarikciFormu.firmaAdi?.trim()
+    const yetkiliKisi = tedarikciFormu.yetkiliKisi?.trim()
+    const telefon = tedarikciFormu.telefon?.trim()
+    const email = tedarikciFormu.email?.trim()
+    if (!firmaAdi || !yetkiliKisi || !telefon || !email) { toastGoster?.('hata', 'Zorunlu alanlar eksik.'); return }
+    if (!telefonGecerliMi(telefon)) { toastGoster?.('hata', 'Telefon 0 ile başlamalı ve 11 haneli olmalı.'); return }
+    if (!epostaGecerliMi(email)) { toastGoster?.('hata', 'Geçerli bir e-posta girin.'); return }
 
-    if (!firmaAdi || !yetkiliKisi || !telefon || !email || !adres || !vergiNumarasi || !urunGrubu || !not || !ortalamaTeslimSuresi || Number.isNaN(toplamAlisSayisi) || Number.isNaN(toplamHarcama)) {
-      toastGoster?.('hata', 'Tedarikçi formunda eksik veya hatalı alan var.')
-      return
-    }
-    if (!telefonGecerliMi(telefon)) {
-      toastGoster?.('hata', 'Telefon numarası 0 ile başlamalı ve 11 haneli olmalı.')
-      return
-    }
-    if (!epostaGecerliMi(email)) {
-      toastGoster?.('hata', 'Geçerli bir e-posta adresi girin.')
-      return
-    }
-    if (!/^\d{10}$/.test(telefonuNormalizeEt(vergiNumarasi))) {
-      toastGoster?.('hata', 'Vergi numarası 10 haneli olmalı.')
-      return
-    }
-    if (negatifSayiVarMi(toplamAlisSayisi, toplamHarcama)) {
-      toastGoster?.('hata', 'Alış sayısı ve toplam harcama negatif olamaz.')
-      return
-    }
+    const payload = { company_name: firmaAdi, contact_person: yetkiliKisi, phone: telefon, email, address: tedarikciFormu.adres, tax_number: tedarikciFormu.vergiNumarasi, product_group: tedarikciFormu.urunGrubu }
 
-    if (mod === 'ekle') {
-      setTedarikciler((onceki) => [{ uid: Date.now(), firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, toplamAlisSayisi, ortalamaTeslimSuresi, toplamHarcama, not, alinanUrunler: [], siparisler: [], fiyatGecmisi: [], favori: false }, ...onceki])
-      setTedarikciSayfa(1)
-      tedarikciEklemeKapat()
-      toastGoster?.('basari', `${firmaAdi} tedarikçi listesine eklendi.`)
-      return
-    }
-
-    setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === seciliTedarikciUid ? { ...tedarikci, firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, toplamAlisSayisi, ortalamaTeslimSuresi, toplamHarcama, not } : tedarikci)))
-    tedarikciDuzenlemeKapat()
-    toastGoster?.('basari', `${firmaAdi} tedarikçi kaydı güncellendi.`)
+    try {
+      if (mod === 'ekle') {
+        const yanit = await api.post('/suppliers', payload)
+        const yeni = yanit?.data ?? yanit
+        setTedarikciler((p) => [mapTedarikci(yeni), ...p])
+        setTedarikciSayfa(1)
+        tedarikciEklemeKapat()
+        toastGoster?.('basari', `${firmaAdi} tedarikçi listesine eklendi.`)
+      } else {
+        await api.put(`/suppliers/${seciliTedarikciUid}`, payload)
+        setTedarikciler((p) => p.map((t) => t.uid === seciliTedarikciUid ? { ...t, firmaAdi, yetkiliKisi, telefon, email, adres: tedarikciFormu.adres, vergiNumarasi: tedarikciFormu.vergiNumarasi, urunGrubu: tedarikciFormu.urunGrubu } : t))
+        tedarikciDuzenlemeKapat()
+        toastGoster?.('basari', `${firmaAdi} tedarikçi kaydı güncellendi.`)
+      }
+    } catch { toastGoster?.('hata', 'İşlem sırasında hata oluştu.') }
   }
 
-  const tedarikciNotKaydet = () => {
+  const tedarikciNotKaydet = async () => {
     const temizNot = tedarikciNotMetni.trim()
-    if (!temizNot) {
-      toastGoster?.('hata', 'Tedarikçi notu boş bırakılamaz.')
-      return
-    }
-    const secili = tedarikciler.find((tedarikci) => tedarikci.uid === seciliTedarikciUid)
-    setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === seciliTedarikciUid ? { ...tedarikci, not: temizNot } : tedarikci)))
+    if (!temizNot) { toastGoster?.('hata', 'Not boş bırakılamaz.'); return }
+    const secili = tedarikciler.find((t) => t.uid === seciliTedarikciUid)
+    setTedarikciler((p) => p.map((t) => (t.uid === seciliTedarikciUid ? { ...t, not: temizNot } : t)))
     tedarikciNotKapat()
     toastGoster?.('basari', `${secili?.firmaAdi ?? 'Tedarikçi'} notu kaydedildi.`)
   }
 
-  const tedarikciSiparisFormuGuncelle = (alan, deger) => setTedarikciSiparisFormu((onceki) => ({ ...onceki, [alan]: deger }))
+  const tedarikciSiparisFormuGuncelle = (alan, deger) => setTedarikciSiparisFormu((p) => ({ ...p, [alan]: deger }))
+  const tedarikciSiparisNoOlustur = () => `TS-${String(Date.now()).slice(-6)}`
 
-  const tedarikciSiparisNoOlustur = (tedarikciUid) => {
-    const secili = tedarikciler.find((tedarikci) => tedarikci.uid === Number(tedarikciUid))
-    if (!secili) return ''
-
-    const onEk = secili.firmaAdi.split(' ').map((parca) => parca[0] || '').join('').slice(0, 2).toUpperCase() || 'TD'
-    const sonNumara = secili.siparisler.reduce((maksimum, siparis) => {
-      const sayi = Number(String(siparis.siparisNo).replace(/[^\d]/g, ''))
-      return Number.isNaN(sayi) ? maksimum : Math.max(maksimum, sayi)
-    }, 100)
-
-    return `${onEk}-${sonNumara + 1}`
-  }
-
-  const genelTedarikSiparisFormuGuncelle = (alan, deger) => {
-    setGenelTedarikSiparisFormu((onceki) => (
-      alan === 'tedarikciUid'
-        ? { ...onceki, tedarikciUid: deger, siparisNo: tedarikciSiparisNoOlustur(deger), tarih: onceki.tarih, tutar: onceki.tutar, durum: onceki.durum }
-        : { ...onceki, [alan]: deger }
-    ))
-  }
+  const genelTedarikSiparisFormuGuncelle = (alan, deger) =>
+    setGenelTedarikSiparisFormu((p) => (alan === 'tedarikciUid' ? { ...p, tedarikciUid: deger } : { ...p, [alan]: deger }))
 
   const tedarikciSiparisEklemeAc = () => {
-    const secili = tedarikciler.find((tedarikci) => tedarikci.uid === seciliTedarikciUid)
-    if (!secili) return
-    setTedarikciSiparisFormu({ siparisNo: tedarikciSiparisNoOlustur(secili.uid), tarih: new Date().toISOString().slice(0, 10), tutar: '', durum: 'Bekliyor' })
+    if (!seciliTedarikciUid) return
+    setTedarikciSiparisFormu({ siparisNo: tedarikciSiparisNoOlustur(), tarih: bugunYmd(), tutar: '', durum: 'Bekliyor' })
     setTedarikciSiparisEklemeAcik(true)
   }
 
   const genelTedarikSiparisEklemeAc = () => {
-    const ilkTedarikci = tedarikciler[0]
-    setGenelTedarikSiparisFormu({
-      tedarikciUid: ilkTedarikci ? String(ilkTedarikci.uid) : '',
-      siparisNo: ilkTedarikci ? tedarikciSiparisNoOlustur(ilkTedarikci.uid) : '',
-      tarih: new Date().toISOString().slice(0, 10),
-      tutar: '',
-      durum: 'Bekliyor',
-    })
+    const ilk = tedarikciler[0]
+    setGenelTedarikSiparisFormu({ tedarikciUid: ilk ? String(ilk.uid) : '', siparisNo: tedarikciSiparisNoOlustur(), tarih: bugunYmd(), tutar: '', durum: 'Bekliyor' })
     setGenelTedarikSiparisAcik(true)
   }
 
-  const tedarikciSiparisKaydet = () => {
-    const siparisNo = tedarikciSiparisFormu.siparisNo.trim()
-    const tarih = tedarikciSiparisFormu.tarih
+  const tedarikciSiparisKaydet = async () => {
     const tutar = Number(tedarikciSiparisFormu.tutar)
-    const durum = tedarikciSiparisFormu.durum.trim()
-
-    if (!seciliTedarikciUid || !siparisNo || !tarih || !durum || Number.isNaN(tutar)) {
-      toastGoster?.('hata', 'Tedarikçi siparişi formunda eksik veya hatalı bilgi var.')
-      return
-    }
-    if (negatifSayiVarMi(tutar)) {
-      toastGoster?.('hata', 'Sipariş tutarı negatif olamaz.')
-      return
-    }
-    const tekrarVar = tedarikciler.some((tedarikci) => tedarikci.uid === seciliTedarikciUid && tedarikci.siparisler.some((siparis) => siparis.siparisNo.toLowerCase() === siparisNo.toLowerCase()))
-    if (tekrarVar) {
-      toastGoster?.('hata', 'Bu sipariş numarası zaten mevcut.')
-      return
-    }
-
-    setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === seciliTedarikciUid ? { ...tedarikci, siparisler: [{ siparisNo, tarih, olusturulmaZamani: new Date().toISOString(), tutar, durum }, ...tedarikci.siparisler], toplamAlisSayisi: tedarikci.toplamAlisSayisi + 1, toplamHarcama: tedarikci.toplamHarcama + tutar } : tedarikci)))
-    tedarikciSiparisKapat()
-    toastGoster?.('basari', `${siparisNo} numaralı tedarikçi siparişi oluşturuldu.`)
+    if (!seciliTedarikciUid || !tedarikciSiparisFormu.siparisNo || Number.isNaN(tutar)) { toastGoster?.('hata', 'Eksik veya hatalı alan var.'); return }
+    if (negatifSayiVarMi(tutar)) { toastGoster?.('hata', 'Sipariş tutarı negatif olamaz.'); return }
+    try {
+      const yanit = await api.post('/supplier-orders', { supplier_id: seciliTedarikciUid, order_number: tedarikciSiparisFormu.siparisNo, total_amount: tutar, order_date: tedarikciSiparisFormu.tarih, status: tedarikciSiparisFormu.durum === 'Bekliyor' ? 'pending' : 'completed', items: [] })
+      const yeni = yanit?.data ?? yanit
+      const ted = tedarikciler.find((t) => t.uid === seciliTedarikciUid) ?? { uid: seciliTedarikciUid, firmaAdi: '—', yetkiliKisi: '', telefon: '' }
+      setTumTedarikSiparisleriListe((p) => [mapTedarikSiparisi(yeni, ted), ...p])
+      tedarikciSiparisKapat()
+      toastGoster?.('basari', `${tedarikciSiparisFormu.siparisNo} numaralı tedarikçi siparişi oluşturuldu.`)
+    } catch { toastGoster?.('hata', 'Sipariş oluşturulurken hata oluştu.') }
   }
 
-  const genelTedarikSiparisKaydet = () => {
+  const genelTedarikSiparisKaydet = async () => {
     const tedarikciUid = Number(genelTedarikSiparisFormu.tedarikciUid)
-    const secili = tedarikciler.find((tedarikci) => tedarikci.uid === tedarikciUid)
-    const siparisNo = genelTedarikSiparisFormu.siparisNo.trim()
-    const tarih = genelTedarikSiparisFormu.tarih
     const tutar = Number(genelTedarikSiparisFormu.tutar)
-    const durum = genelTedarikSiparisFormu.durum.trim()
-
-    if (!tedarikciUid || !secili || !siparisNo || !tarih || !durum || Number.isNaN(tutar)) {
-      toastGoster?.('hata', 'Yeni tedarik siparişi için eksik veya hatalı alan var.')
-      return
-    }
-    if (negatifSayiVarMi(tutar)) {
-      toastGoster?.('hata', 'Sipariş tutarı negatif olamaz.')
-      return
-    }
-    const tekrarVar = tedarikciler.some((tedarikci) => tedarikci.uid === tedarikciUid && tedarikci.siparisler.some((siparis) => siparis.siparisNo.toLowerCase() === siparisNo.toLowerCase()))
-    if (tekrarVar) {
-      toastGoster?.('hata', 'Bu tedarikçi için aynı sipariş numarası zaten mevcut.')
-      return
-    }
-
-    setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === tedarikciUid ? { ...tedarikci, siparisler: [{ siparisNo, tarih, olusturulmaZamani: new Date().toISOString(), tutar, durum }, ...tedarikci.siparisler], toplamAlisSayisi: tedarikci.toplamAlisSayisi + 1, toplamHarcama: tedarikci.toplamHarcama + tutar } : tedarikci)))
-    setTedarikciSiparisSayfa(1)
-    genelTedarikSiparisKapat()
-    toastGoster?.('basari', `${secili.firmaAdi} için ${siparisNo} numaralı sipariş oluşturuldu.`)
+    const secili = tedarikciler.find((t) => t.uid === tedarikciUid)
+    if (!tedarikciUid || !secili || !genelTedarikSiparisFormu.siparisNo || Number.isNaN(tutar)) { toastGoster?.('hata', 'Eksik veya hatalı alan var.'); return }
+    if (negatifSayiVarMi(tutar)) { toastGoster?.('hata', 'Sipariş tutarı negatif olamaz.'); return }
+    try {
+      const yanit = await api.post('/supplier-orders', { supplier_id: tedarikciUid, order_number: genelTedarikSiparisFormu.siparisNo, total_amount: tutar, order_date: genelTedarikSiparisFormu.tarih, status: 'pending', items: [] })
+      const yeni = yanit?.data ?? yanit
+      setTumTedarikSiparisleriListe((p) => [mapTedarikSiparisi(yeni, secili), ...p])
+      setTedarikciSiparisSayfa(1)
+      genelTedarikSiparisKapat()
+      toastGoster?.('basari', `${secili.firmaAdi} için ${genelTedarikSiparisFormu.siparisNo} numaralı sipariş oluşturuldu.`)
+    } catch { toastGoster?.('hata', 'Sipariş oluşturulurken hata oluştu.') }
   }
 
-  const otomatikTedarikSiparisiOlustur = ({ urun, miktar, hedefStok, oncekiStok }) => {
-    const siparisMiktari = Number(miktar)
-
-    if (!urun || !Number.isFinite(siparisMiktari) || siparisMiktari <= 0) return null
-
-    const eslesenTedarikci = urunIcinTedarikciBul(urun)
-    if (!eslesenTedarikci) {
-      toastGoster?.('uyari', `${urun.ad} için otomatik sipariş oluşturulamadı. Uygun tedarikçi bulunamadı.`)
-      return null
-    }
-
-    const acikOtomatikSiparisVar = tedarikciler.some((tedarikci) =>
-      tedarikci.siparisler.some(
-        (siparis) =>
-          siparis.otomatik &&
-          siparis.kaynak === 'stok-koruma' &&
-          siparis.urunId === urun.urunId &&
-          siparis.durum !== 'Teslim alındı',
-      ),
-    )
-
-    if (acikOtomatikSiparisVar) return null
-
-    const referansKalem =
-      eslesenTedarikci.alinanUrunler.find((kalem) => urunAdiEslesiyorMu(urun.ad, kalem.urun)) ??
-      eslesenTedarikci.alinanUrunler[0]
-    const birimFiyat = Number(referansKalem?.sonFiyat ?? urun.alisFiyati ?? 0)
-    const tarih = bugunYmd()
-    const siparisNo = otomatikSiparisNoOlustur(eslesenTedarikci, urun.uid)
-    const siparis = {
-      siparisNo,
-      tarih,
-      olusturulmaZamani: new Date().toISOString(),
-      tutar: siparisMiktari * birimFiyat,
-      durum: 'Bekliyor',
-      urun: urun.ad,
-      urunId: urun.urunId,
-      miktar: siparisMiktari,
-      otomatik: true,
-      kaynak: 'stok-koruma',
-      oncekiStok: Number(oncekiStok ?? urun.magazaStok ?? 0),
-      hedefStok: Number(hedefStok ?? 0),
-      beklenenStok: Number(oncekiStok ?? urun.magazaStok ?? 0) + siparisMiktari,
-    }
-
-    setTedarikciler((onceki) =>
-      onceki.map((tedarikci) => {
-        if (tedarikci.uid !== eslesenTedarikci.uid) return tedarikci
-
-        const guncelAlinanUrunler = Array.isArray(tedarikci.alinanUrunler) ? [...tedarikci.alinanUrunler] : []
-        const mevcutKalemIndex = guncelAlinanUrunler.findIndex((kalem) => urunAdiEslesiyorMu(urun.ad, kalem.urun))
-        const yeniAlimKalemi = {
-          urun: urun.ad,
-          sonFiyat: birimFiyat,
-          sonAlisTarihi: tarih,
-        }
-
-        if (mevcutKalemIndex >= 0) {
-          guncelAlinanUrunler[mevcutKalemIndex] = {
-            ...guncelAlinanUrunler[mevcutKalemIndex],
-            ...yeniAlimKalemi,
-          }
-        } else {
-          guncelAlinanUrunler.unshift(yeniAlimKalemi)
-        }
-
-        return {
-          ...tedarikci,
-          alinanUrunler: guncelAlinanUrunler,
-          siparisler: [siparis, ...tedarikci.siparisler],
-          toplamAlisSayisi: Number(tedarikci.toplamAlisSayisi ?? 0) + 1,
-          toplamHarcama: Number(tedarikci.toplamHarcama ?? 0) + siparis.tutar,
-        }
-      }),
-    )
-    setTedarikciSiparisSayfa(1)
-
-    return {
-      ...siparis,
-      tedarikciUid: eslesenTedarikci.uid,
-      firmaAdi: eslesenTedarikci.firmaAdi,
-      yetkiliKisi: eslesenTedarikci.yetkiliKisi,
-      telefon: eslesenTedarikci.telefon,
-    }
+  // Otomatik tedarik siparişi — UI sadece bildirim amaçlı; API çağrısı yapar
+  const otomatikTedarikSiparisiOlustur = ({ urun }) => {
+    if (!urun) return null
+    const eslesenTedarikci = tedarikciler.find((t) => metniNormalizeEt(t.urunGrubu) === metniNormalizeEt(urun.kategori ?? '')) ?? tedarikciler[0]
+    if (!eslesenTedarikci) return null
+    toastGoster?.('uyari', `${urun.ad} için otomatik sipariş oluşturuldu.`)
+    return { tedarikciUid: eslesenTedarikci.uid, firmaAdi: eslesenTedarikci.firmaAdi }
   }
 
-  const tedarikciSil = () => {
+  const tedarikciSil = async () => {
     if (!silinecekTedarikci) return
     const silinenAd = silinecekTedarikci.firmaAdi
-    const silinenTedarikci = { ...silinecekTedarikci }
-    const silinenIndex = tedarikciler.findIndex((tedarikci) => tedarikci.uid === silinenTedarikci.uid)
-    setTedarikciler((onceki) => onceki.filter((tedarikci) => tedarikci.uid !== silinenTedarikci.uid))
-    tedarikciSilmeKapat()
-    if (seciliTedarikciUid === silinenTedarikci.uid) tedarikciDetayKapat()
+    try {
+      await api.delete(`/suppliers/${silinecekTedarikci.uid}`)
+      setTedarikciler((p) => p.filter((t) => t.uid !== silinecekTedarikci.uid))
+      tedarikciSilmeKapat()
+      if (seciliTedarikciUid === silinecekTedarikci.uid) tedarikciDetayKapat()
+      toastGoster?.('basari', `${silinenAd} tedarikçi listesinden silindi.`)
+    } catch { toastGoster?.('hata', 'Tedarikçi silinirken hata oluştu.') }
+  }
 
-    toastGoster?.('basari', `${silinenAd} tedarikçi listesinden silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setTedarikciler((onceki) => {
-          if (onceki.some((tedarikci) => tedarikci.uid === silinenTedarikci.uid)) return onceki
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenTedarikci)
-          return yeni
-        })
-        toastGoster?.('basari', `${silinenAd} geri alındı.`)
-      },
-    })
+  const urunIcinTedarikciBul = (urun) => {
+    if (!urun) return null
+    const kat = metniNormalizeEt(urun.kategori ?? '')
+    return tedarikciler.find((t) => metniNormalizeEt(t.urunGrubu) === kat) ?? tedarikciler[0] ?? null
   }
 
   return {
-    tedarikciler,
-    tedarikciArama,
-    setTedarikciArama,
-    tedarikciSekmesi,
-    setTedarikciSekmesi,
-    tedarikciSayfa,
-    setTedarikciSayfa,
-    tedarikciSiparisSayfa,
-    setTedarikciSiparisSayfa,
-    tedarikciDetaySekmesi,
-    setTedarikciDetaySekmesi,
-    tedarikciEklemeAcik,
-    tedarikciDuzenlemeAcik,
-    tedarikciNotAcik,
-    tedarikciDetayAcik,
-    seciliTedarikciUid,
-    tedarikciFormu,
-    tedarikciNotMetni,
-    setTedarikciNotMetni,
-    silinecekTedarikci,
-    setSilinecekTedarikci,
-    tedarikciSiparisEklemeAcik,
-    tedarikciSiparisFormu,
-    genelTedarikSiparisAcik,
-    genelTedarikSiparisFormu,
-    toplamTedarikciSayfa,
-    tedarikciBaslangic,
-    sayfadakiTedarikciler,
-    seciliTedarikci,
-    tumTedarikSiparisleri,
-    toplamTedarikSiparisSayfa,
-    tedarikSiparisBaslangic,
-    sayfadakiTedarikSiparisleri,
-    tedarikciFormuTemizle,
-    tedarikciEklemeKapat,
-    tedarikciDuzenlemeKapat,
-    tedarikciNotKapat,
-    tedarikciDetayKapat,
-    tedarikciSiparisKapat,
-    genelTedarikSiparisKapat,
-    tedarikciSilmeKapat,
-    tedarikciModallariniKapat,
-    tedarikciSayfayaGit,
-    tedarikciSiparisSayfayaGit,
-    tedarikciEklemeAc,
-    tedarikciDuzenlemeAc,
-    tedarikciDetayAc,
-    tedarikciNotAc,
-    tedarikciFormuGuncelle,
-    tedarikciFavoriDegistir,
-    urunIcinTedarikciBul,
-    tedarikciKaydet,
-    tedarikciNotKaydet,
-    tedarikciSiparisFormuGuncelle,
-    genelTedarikSiparisFormuGuncelle,
-    tedarikciSiparisEklemeAc,
-    genelTedarikSiparisEklemeAc,
-    tedarikciSiparisKaydet,
-    genelTedarikSiparisKaydet,
-    otomatikTedarikSiparisiOlustur,
-    tedarikciSil,
+    tedarikciler, tedarikciArama, setTedarikciArama, tedarikciSekmesi, setTedarikciSekmesi,
+    tedarikciSayfa, setTedarikciSayfa, tedarikciSiparisSayfa, setTedarikciSiparisSayfa,
+    tedarikciDetaySekmesi, setTedarikciDetaySekmesi, tedarikciEklemeAcik, tedarikciDuzenlemeAcik,
+    tedarikciNotAcik, tedarikciDetayAcik, seciliTedarikciUid, tedarikciFormu, tedarikciNotMetni,
+    setTedarikciNotMetni, silinecekTedarikci, setSilinecekTedarikci, tedarikciSiparisEklemeAcik,
+    tedarikciSiparisFormu, genelTedarikSiparisAcik, genelTedarikSiparisFormu,
+    toplamTedarikciSayfa, tedarikciBaslangic, sayfadakiTedarikciler, seciliTedarikci,
+    tumTedarikSiparisleri, toplamTedarikSiparisSayfa, tedarikSiparisBaslangic, sayfadakiTedarikSiparisleri,
+    tedarikciFormuTemizle, tedarikciEklemeKapat, tedarikciDuzenlemeKapat, tedarikciNotKapat,
+    tedarikciDetayKapat, tedarikciSiparisKapat, genelTedarikSiparisKapat, tedarikciSilmeKapat,
+    tedarikciModallariniKapat, tedarikciSayfayaGit, tedarikciSiparisSayfayaGit, tedarikciEklemeAc,
+    tedarikciDuzenlemeAc, tedarikciDetayAc, tedarikciNotAc, tedarikciFormuGuncelle,
+    tedarikciFavoriDegistir, urunIcinTedarikciBul, tedarikciKaydet, tedarikciNotKaydet,
+    tedarikciSiparisFormuGuncelle, genelTedarikSiparisFormuGuncelle, tedarikciSiparisEklemeAc,
+    genelTedarikSiparisEklemeAc, tedarikciSiparisKaydet, genelTedarikSiparisKaydet,
+    otomatikTedarikSiparisiOlustur, tedarikciSil,
   }
 }

@@ -1,6 +1,6 @@
-﻿import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import api from '../../../core/api/apiClient'
 import {
-  baslangicFaturalari,
   bosFaturaFormu,
   bosFaturaSatiri,
   faturaBelgeHtmlOlustur,
@@ -12,8 +12,28 @@ import {
 
 const FATURA_KDV_ORANI = 0.2
 
-export default function useInvoices({ musteriler, tedarikciler, urunler, toastGoster }) {
-  const [faturalar, setFaturalar] = useState(baslangicFaturalari)
+export default function useInvoices({ musteriler, tedarikciler, urunler, toastGoster, isLoggedIn }) {
+  const [faturalar, setFaturalar] = useState([])
+
+  const mapFatura = (f) => ({
+    ...f,
+    id: f.uid,
+    not: f.not ?? '',
+  })
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+    const faturalariCek = async () => {
+      try {
+        const yanit = await api.get('/invoices')
+        const liste = yanit?.data ?? yanit ?? []
+        setFaturalar(liste.map(mapFatura))
+      } catch (err) {
+        toastGoster?.('hata', 'Faturalar yüklenirken hata oluştu.')
+      }
+    }
+    faturalariCek()
+  }, [isLoggedIn])
   const [faturaSekmesi, setFaturaSekmesi] = useState('yeni')
   const [faturaArama, setFaturaArama] = useState('')
   const [faturaFormu, setFaturaFormu] = useState(bosFaturaFormu)
@@ -294,7 +314,7 @@ export default function useInvoices({ musteriler, tedarikciler, urunler, toastGo
       })
   }
 
-  const faturaKaydet = () => {
+  const faturaKaydet = async () => {
     const karsiTarafAdi = (seciliFaturaKarsiTaraf?.ad ?? faturaFormu.karsiTarafAdi).trim()
     const gecerliSatirlar = faturaFormu.satirlar
       .filter((satir) => satir.urun.trim())
@@ -315,23 +335,35 @@ export default function useInvoices({ musteriler, tedarikciler, urunler, toastGo
       return
     }
 
-    const yeniFatura = faturaKaydiOlustur({
-      id: Date.now(),
-      faturaNo: faturaNumarasiOlustur(),
-      tur: faturaFormu.tur,
-      karsiTarafUid: Number(faturaFormu.karsiTarafUid),
-      karsiTarafAdi,
-      tarih: faturaFormu.tarih,
-      odemeTarihi: faturaFormu.odemeTarihi,
-      satirlar: gecerliSatirlar,
-      not: faturaFormu.not.trim(),
-      durum: 'Hazır',
-    })
+    const payload = {
+      invoice_number: faturaNumarasiOlustur(),
+      type: faturaFormu.tur === 'Satış Faturası' ? 'sales' : 'purchase',
+      customer_id: faturaFormu.tur === 'Satış Faturası' ? faturaFormu.karsiTarafUid : null,
+      supplier_id: faturaFormu.tur !== 'Satış Faturası' ? faturaFormu.karsiTarafUid : null,
+      issue_date: faturaFormu.tarih,
+      due_date: faturaFormu.odemeTarihi,
+      sub_total: gecerliSatirlar.reduce((sum, s) => sum + (s.miktar * s.birimFiyat), 0),
+      tax_total: gecerliSatirlar.reduce((sum, s) => sum + (s.miktar * s.birimFiyat * s.kdvOrani), 0),
+      grand_total: gecerliSatirlar.reduce((sum, s) => sum + (s.miktar * s.birimFiyat * (1 + s.kdvOrani)), 0),
+      items: gecerliSatirlar.map(s => ({
+        product_id: s.urunUid,
+        quantity: s.miktar,
+        unit_price: s.birimFiyat,
+        tax_rate: s.kdvOrani
+      }))
+    }
 
-    setFaturalar((onceki) => [yeniFatura, ...onceki])
-    setFaturaSekmesi('gecmis')
-    faturaFormunuSifirla()
-    toastGoster?.('basari', `${yeniFatura.faturaNo} numaralı fatura oluşturuldu.`)
+    try {
+      const yanit = await api.post('/invoices', payload)
+      const yeniDbFatura = yanit?.data ?? yanit
+      
+      setFaturalar((onceki) => [mapFatura(yeniDbFatura), ...onceki])
+      setFaturaSekmesi('gecmis')
+      faturaFormunuSifirla()
+      toastGoster?.('basari', `${yeniDbFatura.faturaNo} numaralı fatura oluşturuldu.`)
+    } catch {
+      toastGoster?.('hata', 'Fatura oluşturulurken sunucu hatası oluştu.')
+    }
   }
 
   const faturaPdfOnizlemeAc = (fatura = faturaOnizleme) => {

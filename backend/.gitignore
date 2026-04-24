@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# SQLite
+/database/*.sqlite
+/database/*.sqlite-journal

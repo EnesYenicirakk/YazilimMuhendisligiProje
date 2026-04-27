@@ -14,6 +14,6 @@ if (!CHAT_ASSISTANT_API_KEY) {
 export const aiConfig = {
   apiKey: CHAT_ASSISTANT_API_KEY,
   apiUrl: 'https://openrouter.ai/api/v1/chat/completions',
-  model: 'google/gemini-2.0-flash-lite-preview-02-05:free', // Ücretsiz bir model örneği
-  siteName: 'Yazılım Mühendisliği Projesi',
+  model: 'google/gemini-2.0-flash-lite-001', // Daha kararlı bir model ID
+  siteName: 'Yazilim Muhendisligi Projesi',
 }

@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { gelenNakitKayitlari, gidenNakitKayitlari } from '../../../components/common/Ikonlar'
+import { useEffect, useMemo, useState } from 'react'
+import { financeApi } from '../../../core/services/backendApiService'
 import {
   favorileriOneTasi,
   gerceklesenOdemeTutari,
@@ -9,21 +9,9 @@ import {
 
 const ODEME_SAYFA_BASINA = 10
 const BOS_ODEME_FORMU = { taraf: '', tarih: '', durum: '', tutar: '' }
-export default function useFinance({ toastGoster }) {
-  const [gelenNakitListesi, setGelenNakitListesi] = useState(() =>
-    gelenNakitKayitlari.map((kayit) => ({
-      ...kayit,
-      durum: odemeDurumunuStandartlastir(kayit.durum),
-      favori: false,
-    })),
-  )
-  const [gidenNakitListesi, setGidenNakitListesi] = useState(() =>
-    gidenNakitKayitlari.map((kayit) => ({
-      ...kayit,
-      durum: odemeDurumunuStandartlastir(kayit.durum),
-      favori: false,
-    })),
-  )
+export default function useFinance({ toastGoster, isLoggedIn }) {
+  const [gelenNakitListesi, setGelenNakitListesi] = useState([])
+  const [gidenNakitListesi, setGidenNakitListesi] = useState([])
   const [odemeSekmesi, setOdemeSekmesi] = useState('gelen')
   const [gelenSayfa, setGelenSayfa] = useState(1)
   const [gidenSayfa, setGidenSayfa] = useState(1)
@@ -72,6 +60,22 @@ export default function useFinance({ toastGoster }) {
   useEffect(() => {
     if (gidenSayfa > toplamGidenSayfa) setGidenSayfa(toplamGidenSayfa)
   }, [gidenSayfa, toplamGidenSayfa])
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const finansYukle = async () => {
+      try {
+        const veriler = await financeApi.getAll()
+        setGelenNakitListesi(veriler.gelen || [])
+        setGidenNakitListesi(veriler.giden || [])
+      } catch (error) {
+        console.error('Finans verileri yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Finansal veriler veritabanından alınamadı.')
+      }
+    }
+    finansYukle()
+  }, [toastGoster, isLoggedIn])
 
   const odemeListesiGuncelle = (sekme, guncelleyici) => {
     if (sekme === 'gelen') {

@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { baslangicTedarikcileri } from '../../../components/common/Ikonlar'
+import { useEffect, useMemo, useState } from 'react'
+import { supplierApi } from '../../../core/services/backendApiService'
 import {
   bosTedarikciFormu,
   bosTedarikciSiparisFormu,
@@ -52,8 +52,8 @@ const siparisZamaniniAl = (siparis) => {
   return Number.isNaN(gunBazliZaman) ? 0 : gunBazliZaman
 }
 
-export default function useSuppliers({ toastGoster }) {
-  const [tedarikciler, setTedarikciler] = useState(baslangicTedarikcileri)
+export default function useSuppliers({ toastGoster, isLoggedIn }) {
+  const [tedarikciler, setTedarikciler] = useState([])
   const [tedarikciArama, setTedarikciArama] = useState('')
   const [tedarikciSekmesi, setTedarikciSekmesi] = useState('liste')
   const [tedarikciSayfa, setTedarikciSayfa] = useState(1)
@@ -139,6 +139,21 @@ export default function useSuppliers({ toastGoster }) {
     tedarikSiparisBaslangic,
     tedarikSiparisBaslangic + TEDARIKCI_SAYFA_BASINA,
   )
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const tedarikcileriYukle = async () => {
+      try {
+        const veriler = await supplierApi.getAll()
+        setTedarikciler(veriler)
+      } catch (error) {
+        console.error('Tedarikçiler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Tedarikçi listesi veritabanından alınamadı.')
+      }
+    }
+    tedarikcileriYukle()
+  }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
     if (tedarikciSayfa > toplamTedarikciSayfa) setTedarikciSayfa(toplamTedarikciSayfa)
@@ -232,16 +247,30 @@ export default function useSuppliers({ toastGoster }) {
     }
 
     if (mod === 'ekle') {
-      setTedarikciler((onceki) => [{ uid: Date.now(), firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, toplamAlisSayisi, ortalamaTeslimSuresi, toplamHarcama, not, alinanUrunler: [], siparisler: [], fiyatGecmisi: [], favori: false }, ...onceki])
-      setTedarikciSayfa(1)
-      tedarikciEklemeKapat()
-      toastGoster?.('basari', `${firmaAdi} tedarikçi listesine eklendi.`)
+      const yeniTedarikciData = { firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, not }
+      supplierApi.create(yeniTedarikciData).then((sunucuVerisi) => {
+        setTedarikciler((onceki) => [sunucuVerisi, ...onceki])
+        setTedarikciSayfa(1)
+        tedarikciEklemeKapat()
+        toastGoster?.('basari', `${firmaAdi} tedarikçi listesine eklendi.`)
+      }).catch(err => {
+        console.error('Tedarikçi eklenirken hata:', err)
+        toastGoster?.('hata', 'Tedarikçi eklenirken bir hata oluştu.')
+      })
       return
     }
 
-    setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === seciliTedarikciUid ? { ...tedarikci, firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, toplamAlisSayisi, ortalamaTeslimSuresi, toplamHarcama, not } : tedarikci)))
-    tedarikciDuzenlemeKapat()
-    toastGoster?.('basari', `${firmaAdi} tedarikçi kaydı güncellendi.`)
+    const guncellenenTedarikciData = { firmaAdi, yetkiliKisi, telefon, email, adres, vergiNumarasi, urunGrubu, not }
+    supplierApi.update(seciliTedarikciUid, guncellenenTedarikciData).then((sunucuVerisi) => {
+      setTedarikciler((onceki) =>
+        onceki.map((t) => (t.uid === seciliTedarikciUid ? sunucuVerisi : t)),
+      )
+      tedarikciDuzenlemeKapat()
+      toastGoster?.('basari', `${firmaAdi} tedarikçi kaydı güncellendi.`)
+    }).catch(err => {
+      console.error('Tedarikçi güncellenirken hata:', err)
+      toastGoster?.('hata', 'Tedarikçi güncellenirken bir hata oluştu.')
+    })
   }
 
   const tedarikciNotKaydet = () => {
@@ -439,25 +468,17 @@ export default function useSuppliers({ toastGoster }) {
 
   const tedarikciSil = () => {
     if (!silinecekTedarikci) return
-    const silinenAd = silinecekTedarikci.firmaAdi
     const silinenTedarikci = { ...silinecekTedarikci }
-    const silinenIndex = tedarikciler.findIndex((tedarikci) => tedarikci.uid === silinenTedarikci.uid)
-    setTedarikciler((onceki) => onceki.filter((tedarikci) => tedarikci.uid !== silinenTedarikci.uid))
-    tedarikciSilmeKapat()
-    if (seciliTedarikciUid === silinenTedarikci.uid) tedarikciDetayKapat()
+    const silinenAd = silinenTedarikci.firmaAdi
 
-    toastGoster?.('basari', `${silinenAd} tedarikçi listesinden silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setTedarikciler((onceki) => {
-          if (onceki.some((tedarikci) => tedarikci.uid === silinenTedarikci.uid)) return onceki
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenTedarikci)
-          return yeni
-        })
-        toastGoster?.('basari', `${silinenAd} geri alındı.`)
-      },
+    supplierApi.delete(silinenTedarikci.uid).then(() => {
+      setTedarikciler((onceki) => onceki.filter((t) => t.uid !== silinenTedarikci.uid))
+      tedarikciSilmeKapat()
+      if (seciliTedarikciUid === silinenTedarikci.uid) tedarikciDetayKapat()
+      toastGoster?.('basari', `${silinenAd} tedarikçi listesinden silindi.`)
+    }).catch(err => {
+      console.error('Tedarikçi silinirken hata:', err)
+      toastGoster?.('hata', 'Tedarikçi silinirken bir hata oluştu.')
     })
   }
 

@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  baslangicGecmisSiparisleri,
-  baslangicSiparisleri,
-} from '../../../components/common/Ikonlar'
+import { orderApi } from '../../../core/services/backendApiService'
 import { bosSiparisFormu, negatifSayiVarMi } from '../../../shared/utils/constantsAndHelpers'
 
 const SIPARIS_SAYFA_BASINA = 8
@@ -22,11 +19,17 @@ const siparisIcinMusteriBul = (kayit, musteriListesi) => {
   )
 }
 
-export default function useOrders({ musteriler, toastGoster, telefonAramasiBaslat }) {
+export default function useOrders({
+  musteriler = [],
+  urunler = [],
+  toastGoster,
+  telefonAramasiBaslat,
+  isLoggedIn,
+}) {
   const siparisMusteriAdiniGetir = (kayit) =>
     siparisIcinMusteriBul(kayit, musteriler)?.ad ?? kayit?.musteri ?? 'Bilinmiyor'
 
-  const [siparisler, setSiparisler] = useState(baslangicSiparisleri)
+  const [siparisler, setSiparisler] = useState([])
   const [siparisArama, setSiparisArama] = useState('')
   const [siparisOdemeFiltresi, setSiparisOdemeFiltresi] = useState('Tüm Siparişler')
   const [siparisSekmesi, setSiparisSekmesi] = useState('aktif')
@@ -41,7 +44,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   const [silinecekSiparis, setSilinecekSiparis] = useState(null)
   const [siparisFormu, setSiparisFormu] = useState(bosSiparisFormu)
   const [siparisDurumFormu, setSiparisDurumFormu] = useState(BOS_DURUM_FORMU)
-  const [gecmisSiparisler] = useState(baslangicGecmisSiparisleri)
+  const [gecmisSiparisler] = useState([])
 
   const musteriSecenekleri = useMemo(
     () =>
@@ -129,6 +132,21 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   useEffect(() => {
     setSiparisSayfa(1)
   }, [siparisArama, siparisOdemeFiltresi])
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const siparisleriYukle = async () => {
+      try {
+        const veriler = await orderApi.getAll()
+        setSiparisler(veriler)
+      } catch (error) {
+        console.error('Siparişler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Sipariş listesi veritabanından alınamadı.')
+      }
+    }
+    siparisleriYukle()
+  }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
     setSiparisler((onceki) =>
@@ -228,31 +246,27 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
       return
     }
 
-    const enYuksekNo = siparisler.reduce((maksimum, siparis) => {
-      const sayi = Number(String(siparis.siparisNo).replace(/[^\d]/g, ''))
-      return Number.isNaN(sayi) ? maksimum : Math.max(maksimum, sayi)
-    }, 0)
-    const yeniSiparisNo = `#SP-${enYuksekNo + 1}`
+    const yeniSiparisData = {
+      musteriUid,
+      urun,
+      siparisTarihi,
+      toplamTutar,
+      odemeDurumu,
+      urunHazirlik,
+      teslimatDurumu,
+      teslimatSuresi,
+    }
 
-    setSiparisler((onceki) => [
-      {
-        siparisNo: yeniSiparisNo,
-        musteriUid: seciliMusteri.uid,
-        musteri: seciliMusteri.ad,
-        urun,
-        toplamTutar,
-        siparisTarihi,
-        odemeDurumu,
-        urunHazirlik,
-        teslimatDurumu,
-        teslimatSuresi,
-      },
-      ...onceki,
-    ])
-    setYeniSiparisAcik(false)
-    setSiparisSayfa(1)
-    setSiparisFormu(bosSiparisFormu)
-    toastGoster?.('basari', `${yeniSiparisNo} numaralı yeni sipariş oluşturuldu.`)
+    orderApi.create(yeniSiparisData).then((sunucuVerisi) => {
+      setSiparisler((onceki) => [sunucuVerisi, ...onceki])
+      setYeniSiparisAcik(false)
+      setSiparisSayfa(1)
+      setSiparisFormu(bosSiparisFormu)
+      toastGoster?.('basari', `${sunucuVerisi.siparisNo} numaralı yeni sipariş oluşturuldu.`)
+    }).catch(err => {
+      console.error('Sipariş eklenirken hata:', err)
+      toastGoster?.('hata', 'Sipariş oluşturulurken bir hata oluştu.')
+    })
   }
 
   const siparisDuzenlemeKaydet = () => {

@@ -1,5 +1,6 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
+import { fetchAiResponse } from '../services/aiService'
 
 export default function useAppNotifications({
   aktifSayfa,
@@ -208,11 +209,27 @@ export default function useAppNotifications({
     if (normalizeMetin === metniNormalizeEt('Diğer')) return
 
     const hazirCevap = aiHazirCevaplar[normalizeMetin]
-    if (!hazirCevap) return
+    if (hazirCevap) {
+      window.setTimeout(() => {
+        setAiMesajlar((onceki) => [...onceki, { id: Date.now() + 1, rol: 'bot', metin: hazirCevap, saat: 'Şimdi' }])
+      }, 320)
+    } else {
+      // Dış API'den cevap al
+      const botMesajId = Date.now() + 1
+      setAiMesajlar((onceki) => [...onceki, { id: botMesajId, rol: 'bot', metin: 'Düşünüyorum...', saat: 'Şimdi' }])
 
-    window.setTimeout(() => {
-      setAiMesajlar((onceki) => [...onceki, { id: Date.now() + 1, rol: 'bot', metin: hazirCevap, saat: 'Şimdi' }])
-    }, 320)
+      fetchAiResponse(metin)
+        .then((cevap) => {
+          setAiMesajlar((onceki) => 
+            onceki.map(m => m.id === botMesajId ? { ...m, metin: cevap } : m)
+          )
+        })
+        .catch((error) => {
+          setAiMesajlar((onceki) => 
+            onceki.map(m => m.id === botMesajId ? { ...m, metin: 'Üzgünüm, şu an cevap veremiyorum. ' + error.message } : m)
+          )
+        })
+    }
   }
 
   const aiPaneliAc = () => {

@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { KucukIkon } from '../../components/common/Ikonlar'
 
 const ToastContext = createContext(null)
@@ -8,7 +8,7 @@ export function ToastProvider({ children }) {
   const [sonGeriAlma, setSonGeriAlma] = useState(null)
   const zamanlayicilar = useRef(new Map())
 
-  const toastKapat = (toastId) => {
+  const toastKapat = useCallback((toastId) => {
     setToastlar((onceki) => onceki.filter((oge) => oge.id !== toastId))
     setSonGeriAlma((onceki) => (onceki?.toastId === toastId ? null : onceki))
 
@@ -17,16 +17,16 @@ export function ToastProvider({ children }) {
       window.clearTimeout(zamanlayici)
       zamanlayicilar.current.delete(toastId)
     }
-  }
+  }, [])
 
-  const toastEyleminiCalistir = (toast) => {
+  const toastEyleminiCalistir = useCallback((toast) => {
     toastKapat(toast.id)
     if (typeof toast.eylem === 'function') {
       toast.eylem()
     }
-  }
+  }, [toastKapat])
 
-  const toastGoster = (tip, metin, secenekler = {}) => {
+  const toastGoster = useCallback((tip, metin, secenekler = {}) => {
     const id = Date.now() + Math.random()
     const yeniToast = { id, tip, metin, ...secenekler }
 
@@ -44,7 +44,7 @@ export function ToastProvider({ children }) {
     }, secenekler.sure ?? 3200)
 
     zamanlayicilar.current.set(id, zamanlayici)
-  }
+  }, [toastKapat])
 
   useEffect(() => {
     const aktifZamanlayicilar = zamanlayicilar.current

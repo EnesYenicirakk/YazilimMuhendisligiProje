@@ -23,3 +23,6 @@ lerna-debug.log*
 
 # Logs
 *.log
+
+# Environment variables
+.env

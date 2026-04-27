@@ -9,13 +9,15 @@ import {
   favorileriOneTasi,
   negatifSayiVarMi,
 } from '../../../shared/utils/constantsAndHelpers'
+import { productApi, categoryApi } from '../../../core/services/backendApiService'
 
 const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
 const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, '').toLocaleLowerCase('tr-TR')
 
-export default function useInventory({ toastGoster }) {
-  const [urunler, setUrunler] = useState(baslangicUrunleri)
+export default function useInventory({ toastGoster, isLoggedIn }) {
+  const [urunler, setUrunler] = useState([])
+  const [kategoriler, setKategoriler] = useState(['Tümü'])
   const [stokDegisimLoglari, setStokDegisimLoglari] = useState(() => [...baslangicStokDegisimLoglari])
   const [aramaMetni, setAramaMetni] = useState('')
   const [envanterKategori, setEnvanterKategori] = useState('Tümü')
@@ -159,6 +161,25 @@ export default function useInventory({ toastGoster }) {
   )
 
   useEffect(() => {
+    if (!isLoggedIn) return
+
+    const urunleriYukle = async () => {
+      try {
+        const [urunVerileri, kategoriVerileri] = await Promise.all([
+          productApi.getAll(),
+          categoryApi.getAll(),
+        ])
+        setUrunler(urunVerileri)
+        setKategoriler(['Tümü', ...kategoriVerileri.map((c) => c.name)])
+      } catch (error) {
+        console.error('Veriler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Ürün verileri veritabanından alınamadı.')
+      }
+    }
+    urunleriYukle()
+  }, [toastGoster, isLoggedIn])
+
+  useEffect(() => {
     if (envanterSayfa > toplamEnvanterSayfa) {
       setEnvanterSayfa(toplamEnvanterSayfa)
     }
@@ -238,102 +259,87 @@ export default function useInventory({ toastGoster }) {
     }
 
     if (mod === 'ekle') {
-      const yeniUid = Date.now()
-      const yeniUrun = {
-        uid: yeniUid,
+      const yeniUrunData = {
         urunId,
-        barkod: barkodOlustur(yeniUid),
-        kategori: 'Diğer',
         ad,
-        avatar: avatarOlustur(ad),
         urunAdedi,
         magazaStok,
         minimumStok,
-        alisFiyati: 0,
-        satisFiyati: 0,
-        favori: false,
+        kategori: 'Diğer',
+        barkod: barkodOlustur(Date.now()),
+        avatar: avatarOlustur(ad),
       }
 
-      setUrunler((onceki) => [yeniUrun, ...onceki])
-      stokLoguEkle({
-        urun: yeniUrun.ad,
-        urunId: yeniUrun.urunId,
-        eskiStok: 0,
-        yeniStok: yeniUrun.magazaStok,
-        islem: 'Stok artışı',
-        aciklama: `${yeniUrun.magazaStok} adet başlangıç stokuyla envantere eklendi.`,
+      productApi.create(yeniUrunData).then((sunucuVerisi) => {
+        setUrunler((onceki) => [sunucuVerisi, ...onceki])
+        stokLoguEkle({
+          urun: sunucuVerisi.ad,
+          urunId: sunucuVerisi.urunId,
+          eskiStok: 0,
+          yeniStok: sunucuVerisi.magazaStok,
+          islem: 'Stok artışı',
+          aciklama: `${sunucuVerisi.magazaStok} adet başlangıç stokuyla envantere eklendi.`,
+        })
+        eklemePenceresiniKapat()
+        setEnvanterSayfa(1)
+        toastGoster?.('basari', `${ad} envantere eklendi.`)
+      }).catch(err => {
+        console.error('Ürün eklenirken hata:', err)
+        toastGoster?.('hata', 'Ürün eklenirken bir hata oluştu.')
       })
-      eklemePenceresiniKapat()
-      setEnvanterSayfa(1)
-      toastGoster?.('basari', `${ad} envantere eklendi.`)
       return
     }
 
     const mevcutUrun = urunler.find((urun) => urun.uid === seciliUid)
-    const guncellenenUrun = {
+    const guncellenenUrunData = {
       ...(mevcutUrun ?? {}),
       urunId,
-      barkod: mevcutUrun?.barkod ?? barkodOlustur(seciliUid),
       ad,
       urunAdedi,
       magazaStok,
       minimumStok,
-      avatar: avatarOlustur(ad),
     }
 
-    setUrunler((onceki) =>
-      onceki.map((urun) => {
-        if (urun.uid !== seciliUid) return urun
-        return guncellenenUrun
-      }),
-    )
+    productApi.update(seciliUid, guncellenenUrunData).then((sunucuVerisi) => {
+      setUrunler((onceki) =>
+        onceki.map((urun) => (urun.uid === seciliUid ? sunucuVerisi : urun)),
+      )
 
-    stokDegisimiLogla({
-      oncekiUrun: mevcutUrun,
-      sonrakiUrun: guncellenenUrun,
-      artisMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet artırıldı.`,
-      dususMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet azaltıldı.`,
+      stokDegisimiLogla({
+        oncekiUrun: mevcutUrun,
+        sonrakiUrun: sunucuVerisi,
+        artisMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet artırıldı.`,
+        dususMesaji: (fark) => `Ürün düzenlemesinde stok ${fark} adet azaltıldı.`,
+      })
+
+      duzenlemePenceresiniKapat()
+      toastGoster?.('basari', `${ad} bilgileri güncellendi.`)
+    }).catch(err => {
+      console.error('Ürün güncellenirken hata:', err)
+      toastGoster?.('hata', 'Ürün güncellenirken bir hata oluştu.')
     })
-
-    duzenlemePenceresiniKapat()
-    toastGoster?.('basari', `${ad} bilgileri güncellendi.`)
   }
 
   const urunSil = () => {
     if (!silinecekUrun) return
     const silinenUrun = { ...silinecekUrun }
     const silinenAd = silinenUrun.ad
-    const silinenIndex = urunler.findIndex((urun) => urun.uid === silinenUrun.uid)
-    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinenUrun.uid))
-    stokLoguEkle({
-      urun: silinenUrun.ad,
-      urunId: silinenUrun.urunId,
-      eskiStok: silinenUrun.magazaStok,
-      yeniStok: 0,
-      islem: 'Ürün silindi',
-      aciklama: `${silinenUrun.magazaStok} adet stokla envanterden kaldırıldı.`,
-    })
-    setSilinecekUrun(null)
-    toastGoster?.('basari', `${silinenAd} envanterden silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setUrunler((onceki) => {
-          if (onceki.some((urun) => urun.uid === silinenUrun.uid)) return onceki
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenUrun)
-          return yeni
-        })
-        stokLoguEkle({
-          urun: silinenUrun.ad,
-          urunId: silinenUrun.urunId,
-          eskiStok: 0,
-          yeniStok: silinenUrun.magazaStok,
-          islem: 'Stok artışı',
-          aciklama: 'Silme işlemi geri alındı ve ürün yeniden envantere eklendi.',
-        })
-        toastGoster?.('basari', `${silinenAd} geri alındı.`)
-      },
+    
+    productApi.delete(silinenUrun.uid).then(() => {
+      setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinenUrun.uid))
+      stokLoguEkle({
+        urun: silinenUrun.ad,
+        urunId: silinenUrun.urunId,
+        eskiStok: silinenUrun.magazaStok,
+        yeniStok: 0,
+        islem: 'Ürün silindi',
+        aciklama: `${silinenUrun.magazaStok} adet stokla envanterden kaldırıldı.`,
+      })
+      setSilinecekUrun(null)
+      toastGoster?.('basari', `${silinenAd} envanterden silindi.`)
+    }).catch(err => {
+      console.error('Ürün silinirken hata:', err)
+      toastGoster?.('hata', 'Ürün silinirken bir hata oluştu.')
     })
   }
 
@@ -387,73 +393,55 @@ export default function useInventory({ toastGoster }) {
     }
 
     const mevcutUrun = urunler.find((urun) => urun.uid === urunDuzenlemeUid)
-    const guncellenenUrun = {
+    const guncellenenUrunData = {
       ...(mevcutUrun ?? {}),
       urunId,
-      barkod: mevcutUrun?.barkod ?? barkodOlustur(urunDuzenlemeUid),
-      kategori: mevcutUrun?.kategori ?? 'Diğer',
       ad,
       urunAdedi,
       magazaStok,
       alisFiyati,
       satisFiyati,
-      avatar: avatarOlustur(ad),
     }
 
-    setUrunler((onceki) =>
-      onceki.map((urun) =>
-        urun.uid === urunDuzenlemeUid
-          ? guncellenenUrun
-          : urun,
-      ),
-    )
+    productApi.update(urunDuzenlemeUid, guncellenenUrunData).then((sunucuVerisi) => {
+      setUrunler((onceki) =>
+        onceki.map((urun) => (urun.uid === urunDuzenlemeUid ? sunucuVerisi : urun)),
+      )
 
-    stokDegisimiLogla({
-      oncekiUrun: mevcutUrun,
-      sonrakiUrun: guncellenenUrun,
-      artisMesaji: (fark) => `Ürün güncellemesinde stok ${fark} adet artırıldı.`,
-      dususMesaji: (fark) => `Ürün güncellemesinde stok ${fark} adet azaltıldı.`,
+      stokDegisimiLogla({
+        oncekiUrun: mevcutUrun,
+        sonrakiUrun: sunucuVerisi,
+        artisMesaji: (fark) => `Ürün güncellemesinde stok ${fark} adet artırıldı.`,
+        dususMesaji: (fark) => `Ürün güncellemesinde stok ${fark} adet azaltıldı.`,
+      })
+
+      urunDuzenlemeModaliniKapat()
+      toastGoster?.('basari', `${ad} fiyat ve stok bilgileri kaydedildi.`)
+    }).catch(err => {
+      console.error('Ürün güncellenirken hata:', err)
+      toastGoster?.('hata', 'Ürün güncellenirken bir hata oluştu.')
     })
-
-    urunDuzenlemeModaliniKapat()
-    toastGoster?.('basari', `${ad} fiyat ve stok bilgileri kaydedildi.`)
   }
 
   const urunDuzenlemeSil = () => {
     if (!silinecekDuzenlemeUrunu) return
     const silinenUrun = { ...silinecekDuzenlemeUrunu }
     const silinenAd = silinenUrun.ad
-    const silinenIndex = urunler.findIndex((urun) => urun.uid === silinenUrun.uid)
-    setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinenUrun.uid))
-    stokLoguEkle({
-      urun: silinenUrun.ad,
-      urunId: silinenUrun.urunId,
-      eskiStok: silinenUrun.magazaStok,
-      yeniStok: 0,
-      islem: 'Ürün silindi',
-      aciklama: `${silinenUrun.magazaStok} adet stokla ürün düzenleme listesinden kaldırıldı.`,
-    })
-    setSilinecekDuzenlemeUrunu(null)
-    toastGoster?.('basari', `${silinenAd} ürün düzenleme listesinden kaldırıldı.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setUrunler((onceki) => {
-          if (onceki.some((urun) => urun.uid === silinenUrun.uid)) return onceki
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenUrun)
-          return yeni
-        })
-        stokLoguEkle({
-          urun: silinenUrun.ad,
-          urunId: silinenUrun.urunId,
-          eskiStok: 0,
-          yeniStok: silinenUrun.magazaStok,
-          islem: 'Stok artışı',
-          aciklama: 'Silme işlemi geri alındı ve ürün yeniden ürün listesine eklendi.',
-        })
-        toastGoster?.('basari', `${silinenAd} geri alındı.`)
-      },
+    productApi.delete(silinenUrun.uid).then(() => {
+      setUrunler((onceki) => onceki.filter((urun) => urun.uid !== silinenUrun.uid))
+      stokLoguEkle({
+        urun: silinenUrun.ad,
+        urunId: silinenUrun.urunId,
+        eskiStok: silinenUrun.magazaStok,
+        yeniStok: 0,
+        islem: 'Ürün silindi',
+        aciklama: `${silinenUrun.magazaStok} adet stokla ürün düzenleme listesinden kaldırıldı.`,
+      })
+      setSilinecekDuzenlemeUrunu(null)
+      toastGoster?.('basari', `${silinenAd} envanterden silindi.`)
+    }).catch(err => {
+      console.error('Ürün silinirken hata:', err)
+      toastGoster?.('hata', 'Ürün silinirken bir hata oluştu.')
     })
   }
 
@@ -710,6 +698,7 @@ export default function useInventory({ toastGoster }) {
 
   return {
     urunler,
+    kategoriler,
     stokDegisimLoglari,
     aramaMetni,
     setAramaMetni,

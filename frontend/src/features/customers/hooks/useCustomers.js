@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { baslangicMusterileri } from '../../../components/common/Ikonlar'
+import { useEffect, useMemo, useState } from 'react'
+import { customerApi } from '../../../core/services/backendApiService'
 import {
   bosMusteriFormu,
   favorileriOneTasi,
@@ -8,8 +8,8 @@ import {
 
 const MUSTERI_SAYFA_BASINA = 8
 
-export default function useCustomers({ toastGoster }) {
-  const [musteriler, setMusteriler] = useState(baslangicMusterileri)
+export default function useCustomers({ toastGoster, isLoggedIn }) {
+  const [musteriler, setMusteriler] = useState([])
   const [musteriArama, setMusteriArama] = useState('')
   const [musteriSayfa, setMusteriSayfa] = useState(1)
   const [musteriEklemeAcik, setMusteriEklemeAcik] = useState(false)
@@ -39,6 +39,21 @@ export default function useCustomers({ toastGoster }) {
   const toplamMusteriSayfa = Math.max(1, Math.ceil(filtreliMusteriler.length / MUSTERI_SAYFA_BASINA))
   const musteriBaslangic = (musteriSayfa - 1) * MUSTERI_SAYFA_BASINA
   const sayfadakiMusteriler = filtreliMusteriler.slice(musteriBaslangic, musteriBaslangic + MUSTERI_SAYFA_BASINA)
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const musterileriYukle = async () => {
+      try {
+        const veriler = await customerApi.getAll()
+        setMusteriler(veriler)
+      } catch (error) {
+        console.error('Müşteriler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Müşteri listesi veritabanından alınamadı.')
+      }
+    }
+    musterileriYukle()
+  }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
     if (musteriSayfa > toplamMusteriSayfa) {
@@ -130,32 +145,30 @@ export default function useCustomers({ toastGoster }) {
     }
 
     if (mod === 'ekle') {
-      setMusteriler((onceki) => [
-        {
-          uid: Date.now(),
-          ad,
-          telefon,
-          sonAlim,
-          not,
-          favori: false,
-        },
-        ...onceki,
-      ])
-      setMusteriSayfa(1)
-      musteriEklemeKapat()
-      toastGoster?.('basari', `${ad} müşteri listesine eklendi.`)
+      const yeniMusteriData = { ad, telefon, sonAlim, not }
+      customerApi.create(yeniMusteriData).then((sunucuVerisi) => {
+        setMusteriler((onceki) => [sunucuVerisi, ...onceki])
+        setMusteriSayfa(1)
+        musteriEklemeKapat()
+        toastGoster?.('basari', `${ad} müşteri listesine eklendi.`)
+      }).catch(err => {
+        console.error('Müşteri eklenirken hata:', err)
+        toastGoster?.('hata', 'Müşteri eklenirken bir hata oluştu.')
+      })
       return
     }
 
-    setMusteriler((onceki) =>
-      onceki.map((musteri) =>
-        musteri.uid === seciliMusteriUid
-          ? { ...musteri, ad, telefon, sonAlim, not }
-          : musteri,
-      ),
-    )
-    musteriDuzenlemeKapat()
-    toastGoster?.('basari', `${ad} müşteri kaydı güncellendi.`)
+    const guncellenenMusteriData = { ad, telefon, sonAlim, not }
+    customerApi.update(seciliMusteriUid, guncellenenMusteriData).then((sunucuVerisi) => {
+      setMusteriler((onceki) =>
+        onceki.map((m) => (m.uid === seciliMusteriUid ? sunucuVerisi : m)),
+      )
+      musteriDuzenlemeKapat()
+      toastGoster?.('basari', `${ad} müşteri kaydı güncellendi.`)
+    }).catch(err => {
+      console.error('Müşteri güncellenirken hata:', err)
+      toastGoster?.('hata', 'Müşteri güncellenirken bir hata oluştu.')
+    })
   }
 
   const musteriNotKaydet = () => {
@@ -177,28 +190,16 @@ export default function useCustomers({ toastGoster }) {
   }
 
   const musteriSil = () => {
-    if (!silinecekMusteri) return
-
     const silinenMusteri = { ...silinecekMusteri }
     const silinenAd = silinenMusteri.ad
-    const silinenIndex = musteriler.findIndex((musteri) => musteri.uid === silinenMusteri.uid)
 
-    setMusteriler((onceki) => onceki.filter((musteri) => musteri.uid !== silinenMusteri.uid))
-    musteriSilmeKapat()
-    toastGoster?.('basari', `${silinenAd} müşteri listesinden silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setMusteriler((onceki) => {
-          if (onceki.some((musteri) => musteri.uid === silinenMusteri.uid)) {
-            return onceki
-          }
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenMusteri)
-          return yeni
-        })
-        toastGoster?.('basari', `${silinenAd} geri alındı.`)
-      },
+    customerApi.delete(silinenMusteri.uid).then(() => {
+      setMusteriler((onceki) => onceki.filter((m) => m.uid !== silinenMusteri.uid))
+      musteriSilmeKapat()
+      toastGoster?.('basari', `${silinenAd} müşteri listesinden silindi.`)
+    }).catch(err => {
+      console.error('Müşteri silinirken hata:', err)
+      toastGoster?.('hata', 'Müşteri silinirken bir hata oluştu.')
     })
   }
 

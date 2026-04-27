@@ -9,6 +9,7 @@ import {
   favorileriOneTasi,
   negatifSayiVarMi,
 } from '../../../shared/utils/constantsAndHelpers'
+import { productApi } from '../../../core/services/backendApiService'
 
 const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
@@ -157,6 +158,19 @@ export default function useInventory({ toastGoster }) {
     stokLogBaslangic,
     stokLogBaslangic + STOK_LOG_SAYFA_BASINA,
   )
+
+  useEffect(() => {
+    const urunleriYukle = async () => {
+      try {
+        const veriler = await productApi.getAll()
+        setUrunler(veriler)
+      } catch (error) {
+        console.error('Ürünler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Ürün listesi veritabanından alınamadı.')
+      }
+    }
+    urunleriYukle()
+  }, [toastGoster])
 
   useEffect(() => {
     if (envanterSayfa > toplamEnvanterSayfa) {

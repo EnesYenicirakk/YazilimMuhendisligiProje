@@ -582,10 +582,12 @@ function App() {
             aiPanelKapaniyor={appNotifications.aiPanelKapaniyor}
             aiPaneliKapat={appNotifications.aiPaneliKapat}
             aiTemaMenuAcik={appNotifications.aiTemaMenuAcik}
+            aiYukleniyor={appNotifications.aiYukleniyor}
             setAiMesajMetni={appNotifications.setAiMesajMetni}
             setAiHizliKonularAcik={appNotifications.setAiHizliKonularAcik}
             setAiPanelKucuk={appNotifications.setAiPanelKucuk}
             setAiTemaMenuAcik={appNotifications.setAiTemaMenuAcik}
+            sohbetiTemizle={appNotifications.sohbetiTemizle}
           />
         </Suspense>
       )}

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\CustomerOrderController;
@@ -32,4 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('invoices',       InvoiceController::class);
     Route::apiResource('payments',       PaymentController::class);
     Route::apiResource('stock-logs',     StockLogController::class);
+
+    // AI Chatbot
+    Route::post('/chat', [ChatController::class, 'send']);
 });

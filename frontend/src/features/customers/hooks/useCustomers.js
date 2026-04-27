@@ -8,7 +8,7 @@ import {
 
 const MUSTERI_SAYFA_BASINA = 8
 
-export default function useCustomers({ toastGoster }) {
+export default function useCustomers({ toastGoster, isLoggedIn }) {
   const [musteriler, setMusteriler] = useState([])
   const [musteriArama, setMusteriArama] = useState('')
   const [musteriSayfa, setMusteriSayfa] = useState(1)
@@ -41,6 +41,8 @@ export default function useCustomers({ toastGoster }) {
   const sayfadakiMusteriler = filtreliMusteriler.slice(musteriBaslangic, musteriBaslangic + MUSTERI_SAYFA_BASINA)
 
   useEffect(() => {
+    if (!isLoggedIn) return
+
     const musterileriYukle = async () => {
       try {
         const veriler = await customerApi.getAll()
@@ -51,7 +53,7 @@ export default function useCustomers({ toastGoster }) {
       }
     }
     musterileriYukle()
-  }, [toastGoster])
+  }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
     if (musteriSayfa > toplamMusteriSayfa) {

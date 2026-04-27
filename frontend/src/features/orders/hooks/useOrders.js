@@ -19,7 +19,13 @@ const siparisIcinMusteriBul = (kayit, musteriListesi) => {
   )
 }
 
-export default function useOrders({ musteriler, toastGoster, telefonAramasiBaslat }) {
+export default function useOrders({
+  musteriler = [],
+  urunler = [],
+  toastGoster,
+  telefonAramasiBaslat,
+  isLoggedIn,
+}) {
   const siparisMusteriAdiniGetir = (kayit) =>
     siparisIcinMusteriBul(kayit, musteriler)?.ad ?? kayit?.musteri ?? 'Bilinmiyor'
 
@@ -128,6 +134,8 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   }, [siparisArama, siparisOdemeFiltresi])
 
   useEffect(() => {
+    if (!isLoggedIn) return
+
     const siparisleriYukle = async () => {
       try {
         const veriler = await orderApi.getAll()
@@ -138,7 +146,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
       }
     }
     siparisleriYukle()
-  }, [toastGoster])
+  }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
     setSiparisler((onceki) =>

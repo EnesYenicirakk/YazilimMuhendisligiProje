@@ -52,7 +52,7 @@ const siparisZamaniniAl = (siparis) => {
   return Number.isNaN(gunBazliZaman) ? 0 : gunBazliZaman
 }
 
-export default function useSuppliers({ toastGoster }) {
+export default function useSuppliers({ toastGoster, isLoggedIn }) {
   const [tedarikciler, setTedarikciler] = useState([])
   const [tedarikciArama, setTedarikciArama] = useState('')
   const [tedarikciSekmesi, setTedarikciSekmesi] = useState('liste')
@@ -141,6 +141,8 @@ export default function useSuppliers({ toastGoster }) {
   )
 
   useEffect(() => {
+    if (!isLoggedIn) return
+
     const tedarikcileriYukle = async () => {
       try {
         const veriler = await supplierApi.getAll()
@@ -151,7 +153,7 @@ export default function useSuppliers({ toastGoster }) {
       }
     }
     tedarikcileriYukle()
-  }, [toastGoster])
+  }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
     if (tedarikciSayfa > toplamTedarikciSayfa) setTedarikciSayfa(toplamTedarikciSayfa)
@@ -466,9 +468,6 @@ export default function useSuppliers({ toastGoster }) {
 
   const tedarikciSil = () => {
     if (!silinecekTedarikci) return
-    const silinenAd = silinecekTedarikci.firmaAdi
-    const silinenTedarikci = { ...silinecekTedarikci }
-    const silinenIndex = tedarikciler.findIndex((tedarikci) => tedarikci.uid === silinenTedarikci.uid)
     const silinenTedarikci = { ...silinecekTedarikci }
     const silinenAd = silinenTedarikci.firmaAdi
 

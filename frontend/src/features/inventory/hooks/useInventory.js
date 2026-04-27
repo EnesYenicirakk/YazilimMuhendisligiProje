@@ -15,7 +15,7 @@ const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
 const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, '').toLocaleLowerCase('tr-TR')
 
-export default function useInventory({ toastGoster }) {
+export default function useInventory({ toastGoster, isLoggedIn }) {
   const [urunler, setUrunler] = useState([])
   const [kategoriler, setKategoriler] = useState(['Tümü'])
   const [stokDegisimLoglari, setStokDegisimLoglari] = useState(() => [...baslangicStokDegisimLoglari])
@@ -161,21 +161,23 @@ export default function useInventory({ toastGoster }) {
   )
 
   useEffect(() => {
+    if (!isLoggedIn) return
+
     const urunleriYukle = async () => {
       try {
         const [urunVerileri, kategoriVerileri] = await Promise.all([
           productApi.getAll(),
-          categoryApi.getAll()
+          categoryApi.getAll(),
         ])
         setUrunler(urunVerileri)
-        setKategoriler(['Tümü', ...kategoriVerileri.map(c => c.name)])
+        setKategoriler(['Tümü', ...kategoriVerileri.map((c) => c.name)])
       } catch (error) {
         console.error('Veriler yüklenirken hata oluştu:', error)
-        toastGoster?.('hata', 'Veriler veritabanından alınamadı.')
+        toastGoster?.('hata', 'Ürün verileri veritabanından alınamadı.')
       }
     }
     urunleriYukle()
-  }, [toastGoster])
+  }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
     if (envanterSayfa > toplamEnvanterSayfa) {

@@ -9,7 +9,7 @@ import {
 
 const ODEME_SAYFA_BASINA = 10
 const BOS_ODEME_FORMU = { taraf: '', tarih: '', durum: '', tutar: '' }
-export default function useFinance({ toastGoster }) {
+export default function useFinance({ toastGoster, isLoggedIn }) {
   const [gelenNakitListesi, setGelenNakitListesi] = useState([])
   const [gidenNakitListesi, setGidenNakitListesi] = useState([])
   const [odemeSekmesi, setOdemeSekmesi] = useState('gelen')
@@ -62,6 +62,8 @@ export default function useFinance({ toastGoster }) {
   }, [gidenSayfa, toplamGidenSayfa])
 
   useEffect(() => {
+    if (!isLoggedIn) return
+
     const finansYukle = async () => {
       try {
         const veriler = await financeApi.getAll()
@@ -73,7 +75,7 @@ export default function useFinance({ toastGoster }) {
       }
     }
     finansYukle()
-  }, [toastGoster])
+  }, [toastGoster, isLoggedIn])
 
   const odemeListesiGuncelle = (sekme, guncelleyici) => {
     if (sekme === 'gelen') {

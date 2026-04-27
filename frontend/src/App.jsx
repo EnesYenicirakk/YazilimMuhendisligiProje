@@ -1,4 +1,4 @@
-﻿import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import './App.css'
 import { useMemo } from 'react'
 import { useEffect } from 'react'
@@ -84,10 +84,10 @@ function App() {
     onLoginSuccess: () => setAktifSayfa('merkez'),
   })
 
-  const customersData = useCustomers({ toastGoster })
-  const financeData = useFinance({ toastGoster })
-  const inventoryData = useInventory({ toastGoster })
-  const suppliersData = useSuppliers({ toastGoster })
+  const inventoryData = useInventory({ toastGoster, isLoggedIn: auth.isLoggedIn })
+  const customersData = useCustomers({ toastGoster, isLoggedIn: auth.isLoggedIn })
+  const suppliersData = useSuppliers({ toastGoster, isLoggedIn: auth.isLoggedIn })
+  const financeData = useFinance({ toastGoster, isLoggedIn: auth.isLoggedIn })
 
   const sayfaDegistir = (sayfa) => {
     setAktifSayfa(sayfa)
@@ -131,9 +131,10 @@ function App() {
     musteriler: customersData.musteriler,
     urunler: inventoryData.urunler,
     toastGoster,
+    isLoggedIn: auth.isLoggedIn,
     telefonAramasiBaslat: (telefon, etiket = 'Kayıt') => {
       if (!telefon) {
-        toastGoster('hata', `${etiket} için telefon bilgisi bulunamadı.`)
+        toastGoster('hata', `${etiket} için phone bilgisi bulunamadı.`)
         return
       }
       window.location.href = `tel:${telefon.replace(/\s+/g, '')}`

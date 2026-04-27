@@ -1,4 +1,6 @@
-﻿export default function AiPanel({
+import { useEffect, useRef } from 'react'
+
+export default function AiPanel({
   KucukIkon,
   TemaIkonu,
   aiHizliKonular,
@@ -9,11 +11,30 @@
   aiPanelKapaniyor,
   aiPaneliKapat,
   aiTemaMenuAcik,
+  aiYukleniyor,
   setAiMesajMetni,
   setAiHizliKonularAcik,
   setAiPanelKucuk,
   setAiTemaMenuAcik,
+  sohbetiTemizle,
 }) {
+  const mesajlarRef = useRef(null)
+
+  // Yeni mesaj geldiğinde otomatik aşağı kaydır
+  useEffect(() => {
+    if (mesajlarRef.current) {
+      mesajlarRef.current.scrollTop = mesajlarRef.current.scrollHeight
+    }
+  }, [aiMesajlar])
+
+  // Basit markdown benzeri formatlama (bold, satır sonu)
+  const metniFormatla = (metin) => {
+    if (!metin) return ''
+    return metin
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br />')
+  }
+
   return (
     <section className={`ai-panel ai-tema-acik ${aiPanelKapaniyor ? 'kapaniyor' : 'aciliyor'}`}>
       <header className="ai-panel-ust">
@@ -44,18 +65,30 @@
 
         <div className="ai-panel-baslik">
           <div className="ai-avatar" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="12" cy="8.3" r="4.1" />
-              <path d="M4.9 19.8a7.9 7.9 0 0 1 14.2 0c-1.7 1.4-4.3 2.2-7.1 2.2s-5.4-.8-7.1-2.2Z" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4Z" />
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="12" r="10" />
             </svg>
           </div>
           <div>
-            <strong>Kişisel Asistanınız</strong>
-            <small>Her zaman yanınızda</small>
+            <strong>Nex</strong>
+            <small>{aiYukleniyor ? 'Yanıt yazıyor...' : 'Çevrimiçi'}</small>
           </div>
         </div>
 
         <div className="ai-panel-aksiyonlar">
+          <button
+            type="button"
+            className="ai-ikon-buton"
+            aria-label="Sohbeti Temizle"
+            title="Sohbeti Temizle"
+            onClick={sohbetiTemizle}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '14px', height: '14px' }}>
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+          </button>
           <button
             type="button"
             className="ai-ikon-buton"
@@ -78,10 +111,18 @@
         </div>
       </header>
 
-      <div className="ai-mesajlar">
+      <div className="ai-mesajlar" ref={mesajlarRef}>
         {aiMesajlar.map((mesaj, index) => (
-          <article key={mesaj.id} className={`ai-mesaj ai-mesaj-${mesaj.rol}`}>
-            <p>{mesaj.metin}</p>
+          <article key={mesaj.id} className={`ai-mesaj ai-mesaj-${mesaj.rol}${mesaj.yukleniyor ? ' ai-mesaj-yukleniyor' : ''}`}>
+            {mesaj.yukleniyor ? (
+              <div className="ai-typing-indicator">
+                <span className="ai-typing-dot" />
+                <span className="ai-typing-dot" />
+                <span className="ai-typing-dot" />
+              </div>
+            ) : (
+              <p dangerouslySetInnerHTML={{ __html: metniFormatla(mesaj.metin) }} />
+            )}
             {index === 0 && mesaj.rol === 'bot' && aiHizliKonularAcik && (
               <div className="ai-hizli-konular">
                 {aiHizliKonular.map((konu) => (
@@ -89,6 +130,7 @@
                     key={konu.etiket}
                     type="button"
                     className="ai-hizli-konu"
+                    disabled={aiYukleniyor}
                     onClick={() => {
                       if (konu.etiket === 'Diğer') {
                         setAiHizliKonularAcik(false)
@@ -102,7 +144,7 @@
                 ))}
               </div>
             )}
-            <span>{mesaj.saat}</span>
+            {!mesaj.yukleniyor && mesaj.saat && <span>{mesaj.saat}</span>}
           </article>
         ))}
       </div>
@@ -113,15 +155,20 @@
           value={aiMesajMetni}
           onChange={(event) => setAiMesajMetni(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') aiMesajGonder()
+            if (event.key === 'Enter' && !aiYukleniyor) aiMesajGonder()
           }}
-          placeholder="Mesaj yaz..."
+          placeholder={aiYukleniyor ? 'Yanıt bekleniyor...' : 'Mesaj yaz...'}
+          disabled={aiYukleniyor}
         />
-        <button type="button" className="ai-gonder-buton" onClick={() => aiMesajGonder()}>
+        <button
+          type="button"
+          className="ai-gonder-buton"
+          onClick={() => aiMesajGonder()}
+          disabled={aiYukleniyor || !aiMesajMetni.trim()}
+        >
           <KucukIkon tip="gonder" />
         </button>
       </div>
     </section>
   )
 }
-

@@ -1,5 +1,6 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import { aiHizliKonular } from '../../shared/utils/constantsAndHelpers'
+import api from '../api/apiClient'
 
 export default function useAppNotifications({
   aktifSayfa,
@@ -26,9 +27,11 @@ export default function useAppNotifications({
   const [aiTemaMenuAcik, setAiTemaMenuAcik] = useState(false)
   const [aiMesajMetni, setAiMesajMetni] = useState('')
   const [aiHizliKonularAcik, setAiHizliKonularAcik] = useState(true)
+  const [aiYukleniyor, setAiYukleniyor] = useState(false)
   const [aiMesajlar, setAiMesajlar] = useState([
-    { id: 1, rol: 'bot', metin: 'Tekrardan hoş geldiniz, size nasıl yardımcı olabilirim?', saat: 'Şimdi' },
+    { id: 1, rol: 'bot', metin: 'Merhaba! Ben Nex, stok asistanınızım. Ürünler, stok durumu, siparişler ve müşteriler hakkında sorularınızı yanıtlayabilirim. Nasıl yardımcı olabilirim?', saat: 'Şimdi' },
   ])
+  const aiGecmisRef = useRef([])
 
   const tumBildirimler = useMemo(() => {
     const otomatikTedarikBildirimleri = tedarikSiparisleri
@@ -106,60 +109,60 @@ export default function useAppNotifications({
     [bildirimler, okunanBildirimler],
   )
 
-  const aiHazirCevaplar = useMemo(() => {
-    const enSonSiparis = siraliSiparisler[0]
-    const referansTarih = new Date()
-    const buAySiparisleri = siraliSiparisler.filter((siparis) => {
-      const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
-      return tarih.getMonth() === referansTarih.getMonth() && tarih.getFullYear() === referansTarih.getFullYear()
-    })
+  // AI mesaj gönderme - gerçek OpenRouter API çağrısı
+  const aiMesajGonderAPI = useCallback(async (mesajMetni) => {
+    const metin = mesajMetni.trim()
+    if (!metin || aiYukleniyor) return
 
-    const buAyToplamSatis = buAySiparisleri.reduce((toplam, siparis) => toplam + siparis.toplamTutar, 0)
-    const enYuksekAylikSiparis = [...buAySiparisleri].sort((a, b) => b.toplamTutar - a.toplamTutar)[0]
-    const dusukStokluUrunler = [...urunler]
-      .filter((urun) => dashboardCanliOzetler.kritikStokluUrunler.some((kritikUrun) => kritikUrun.uid === urun.uid))
-      .sort((a, b) => a.magazaStok - b.magazaStok)
-      .slice(0, 4)
-    const kargolananSiparisler = siraliSiparisler.filter(
-      (siparis) =>
-        siparis.teslimatDurumu === 'Yolda' ||
-        siparis.teslimatDurumu === 'Kargoda' ||
-        siparis.teslimatDurumu === 'Teslim Edildi',
-    )
-    const teslimEdilenler = kargolananSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Teslim Edildi')
-    const yoldakiler = kargolananSiparisler.filter(
-      (siparis) => siparis.teslimatDurumu === 'Yolda' || siparis.teslimatDurumu === 'Kargoda',
-    )
-    const kargolanmayanSiparisler = siraliSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Hazırlanıyor')
-    const kargolanmayanOzet = kargolanmayanSiparisler.slice(0, 3).map((siparis) => `${siparis.siparisNo} - ${siparis.urun}`).join(', ')
+    const saatStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+    const mesajId = Date.now()
+    const typingId = mesajId + '-typing'
 
-    const enCokSatanlar = enCokSatilanUrunleriHesapla(siraliSiparisler, 3)
-      .map((urun) => `${urun.ad} (${urun.miktar} adet)`)
-      .join(', ')
+    // Kullanıcı mesajını ve typing indicator'ı tek seferde ekle
+    setAiMesajlar((onceki) => [
+      ...onceki, 
+      { id: mesajId, rol: 'kullanici', metin, saat: saatStr },
+      { id: typingId, rol: 'bot', metin: '...', saat: '', yukleniyor: true }
+    ])
+    
+    setAiHizliKonularAcik(false)
+    setAiYukleniyor(true)
 
-    return {
-      [metniNormalizeEt('Bu ay gerçekleşen satışlar hakkında bilgi ver.')]:
-        `Bu ay toplam ${buAySiparisleri.length} siparişten ${paraFormatla(buAyToplamSatis)} ciro oluştu. En yüksek tutarlı sipariş ${enYuksekAylikSiparis?.siparisNo ?? '-'} numaralı kayıtta, ${enYuksekAylikSiparis?.musteri ?? '-'} için ${paraFormatla(enYuksekAylikSiparis?.toplamTutar ?? 0)} olarak görünüyor.`,
-      [metniNormalizeEt('Bana stokları azalan ürünlerimiz hakkında bilgi ver.')]:
-        dusukStokluUrunler.length > 0
-          ? `Kritik stok seviyesine düşen ürünler: ${dusukStokluUrunler.map((urun) => `${urun.ad} (minimum ${urun.minimumStok} / mevcut ${urun.magazaStok})`).join(', ')}. Bu ürünler için yeniden sipariş açılması gerekiyor.`
-          : 'Şu an kritik eşik altında görünen bir ürün yok. Envanter genel olarak dengeli görünüyor.',
-      [metniNormalizeEt('Kargolanan siparişlerin teslimi yapıldı mı')]:
-        `Toplam ${kargolananSiparisler.length} sipariş kargoya çıktı. Bunların ${teslimEdilenler.length} adedi teslim edildi, ${yoldakiler.length} adedi ise hâlâ yolda. En yakın teslimat beklenen kayıtlar dashboarddaki son siparişler tablosunda da görünüyor.`,
-      [metniNormalizeEt('Hangi siparişlerimiz henüz kargolanmadı')]:
-        kargolanmayanSiparisler.length > 0
-          ? `Şu an ${kargolanmayanSiparisler.length} sipariş henüz kargolanmadı. Öne çıkan kayıtlar: ${kargolanmayanOzet}. Bu siparişlerin durumu siparişler ekranında "Hazırlanıyor" olarak işaretli.`
-          : 'Şu anda kargolanmamış açık sipariş görünmüyor. Tüm kayıtlar ya yolda ya da teslim edilmiş durumda.',
-      [metniNormalizeEt('En çok satan ürünlerimizden bana bahset.')]:
-        enCokSatanlar
-          ? `Sipariş kaydına göre öne çıkan ürünler: ${enCokSatanlar}. Bu ürünler dashboarddaki "En Çok Satılan Ürünler" alanıyla aynı veriden hesaplanıyor.`
-          : 'Teslim edilmiş siparişlere göre öne çıkan bir ürün verisi henüz oluşmadı.',
-      [metniNormalizeEt('En son gerçekleşen satışın ayrıntılarını anlat.')]:
-        enSonSiparis
-          ? `En son satış ${enSonSiparis.siparisNo} numarasıyla ${tarihFormatla(enSonSiparis.siparisTarihi)} tarihinde oluşturuldu. Ürün ${enSonSiparis.urun}, müşteri ${enSonSiparis.musteri}, tutar ${paraFormatla(enSonSiparis.toplamTutar)} ve teslimat durumu ${enSonSiparis.teslimatDurumu.toLocaleLowerCase('tr-TR')} olarak kayıtlı.`
-          : 'En son satış kaydı şu anda bulunamadı.',
+    try {
+      // Geçmişi hazırla (son 10 mesaj çifti)
+      const gecmis = aiGecmisRef.current.slice(-20)
+
+      const response = await api.post('/chat', {
+        message: metin,
+        history: gecmis,
+      })
+
+      const yanit = response.reply || 'Yanıt alınamadı.'
+
+      // Geçmişe ekle
+      aiGecmisRef.current = [
+        ...aiGecmisRef.current,
+        { role: 'user', content: metin },
+        { role: 'assistant', content: yanit },
+      ].slice(-20)
+
+      // Typing indicator'ı gerçek yanıtla değiştir
+      const yanitSaat = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+      setAiMesajlar((onceki) =>
+        onceki.map((m) => (m.id === typingId ? { ...m, metin: yanit, saat: yanitSaat, yukleniyor: false } : m)),
+      )
+    } catch (err) {
+      // Hata durumunda typing indicator'ı hata mesajına çevir
+      const hataMesaji = err?.data?.reply || err?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.'
+      setAiMesajlar((onceki) =>
+        onceki.map((m) =>
+          m.id === typingId ? { ...m, metin: `⚠️ ${hataMesaji}`, saat: 'Hata', yukleniyor: false } : m,
+        ),
+      )
+    } finally {
+      setAiYukleniyor(false)
     }
-  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, tarihFormatla, urunler])
+  }, [aiYukleniyor])
 
   useEffect(() => {
     if (!aiPanelKapaniyor) return undefined
@@ -200,19 +203,24 @@ export default function useAppNotifications({
     const metin = (hazirMetin ?? aiMesajMetni).trim()
     if (!metin) return
 
-    const normalizeMetin = metniNormalizeEt(metin)
-    setAiHizliKonularAcik(false)
-    setAiMesajlar((onceki) => [...onceki, { id: Date.now(), rol: 'kullanici', metin, saat: 'Şimdi' }])
     if (!hazirMetin) setAiMesajMetni('')
 
-    if (normalizeMetin === metniNormalizeEt('Diğer')) return
+    // "Diğer" butonuna basılırsa sadece hızlı konuları kapat
+    if (metin === 'Diğer') {
+      setAiHizliKonularAcik(false)
+      return
+    }
 
-    const hazirCevap = aiHazirCevaplar[normalizeMetin]
-    if (!hazirCevap) return
+    aiMesajGonderAPI(metin)
+  }
 
-    window.setTimeout(() => {
-      setAiMesajlar((onceki) => [...onceki, { id: Date.now() + 1, rol: 'bot', metin: hazirCevap, saat: 'Şimdi' }])
-    }, 320)
+  const sohbetiTemizle = () => {
+    setAiMesajlar([
+      { id: 1, rol: 'bot', metin: 'Merhaba! Ben Nex, stok asistanınızım. Ürünler, stok durumu, siparişler ve müşteriler hakkında sorularınızı yanıtlayabilirim. Nasıl yardımcı olabilirim?', saat: 'Şimdi' },
+    ])
+    aiGecmisRef.current = []
+    setAiHizliKonularAcik(true)
+    setAiMesajMetni('')
   }
 
   const aiPaneliAc = () => {
@@ -303,6 +311,7 @@ export default function useAppNotifications({
     aiPanelKucuk,
     aiPaneliKapat,
     aiTemaMenuAcik,
+    aiYukleniyor,
     bildirimDugmesiTikla,
     bildirimPanelAcik,
     bildirimPanelKapaniyor,
@@ -318,6 +327,7 @@ export default function useAppNotifications({
     setAiMesajMetni,
     setAiPanelKucuk,
     setAiTemaMenuAcik,
+    sohbetiTemizle,
     tumBildirimleriTemizle,
   }
 }

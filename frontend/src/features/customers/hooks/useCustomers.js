@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { baslangicMusterileri } from '../../../components/common/Ikonlar'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import api from '../../../core/api/apiClient'
 import {
   bosMusteriFormu,
   favorileriOneTasi,
@@ -8,8 +8,8 @@ import {
 
 const MUSTERI_SAYFA_BASINA = 8
 
-export default function useCustomers({ toastGoster }) {
-  const [musteriler, setMusteriler] = useState(baslangicMusterileri)
+export default function useCustomers({ toastGoster, isLoggedIn }) {
+  const [musteriler, setMusteriler] = useState([])
   const [musteriArama, setMusteriArama] = useState('')
   const [musteriSayfa, setMusteriSayfa] = useState(1)
   const [musteriEklemeAcik, setMusteriEklemeAcik] = useState(false)
@@ -20,6 +20,31 @@ export default function useCustomers({ toastGoster }) {
   const [musteriNotMetni, setMusteriNotMetni] = useState('')
   const [silinecekMusteri, setSilinecekMusteri] = useState(null)
 
+  // Backend'den müşterileri yükle
+  const musterileriFetchle = useCallback(async () => {
+    try {
+      const data = await api.get('/customers')
+      const liste = (data?.data ?? data ?? []).map((m) => ({
+        uid: m.uid,
+        ad: m.ad,
+        telefon: m.telefon ?? '',
+        email: m.email ?? '',
+        adres: m.adres ?? '',
+        vergiNumarasi: m.vergiNumarasi ?? '',
+        sonAlim: m.sonAlimTarihi ?? '',
+        not: m.not ?? '',
+        favori: false,
+      }))
+      setMusteriler(liste)
+    } catch {
+      toastGoster?.('hata', 'Müşteriler yüklenirken hata oluştu.')
+    }
+  }, [toastGoster])
+
+  useEffect(() => {
+    if (isLoggedIn) musterileriFetchle()
+  }, [isLoggedIn, musterileriFetchle])
+
   const filtreliMusteriler = useMemo(() => {
     const metin = musteriArama.trim().toLowerCase()
     const sonuc = !metin
@@ -27,7 +52,7 @@ export default function useCustomers({ toastGoster }) {
       : musteriler.filter(
           (musteri) =>
             musteri.ad.toLowerCase().includes(metin) ||
-            musteri.telefon.toLowerCase().includes(metin),
+            (musteri.telefon ?? '').toLowerCase().includes(metin),
         )
 
     return favorileriOneTasi(
@@ -41,9 +66,7 @@ export default function useCustomers({ toastGoster }) {
   const sayfadakiMusteriler = filtreliMusteriler.slice(musteriBaslangic, musteriBaslangic + MUSTERI_SAYFA_BASINA)
 
   useEffect(() => {
-    if (musteriSayfa > toplamMusteriSayfa) {
-      setMusteriSayfa(toplamMusteriSayfa)
-    }
+    if (musteriSayfa > toplamMusteriSayfa) setMusteriSayfa(toplamMusteriSayfa)
   }, [musteriSayfa, toplamMusteriSayfa])
 
   const musteriFormuTemizle = () => {
@@ -52,46 +75,19 @@ export default function useCustomers({ toastGoster }) {
     setMusteriNotMetni('')
   }
 
-  const musteriEklemeKapat = () => {
-    setMusteriEklemeAcik(false)
-    musteriFormuTemizle()
-  }
-
-  const musteriDuzenlemeKapat = () => {
-    setMusteriDuzenlemeAcik(false)
-    musteriFormuTemizle()
-  }
-
-  const musteriNotKapat = () => {
-    setMusteriNotAcik(false)
-    setSeciliMusteriUid(null)
-    setMusteriNotMetni('')
-  }
-
-  const musteriSilmeKapat = () => {
-    setSilinecekMusteri(null)
-  }
-
+  const musteriEklemeKapat = () => { setMusteriEklemeAcik(false); musteriFormuTemizle() }
+  const musteriDuzenlemeKapat = () => { setMusteriDuzenlemeAcik(false); musteriFormuTemizle() }
+  const musteriNotKapat = () => { setMusteriNotAcik(false); setSeciliMusteriUid(null); setMusteriNotMetni('') }
+  const musteriSilmeKapat = () => setSilinecekMusteri(null)
   const musteriModallariniKapat = () => {
-    musteriEklemeKapat()
-    musteriDuzenlemeKapat()
-    musteriNotKapat()
-    musteriSilmeKapat()
+    musteriEklemeKapat(); musteriDuzenlemeKapat(); musteriNotKapat(); musteriSilmeKapat()
   }
 
-  const musteriEklemeAc = () => {
-    musteriFormuTemizle()
-    setMusteriEklemeAcik(true)
-  }
+  const musteriEklemeAc = () => { musteriFormuTemizle(); setMusteriEklemeAcik(true) }
 
   const musteriDuzenlemeAc = (musteri) => {
     setSeciliMusteriUid(musteri.uid)
-    setMusteriFormu({
-      ad: musteri.ad,
-      telefon: musteri.telefon,
-      sonAlim: musteri.sonAlim,
-      not: musteri.not,
-    })
+    setMusteriFormu({ ad: musteri.ad, telefon: musteri.telefon, sonAlim: musteri.sonAlim, not: musteri.not })
     setMusteriDuzenlemeAcik(true)
   }
 
@@ -101,105 +97,93 @@ export default function useCustomers({ toastGoster }) {
     setMusteriNotAcik(true)
   }
 
-  const musteriFormuGuncelle = (alan, deger) => {
+  const musteriFormuGuncelle = (alan, deger) =>
     setMusteriFormu((onceki) => ({ ...onceki, [alan]: deger }))
-  }
 
-  const musteriFavoriDegistir = (uid) => {
+  const musteriFavoriDegistir = (uid) =>
     setMusteriler((onceki) =>
-      onceki.map((musteri) =>
-        musteri.uid === uid ? { ...musteri, favori: !musteri.favori } : musteri,
-      ),
+      onceki.map((m) => (m.uid === uid ? { ...m, favori: !m.favori } : m)),
     )
-  }
 
-  const musteriKaydet = (mod) => {
-    const ad = musteriFormu.ad.trim()
-    const telefon = musteriFormu.telefon.trim()
+  const musteriKaydet = async (mod) => {
+    const ad = musteriFormu.ad?.trim()
+    const telefon = musteriFormu.telefon?.trim()
+    const not = musteriFormu.not?.trim()
     const sonAlim = musteriFormu.sonAlim
-    const not = musteriFormu.not.trim()
 
-    if (!ad || !telefon || !sonAlim || !not) {
-      toastGoster?.('hata', 'Müşteri formunda eksik veya hatalı alan var.')
+    if (!ad || !telefon) {
+      toastGoster?.('hata', 'Müşteri formunda eksik alan var.')
       return
     }
-
     if (!telefonGecerliMi(telefon)) {
       toastGoster?.('hata', 'Telefon numarası 0 ile başlamalı ve 11 haneli olmalı.')
       return
     }
 
-    if (mod === 'ekle') {
-      setMusteriler((onceki) => [
-        {
-          uid: Date.now(),
-          ad,
-          telefon,
-          sonAlim,
-          not,
-          favori: false,
-        },
-        ...onceki,
-      ])
-      setMusteriSayfa(1)
-      musteriEklemeKapat()
-      toastGoster?.('basari', `${ad} müşteri listesine eklendi.`)
-      return
+    try {
+      if (mod === 'ekle') {
+        const yanit = await api.post('/customers', {
+          full_name: ad,
+          phone: telefon,
+          last_purchase_date: sonAlim || null,
+          notes: not,
+        })
+        const yeni = yanit?.data ?? yanit
+        setMusteriler((onceki) => [{
+          uid: yeni.uid, ad: yeni.ad, telefon: yeni.telefon ?? telefon,
+          email: yeni.email ?? '', adres: yeni.adres ?? '',
+          vergiNumarasi: yeni.vergiNumarasi ?? '', sonAlim: yeni.sonAlimTarihi ?? sonAlim,
+          not: yeni.not ?? not, favori: false,
+        }, ...onceki])
+        setMusteriSayfa(1)
+        musteriEklemeKapat()
+        toastGoster?.('basari', `${ad} müşteri listesine eklendi.`)
+      } else {
+        await api.put(`/customers/${seciliMusteriUid}`, {
+          full_name: ad, phone: telefon,
+          last_purchase_date: sonAlim || null, notes: not,
+        })
+        setMusteriler((onceki) =>
+          onceki.map((m) =>
+            m.uid === seciliMusteriUid ? { ...m, ad, telefon, sonAlim, not } : m,
+          ),
+        )
+        musteriDuzenlemeKapat()
+        toastGoster?.('basari', `${ad} müşteri kaydı güncellendi.`)
+      }
+    } catch {
+      toastGoster?.('hata', 'İşlem sırasında hata oluştu.')
     }
-
-    setMusteriler((onceki) =>
-      onceki.map((musteri) =>
-        musteri.uid === seciliMusteriUid
-          ? { ...musteri, ad, telefon, sonAlim, not }
-          : musteri,
-      ),
-    )
-    musteriDuzenlemeKapat()
-    toastGoster?.('basari', `${ad} müşteri kaydı güncellendi.`)
   }
 
-  const musteriNotKaydet = () => {
+  const musteriNotKaydet = async () => {
     const temizNot = musteriNotMetni.trim()
-    if (!temizNot) {
-      toastGoster?.('hata', 'Müşteri notu boş bırakılamaz.')
-      return
+    if (!temizNot) { toastGoster?.('hata', 'Müşteri notu boş bırakılamaz.'); return }
+    const seciliMusteri = musteriler.find((m) => m.uid === seciliMusteriUid)
+    try {
+      await api.put(`/customers/${seciliMusteriUid}`, { notes: temizNot })
+      setMusteriler((onceki) =>
+        onceki.map((m) => (m.uid === seciliMusteriUid ? { ...m, not: temizNot } : m)),
+      )
+      musteriNotKapat()
+      toastGoster?.('basari', `${seciliMusteri?.ad ?? 'Müşteri'} notu kaydedildi.`)
+    } catch {
+      toastGoster?.('hata', 'Not kaydedilirken hata oluştu.')
     }
-
-    const seciliMusteri = musteriler.find((musteri) => musteri.uid === seciliMusteriUid)
-
-    setMusteriler((onceki) =>
-      onceki.map((musteri) =>
-        musteri.uid === seciliMusteriUid ? { ...musteri, not: temizNot } : musteri,
-      ),
-    )
-    musteriNotKapat()
-    toastGoster?.('basari', `${seciliMusteri?.ad ?? 'Müşteri'} notu kaydedildi.`)
   }
 
-  const musteriSil = () => {
+  const musteriSil = async () => {
     if (!silinecekMusteri) return
-
     const silinenMusteri = { ...silinecekMusteri }
     const silinenAd = silinenMusteri.ad
-    const silinenIndex = musteriler.findIndex((musteri) => musteri.uid === silinenMusteri.uid)
-
-    setMusteriler((onceki) => onceki.filter((musteri) => musteri.uid !== silinenMusteri.uid))
-    musteriSilmeKapat()
-    toastGoster?.('basari', `${silinenAd} müşteri listesinden silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setMusteriler((onceki) => {
-          if (onceki.some((musteri) => musteri.uid === silinenMusteri.uid)) {
-            return onceki
-          }
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenMusteri)
-          return yeni
-        })
-        toastGoster?.('basari', `${silinenAd} geri alındı.`)
-      },
-    })
+    try {
+      await api.delete(`/customers/${silinenMusteri.uid}`)
+      setMusteriler((onceki) => onceki.filter((m) => m.uid !== silinenMusteri.uid))
+      musteriSilmeKapat()
+      toastGoster?.('basari', `${silinenAd} müşteri listesinden silindi.`)
+    } catch {
+      toastGoster?.('hata', 'Müşteri silinirken hata oluştu.')
+    }
   }
 
   const musteriSayfayaGit = (sayfa) => {
@@ -208,42 +192,14 @@ export default function useCustomers({ toastGoster }) {
   }
 
   return {
-    musteriler,
-    musteriArama,
-    setMusteriArama,
-    musteriSayfa,
-    setMusteriSayfa,
-    musteriEklemeAcik,
-    setMusteriEklemeAcik,
-    musteriDuzenlemeAcik,
-    setMusteriDuzenlemeAcik,
-    musteriNotAcik,
-    setMusteriNotAcik,
-    seciliMusteriUid,
-    setSeciliMusteriUid,
-    musteriFormu,
-    musteriNotMetni,
-    setMusteriNotMetni,
-    silinecekMusteri,
-    setSilinecekMusteri,
-    filtreliMusteriler,
-    toplamMusteriSayfa,
-    musteriBaslangic,
-    sayfadakiMusteriler,
-    musteriFormuTemizle,
-    musteriEklemeKapat,
-    musteriDuzenlemeKapat,
-    musteriNotKapat,
-    musteriSilmeKapat,
-    musteriModallariniKapat,
-    musteriEklemeAc,
-    musteriDuzenlemeAc,
-    musteriNotAc,
-    musteriFormuGuncelle,
-    musteriFavoriDegistir,
-    musteriKaydet,
-    musteriNotKaydet,
-    musteriSil,
-    musteriSayfayaGit,
+    musteriler, musteriArama, setMusteriArama, musteriSayfa, setMusteriSayfa,
+    musteriEklemeAcik, setMusteriEklemeAcik, musteriDuzenlemeAcik, setMusteriDuzenlemeAcik,
+    musteriNotAcik, setMusteriNotAcik, seciliMusteriUid, setSeciliMusteriUid,
+    musteriFormu, musteriNotMetni, setMusteriNotMetni, silinecekMusteri, setSilinecekMusteri,
+    filtreliMusteriler, toplamMusteriSayfa, musteriBaslangic, sayfadakiMusteriler,
+    musteriFormuTemizle, musteriEklemeKapat, musteriDuzenlemeKapat, musteriNotKapat,
+    musteriSilmeKapat, musteriModallariniKapat, musteriEklemeAc, musteriDuzenlemeAc,
+    musteriNotAc, musteriFormuGuncelle, musteriFavoriDegistir, musteriKaydet,
+    musteriNotKaydet, musteriSil, musteriSayfayaGit,
   }
 }

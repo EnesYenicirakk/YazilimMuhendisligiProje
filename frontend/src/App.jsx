@@ -1,4 +1,4 @@
-﻿import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import './App.css'
 import { useMemo } from 'react'
 import { useEffect } from 'react'
@@ -46,8 +46,6 @@ const SuppliersPanel = lazy(() => import('./features/suppliers/components/Suppli
 const SupplierModals = lazy(() => import('./features/suppliers/components/SupplierModals'))
 const CustomerModals = lazy(() => import('./features/customers/components/CustomerModals'))
 
-const DEFAULT_USERNAME = 'admin'
-const DEFAULT_PASSWORD = 'admin123'
 
 function TemaIkonu({ tema }) {
   if (tema === 'acik') {
@@ -79,15 +77,13 @@ function App() {
   const { toastGoster } = useToast()
 
   const auth = useAuth({
-    validUsername: DEFAULT_USERNAME,
-    validPassword: DEFAULT_PASSWORD,
     onLoginSuccess: () => setAktifSayfa('merkez'),
   })
 
-  const customersData = useCustomers({ toastGoster })
-  const financeData = useFinance({ toastGoster })
-  const inventoryData = useInventory({ toastGoster })
-  const suppliersData = useSuppliers({ toastGoster })
+  const customersData = useCustomers({ toastGoster, isLoggedIn: auth.isLoggedIn })
+  const financeData = useFinance({ toastGoster, isLoggedIn: auth.isLoggedIn })
+  const inventoryData = useInventory({ toastGoster, isLoggedIn: auth.isLoggedIn })
+  const suppliersData = useSuppliers({ toastGoster, isLoggedIn: auth.isLoggedIn })
 
   const sayfaDegistir = (sayfa) => {
     setAktifSayfa(sayfa)
@@ -138,6 +134,7 @@ function App() {
       }
       window.location.href = `tel:${telefon.replace(/\s+/g, '')}`
     },
+    isLoggedIn: auth.isLoggedIn,
   })
 
   const customersViewData = useMemo(() => {
@@ -178,6 +175,7 @@ function App() {
     tedarikciler: suppliersData.tedarikciler,
     urunler: inventoryData.urunler,
     toastGoster,
+    isLoggedIn: auth.isLoggedIn,
   })
 
   const dashboardData = useDashboard({
@@ -204,15 +202,12 @@ function App() {
 
       if (siparisMiktari <= 0) return
 
-      const acikOtomatikSiparisVar = suppliersData.tumTedarikSiparisleri.some(
-        (siparis) =>
-          siparis.otomatik &&
-          siparis.kaynak === 'stok-koruma' &&
-          siparis.urunId === urun.urunId &&
-          siparis.durum !== 'Teslim alındı',
-      )
+      const autoOrdersStr = localStorage.getItem('auto_orders')
+      const autoOrders = autoOrdersStr ? JSON.parse(autoOrdersStr) : []
+      if (autoOrders.includes(urun.urunId)) return
 
-      if (acikOtomatikSiparisVar) return
+      autoOrders.push(urun.urunId)
+      localStorage.setItem('auto_orders', JSON.stringify(autoOrders))
 
       suppliersData.otomatikTedarikSiparisiOlustur({
         urun,
@@ -581,10 +576,12 @@ function App() {
             aiPanelKapaniyor={appNotifications.aiPanelKapaniyor}
             aiPaneliKapat={appNotifications.aiPaneliKapat}
             aiTemaMenuAcik={appNotifications.aiTemaMenuAcik}
+            aiYukleniyor={appNotifications.aiYukleniyor}
             setAiMesajMetni={appNotifications.setAiMesajMetni}
             setAiHizliKonularAcik={appNotifications.setAiHizliKonularAcik}
             setAiPanelKucuk={appNotifications.setAiPanelKucuk}
             setAiTemaMenuAcik={appNotifications.setAiTemaMenuAcik}
+            sohbetiTemizle={appNotifications.sohbetiTemizle}
           />
         </Suspense>
       )}

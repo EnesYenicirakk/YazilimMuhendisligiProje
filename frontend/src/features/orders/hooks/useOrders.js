@@ -238,31 +238,27 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
       return
     }
 
-    const enYuksekNo = siparisler.reduce((maksimum, siparis) => {
-      const sayi = Number(String(siparis.siparisNo).replace(/[^\d]/g, ''))
-      return Number.isNaN(sayi) ? maksimum : Math.max(maksimum, sayi)
-    }, 0)
-    const yeniSiparisNo = `#SP-${enYuksekNo + 1}`
+    const yeniSiparisData = {
+      musteriUid,
+      urun,
+      siparisTarihi,
+      toplamTutar,
+      odemeDurumu,
+      urunHazirlik,
+      teslimatDurumu,
+      teslimatSuresi,
+    }
 
-    setSiparisler((onceki) => [
-      {
-        siparisNo: yeniSiparisNo,
-        musteriUid: seciliMusteri.uid,
-        musteri: seciliMusteri.ad,
-        urun,
-        toplamTutar,
-        siparisTarihi,
-        odemeDurumu,
-        urunHazirlik,
-        teslimatDurumu,
-        teslimatSuresi,
-      },
-      ...onceki,
-    ])
-    setYeniSiparisAcik(false)
-    setSiparisSayfa(1)
-    setSiparisFormu(bosSiparisFormu)
-    toastGoster?.('basari', `${yeniSiparisNo} numaralı yeni sipariş oluşturuldu.`)
+    orderApi.create(yeniSiparisData).then((sunucuVerisi) => {
+      setSiparisler((onceki) => [sunucuVerisi, ...onceki])
+      setYeniSiparisAcik(false)
+      setSiparisSayfa(1)
+      setSiparisFormu(bosSiparisFormu)
+      toastGoster?.('basari', `${sunucuVerisi.siparisNo} numaralı yeni sipariş oluşturuldu.`)
+    }).catch(err => {
+      console.error('Sipariş eklenirken hata:', err)
+      toastGoster?.('hata', 'Sipariş oluşturulurken bir hata oluştu.')
+    })
   }
 
   const siparisDuzenlemeKaydet = () => {

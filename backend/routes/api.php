@@ -13,10 +13,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::get('/customers', [CustomerController::class, 'index']);
-Route::get('/orders', [OrderController::class, 'index']);
+Route::apiResource('products', ProductController::class);
+Route::apiResource('customers', CustomerController::class);
+Route::apiResource('orders', OrderController::class);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/finance', [FinanceController::class, 'index']);
-Route::get('/suppliers', [SupplierController::class, 'index']);
+Route::apiResource('suppliers', SupplierController::class);

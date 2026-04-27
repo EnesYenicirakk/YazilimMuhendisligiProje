@@ -27,14 +27,21 @@ export const apiFetch = async (endpoint, options = {}) => {
 export const productApi = {
   getAll: () => apiFetch('/products'),
   getById: (id) => apiFetch(`/products/${id}`),
+  create: (data) => apiFetch('/products', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => apiFetch(`/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => apiFetch(`/products/${id}`, { method: 'DELETE' }),
 };
 
 export const customerApi = {
   getAll: () => apiFetch('/customers'),
+  create: (data) => apiFetch('/customers', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => apiFetch(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => apiFetch(`/customers/${id}`, { method: 'DELETE' }),
 };
 
 export const orderApi = {
   getAll: () => apiFetch('/orders'),
+  create: (data) => apiFetch('/orders', { method: 'POST', body: JSON.stringify(data) }),
 };
 
 export const categoryApi = {
@@ -47,4 +54,7 @@ export const financeApi = {
 
 export const supplierApi = {
   getAll: () => apiFetch('/suppliers'),
+  create: (data) => apiFetch('/suppliers', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => apiFetch(`/suppliers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => apiFetch(`/suppliers/${id}`, { method: 'DELETE' }),
 };

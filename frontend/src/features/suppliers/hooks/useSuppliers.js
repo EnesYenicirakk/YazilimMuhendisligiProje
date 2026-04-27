@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { baslangicTedarikcileri } from '../../../components/common/Ikonlar'
+import { useEffect, useMemo, useState } from 'react'
+import { supplierApi } from '../../../core/services/backendApiService'
 import {
   bosTedarikciFormu,
   bosTedarikciSiparisFormu,
@@ -53,7 +53,7 @@ const siparisZamaniniAl = (siparis) => {
 }
 
 export default function useSuppliers({ toastGoster }) {
-  const [tedarikciler, setTedarikciler] = useState(baslangicTedarikcileri)
+  const [tedarikciler, setTedarikciler] = useState([])
   const [tedarikciArama, setTedarikciArama] = useState('')
   const [tedarikciSekmesi, setTedarikciSekmesi] = useState('liste')
   const [tedarikciSayfa, setTedarikciSayfa] = useState(1)
@@ -139,6 +139,19 @@ export default function useSuppliers({ toastGoster }) {
     tedarikSiparisBaslangic,
     tedarikSiparisBaslangic + TEDARIKCI_SAYFA_BASINA,
   )
+
+  useEffect(() => {
+    const tedarikcileriYukle = async () => {
+      try {
+        const veriler = await supplierApi.getAll()
+        setTedarikciler(veriler)
+      } catch (error) {
+        console.error('Tedarikçiler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Tedarikçi listesi veritabanından alınamadı.')
+      }
+    }
+    tedarikcileriYukle()
+  }, [toastGoster])
 
   useEffect(() => {
     if (tedarikciSayfa > toplamTedarikciSayfa) setTedarikciSayfa(toplamTedarikciSayfa)

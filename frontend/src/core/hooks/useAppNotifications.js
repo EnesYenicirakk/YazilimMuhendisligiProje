@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react'
 import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
 import { fetchAiResponse } from '../services/aiService'
 

@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  baslangicGecmisSiparisleri,
-  baslangicSiparisleri,
-} from '../../../components/common/Ikonlar'
+import { orderApi } from '../../../core/services/backendApiService'
 import { bosSiparisFormu, negatifSayiVarMi } from '../../../shared/utils/constantsAndHelpers'
 
 const SIPARIS_SAYFA_BASINA = 8
@@ -26,7 +23,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   const siparisMusteriAdiniGetir = (kayit) =>
     siparisIcinMusteriBul(kayit, musteriler)?.ad ?? kayit?.musteri ?? 'Bilinmiyor'
 
-  const [siparisler, setSiparisler] = useState(baslangicSiparisleri)
+  const [siparisler, setSiparisler] = useState([])
   const [siparisArama, setSiparisArama] = useState('')
   const [siparisOdemeFiltresi, setSiparisOdemeFiltresi] = useState('Tüm Siparişler')
   const [siparisSekmesi, setSiparisSekmesi] = useState('aktif')
@@ -41,7 +38,7 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   const [silinecekSiparis, setSilinecekSiparis] = useState(null)
   const [siparisFormu, setSiparisFormu] = useState(bosSiparisFormu)
   const [siparisDurumFormu, setSiparisDurumFormu] = useState(BOS_DURUM_FORMU)
-  const [gecmisSiparisler] = useState(baslangicGecmisSiparisleri)
+  const [gecmisSiparisler] = useState([])
 
   const musteriSecenekleri = useMemo(
     () =>
@@ -129,6 +126,19 @@ export default function useOrders({ musteriler, toastGoster, telefonAramasiBasla
   useEffect(() => {
     setSiparisSayfa(1)
   }, [siparisArama, siparisOdemeFiltresi])
+
+  useEffect(() => {
+    const siparisleriYukle = async () => {
+      try {
+        const veriler = await orderApi.getAll()
+        setSiparisler(veriler)
+      } catch (error) {
+        console.error('Siparişler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Sipariş listesi veritabanından alınamadı.')
+      }
+    }
+    siparisleriYukle()
+  }, [toastGoster])
 
   useEffect(() => {
     setSiparisler((onceki) =>

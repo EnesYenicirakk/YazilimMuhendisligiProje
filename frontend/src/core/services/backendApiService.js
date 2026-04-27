@@ -28,3 +28,23 @@ export const productApi = {
   getAll: () => apiFetch('/products'),
   getById: (id) => apiFetch(`/products/${id}`),
 };
+
+export const customerApi = {
+  getAll: () => apiFetch('/customers'),
+};
+
+export const orderApi = {
+  getAll: () => apiFetch('/orders'),
+};
+
+export const categoryApi = {
+  getAll: () => apiFetch('/categories'),
+};
+
+export const financeApi = {
+  getAll: () => apiFetch('/finance'),
+};
+
+export const supplierApi = {
+  getAll: () => apiFetch('/suppliers'),
+};

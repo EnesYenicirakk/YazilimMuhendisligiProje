@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react'
-import { baslangicMusterileri } from '../../../components/common/Ikonlar'
+import { useEffect, useMemo, useState } from 'react'
+import { customerApi } from '../../../core/services/backendApiService'
 import {
   bosMusteriFormu,
   favorileriOneTasi,
@@ -9,7 +9,7 @@ import {
 const MUSTERI_SAYFA_BASINA = 8
 
 export default function useCustomers({ toastGoster }) {
-  const [musteriler, setMusteriler] = useState(baslangicMusterileri)
+  const [musteriler, setMusteriler] = useState([])
   const [musteriArama, setMusteriArama] = useState('')
   const [musteriSayfa, setMusteriSayfa] = useState(1)
   const [musteriEklemeAcik, setMusteriEklemeAcik] = useState(false)
@@ -39,6 +39,19 @@ export default function useCustomers({ toastGoster }) {
   const toplamMusteriSayfa = Math.max(1, Math.ceil(filtreliMusteriler.length / MUSTERI_SAYFA_BASINA))
   const musteriBaslangic = (musteriSayfa - 1) * MUSTERI_SAYFA_BASINA
   const sayfadakiMusteriler = filtreliMusteriler.slice(musteriBaslangic, musteriBaslangic + MUSTERI_SAYFA_BASINA)
+
+  useEffect(() => {
+    const musterileriYukle = async () => {
+      try {
+        const veriler = await customerApi.getAll()
+        setMusteriler(veriler)
+      } catch (error) {
+        console.error('Müşteriler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Müşteri listesi veritabanından alınamadı.')
+      }
+    }
+    musterileriYukle()
+  }, [toastGoster])
 
   useEffect(() => {
     if (musteriSayfa > toplamMusteriSayfa) {

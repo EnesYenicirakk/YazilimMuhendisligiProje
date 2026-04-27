@@ -9,14 +9,15 @@ import {
   favorileriOneTasi,
   negatifSayiVarMi,
 } from '../../../shared/utils/constantsAndHelpers'
-import { productApi } from '../../../core/services/backendApiService'
+import { productApi, categoryApi } from '../../../core/services/backendApiService'
 
 const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
 const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, '').toLocaleLowerCase('tr-TR')
 
 export default function useInventory({ toastGoster }) {
-  const [urunler, setUrunler] = useState(baslangicUrunleri)
+  const [urunler, setUrunler] = useState([])
+  const [kategoriler, setKategoriler] = useState(['Tümü'])
   const [stokDegisimLoglari, setStokDegisimLoglari] = useState(() => [...baslangicStokDegisimLoglari])
   const [aramaMetni, setAramaMetni] = useState('')
   const [envanterKategori, setEnvanterKategori] = useState('Tümü')
@@ -162,11 +163,15 @@ export default function useInventory({ toastGoster }) {
   useEffect(() => {
     const urunleriYukle = async () => {
       try {
-        const veriler = await productApi.getAll()
-        setUrunler(veriler)
+        const [urunVerileri, kategoriVerileri] = await Promise.all([
+          productApi.getAll(),
+          categoryApi.getAll()
+        ])
+        setUrunler(urunVerileri)
+        setKategoriler(['Tümü', ...kategoriVerileri.map(c => c.name)])
       } catch (error) {
-        console.error('Ürünler yüklenirken hata oluştu:', error)
-        toastGoster?.('hata', 'Ürün listesi veritabanından alınamadı.')
+        console.error('Veriler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Veriler veritabanından alınamadı.')
       }
     }
     urunleriYukle()
@@ -724,6 +729,7 @@ export default function useInventory({ toastGoster }) {
 
   return {
     urunler,
+    kategoriler,
     stokDegisimLoglari,
     aramaMetni,
     setAramaMetni,

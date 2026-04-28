@@ -13,7 +13,6 @@ class ProductResource extends JsonResource
             'uid'         => $this->id,
             'urunId'      => $this->sku,
             'barkod'      => $this->barcode,
-            'kategoriId'  => $this->category_id,
             'kategori'    => $this->whenLoaded('category', fn() => $this->category->name),
             'ad'          => $this->name,
             'avatar'      => $this->avatar,

@@ -59,7 +59,6 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
         urunId: u.urunId,
         barkod: u.barkod,
         kategori: u.kategori ?? 'Diğer',
-        kategoriId: u.kategoriId,
         ad: u.ad,
         avatar: u.avatar,
         urunAdedi: u.urunAdedi ?? 0,
@@ -292,7 +291,7 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
         const yeni = yanit?.data ?? yanit
         const yeniUrun = {
           uid: yeni.uid, urunId: yeni.urunId, barkod: yeni.barkod,
-          kategori: yeni.kategori ?? 'Diğer', kategoriId: yeni.kategoriId,
+          kategori: yeni.kategori ?? 'Diğer',
           ad: yeni.ad, avatar: yeni.avatar ?? avatarOlustur(ad),
           urunAdedi: yeni.urunAdedi ?? urunAdedi, magazaStok: yeni.magazaStok ?? magazaStok,
           minimumStok: yeni.minimumStok ?? minimumStok, alisFiyati: 0, satisFiyati: 0, favori: false,

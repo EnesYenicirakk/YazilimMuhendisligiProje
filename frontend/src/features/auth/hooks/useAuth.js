@@ -1,4 +1,5 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { authApi } from '../../../core/services/backendApiService'
 
 const BOS_KIMLIK = {
   username: '',
@@ -6,17 +7,31 @@ const BOS_KIMLIK = {
 }
 
 export default function useAuth({
-  validUsername = 'admin',
-  validPassword = 'admin123',
-  loginDelay = 1180,
+  loginDelay = 500,
   onLoginSuccess,
 } = {}) {
   const [credentials, setCredentials] = useState(BOS_KIMLIK)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('access_token'))
   const [loginGecisiAktif, setLoginGecisiAktif] = useState(false)
   const [error, setError] = useState('')
   const [currentUser, setCurrentUser] = useState(null)
   const timeoutRef = useRef(null)
+
+  // Sayfa yüklendiğinde token varsa kullanıcı bilgilerini çek
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      authApi.getUser()
+        .then(data => {
+          setCurrentUser(data)
+          setIsLoggedIn(true)
+        })
+        .catch(() => {
+          localStorage.removeItem('access_token')
+          setIsLoggedIn(false)
+        })
+    }
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -44,36 +59,41 @@ export default function useAuth({
     setLoginGecisiAktif(false)
     setIsLoggedIn(false)
     setCurrentUser(null)
+    localStorage.removeItem('access_token')
   }, [])
 
   const logout = useCallback(() => {
-    resetAuth()
+    authApi.logout().finally(() => {
+      resetAuth()
+    })
   }, [resetAuth])
 
-  const handleLogin = useCallback((event) => {
-    event.preventDefault()
-
-    const girilenKullanici = credentials.username.trim()
-    const sifreDogru = credentials.password === validPassword
-    const kullaniciDogru = girilenKullanici === validUsername
-
-    if (!kullaniciDogru || !sifreDogru) {
-      setError('Kullanıcı adı veya şifre hatalı.')
-      return false
-    }
+  const handleLogin = useCallback(async (event) => {
+    if (event) event.preventDefault()
 
     setError('')
     setLoginGecisiAktif(true)
-    timeoutRef.current = window.setTimeout(() => {
-      const user = { username: girilenKullanici }
+
+    try {
+      const data = await authApi.login({
+        username: credentials.username,
+        password: credentials.password,
+      })
+
+      localStorage.setItem('access_token', data.access_token)
+      
+      const user = data.user
       setCurrentUser(user)
       setIsLoggedIn(true)
-      setLoginGecisiAktif(false)
       onLoginSuccess?.(user)
-    }, loginDelay)
-
-    return true
-  }, [credentials.password, credentials.username, loginDelay, onLoginSuccess, validPassword, validUsername])
+      return true
+    } catch (err) {
+      setError(err.message || 'Giriş başarısız oldu.')
+      return false
+    } finally {
+      setLoginGecisiAktif(false)
+    }
+  }, [credentials.password, credentials.username, onLoginSuccess])
 
   return {
     username: credentials.username,

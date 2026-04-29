@@ -18,6 +18,7 @@ export default function InventoryPage({
   favoriDegistir,
   duzenlemePenceresiniAc,
   setSilinecekUrun,
+  loading,
 }) {
   return (
     <section>
@@ -62,7 +63,14 @@ export default function InventoryPage({
           />
         </div>
 
-        {sayfadakiUrunler.length > 0 ? (
+        {loading ? (
+          <div className="yukleniyor-alani">
+            <div className="yukleniyor-spinner"></div>
+            <p>Envanter verileri yükleniyor...</p>
+          </div>
+        ) : (
+          <>
+            {sayfadakiUrunler.length > 0 ? (
           <>
             <div className="tablo-sarmal masaustu-tablo">
               <table>
@@ -202,6 +210,8 @@ export default function InventoryPage({
             }}
           />
         )}
+      </>
+    )}
       </section>
     </section>
   )

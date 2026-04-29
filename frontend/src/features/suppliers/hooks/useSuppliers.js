@@ -67,6 +67,7 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
   const [tedarikciFormu, setTedarikciFormu] = useState(bosTedarikciFormu)
   const [tedarikciNotMetni, setTedarikciNotMetni] = useState('')
   const [silinecekTedarikci, setSilinecekTedarikci] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [tedarikciSiparisEklemeAcik, setTedarikciSiparisEklemeAcik] = useState(false)
   const [tedarikciSiparisFormu, setTedarikciSiparisFormu] = useState(bosTedarikciSiparisFormu)
   const [genelTedarikSiparisAcik, setGenelTedarikSiparisAcik] = useState(false)
@@ -144,12 +145,15 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     if (!isLoggedIn) return
 
     const tedarikcileriYukle = async () => {
+      setLoading(true)
       try {
         const veriler = await supplierApi.getAll()
         setTedarikciler(veriler)
       } catch (error) {
         console.error('Tedarikçiler yüklenirken hata oluştu:', error)
         toastGoster?.('hata', 'Tedarikçi listesi veritabanından alınamadı.')
+      } finally {
+        setLoading(false)
       }
     }
     tedarikcileriYukle()
@@ -575,5 +579,6 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     genelTedarikSiparisKaydet,
     otomatikTedarikSiparisiOlustur,
     tedarikciSil,
+    loading,
   }
 }

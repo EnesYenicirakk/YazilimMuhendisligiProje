@@ -4,13 +4,15 @@
 
 // Laravel 'php artisan serve' kullanıyorsan: http://127.0.0.1:8000/api
 // MAMP Virtual Host kullanıyorsan: http://localhost/api
-const BASE_URL = 'http://127.0.0.1:8000/api'; 
+const BASE_URL = 'http://localhost:8000/api'; 
 
 export const apiFetch = async (endpoint, options = {}) => {
+  const token = localStorage.getItem('access_token');
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...options.headers,
     },
     ...options,
@@ -23,6 +25,19 @@ export const apiFetch = async (endpoint, options = {}) => {
   }
 
   return data;
+};
+
+export const authApi = {
+  login: (credentials) => apiFetch('/login', { method: 'POST', body: JSON.stringify(credentials) }),
+  logout: () => apiFetch('/logout', { method: 'POST' }),
+  getUser: () => apiFetch('/user'),
+};
+
+export const notificationApi = {
+  getAll: () => apiFetch('/notifications'),
+  markAsRead: (id) => apiFetch(`/notifications/${id}`, { method: 'PATCH' }),
+  delete: (id) => apiFetch(`/notifications/${id}`, { method: 'DELETE' }),
+  clearAll: () => apiFetch('/notifications/clear-all', { method: 'POST' }),
 };
 
 export const productApi = {

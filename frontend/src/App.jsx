@@ -9,7 +9,7 @@ import UrunDuzenlemePage from './features/inventory/components/UrunDuzenlemePage
 import InventoryPage from './features/inventory/components/InventoryPage'
 import BarcodeStockModal from './features/inventory/components/BarcodeStockModal'
 import BosDurumKarti from './components/common/BosDurumKarti'
-import { KucukIkon, tarihFormatla } from './components/common/Ikonlar'
+import { KucukIkon } from './components/common/Ikonlar'
 import MobilKart from './components/common/MobilKart'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/layout/BottomNav'
@@ -33,6 +33,7 @@ import {
   kritikStoktaMi,
   merkezMenusu,
   siparisTamamlandiMi,
+  tarihFormatla,
 } from './shared/utils/constantsAndHelpers'
 
 const BildirimPaneli = lazy(() => import('./BildirimPaneli'))
@@ -45,9 +46,6 @@ const InventoryModals = lazy(() => import('./features/inventory/components/Inven
 const SuppliersPanel = lazy(() => import('./features/suppliers/components/SuppliersPanel'))
 const SupplierModals = lazy(() => import('./features/suppliers/components/SupplierModals'))
 const CustomerModals = lazy(() => import('./features/customers/components/CustomerModals'))
-
-const DEFAULT_USERNAME = 'admin'
-const DEFAULT_PASSWORD = 'admin123'
 
 function TemaIkonu({ tema }) {
   if (tema === 'acik') {
@@ -79,8 +77,6 @@ function App() {
   const { toastGoster } = useToast()
 
   const auth = useAuth({
-    validUsername: DEFAULT_USERNAME,
-    validPassword: DEFAULT_PASSWORD,
     onLoginSuccess: () => setAktifSayfa('merkez'),
   })
 
@@ -362,6 +358,7 @@ function App() {
             <OdemelerPage
               KucukIkon={KucukIkon}
               MobilKart={MobilKart}
+              loading={financeData.loading}
               odemeSekmesi={financeData.odemeSekmesi}
               setOdemeSekmesi={financeData.setOdemeSekmesi}
               toplamGelenNakit={financeData.toplamGelenNakit}
@@ -437,6 +434,7 @@ function App() {
               favoriDegistir={inventoryData.favoriDegistir}
               duzenlemePenceresiniAc={inventoryData.duzenlemePenceresiniAc}
               setSilinecekUrun={inventoryData.setSilinecekUrun}
+              loading={inventoryData.loading}
             />
           )}
         </div>

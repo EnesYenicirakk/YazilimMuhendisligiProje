@@ -8,6 +8,7 @@ export default function SuppliersPanel({
 }) {
   return (
     <TedarikcilerPaneli
+      loading={suppliersData.loading}
       tedarikciSekmesi={suppliersData.tedarikciSekmesi}
       setTedarikciSekmesi={suppliersData.setTedarikciSekmesi}
       tedarikciArama={suppliersData.tedarikciArama}

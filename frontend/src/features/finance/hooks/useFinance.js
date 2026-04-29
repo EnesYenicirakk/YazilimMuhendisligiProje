@@ -18,6 +18,7 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
   const [duzenlenenOdeme, setDuzenlenenOdeme] = useState(null)
   const [odemeFormu, setOdemeFormu] = useState(BOS_ODEME_FORMU)
   const [silinecekOdeme, setSilinecekOdeme] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const siraliGelenNakit = useMemo(
     () => favorileriOneTasi(gelenNakitListesi, (kayit) => new Date(kayit.tarih).getTime()),
@@ -65,6 +66,7 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
     if (!isLoggedIn) return
 
     const finansYukle = async () => {
+      setLoading(true)
       try {
         const veriler = await financeApi.getAll()
         setGelenNakitListesi(veriler.gelen || [])
@@ -72,6 +74,8 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
       } catch (error) {
         console.error('Finans verileri yüklenirken hata oluştu:', error)
         toastGoster?.('hata', 'Finansal veriler veritabanından alınamadı.')
+      } finally {
+        setLoading(false)
       }
     }
     finansYukle()
@@ -209,5 +213,6 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
     odemeSilmeKapat,
     odemeSil,
     financeModallariniKapat,
+    loading,
   }
 }

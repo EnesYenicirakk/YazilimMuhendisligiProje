@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
 import { fetchAiResponse } from '../services/aiService'
+import { notificationApi } from '../services/backendApiService'
 
 export default function useAppNotifications({
   aktifSayfa,
@@ -31,80 +32,45 @@ export default function useAppNotifications({
     { id: 1, rol: 'bot', metin: 'Tekrardan hoş geldiniz, size nasıl yardımcı olabilirim?', saat: 'Şimdi' },
   ])
 
-  const tumBildirimler = useMemo(() => {
-    const otomatikTedarikBildirimleri = tedarikSiparisleri
-      .filter((siparis) => siparis.otomatik && siparis.kaynak === 'stok-koruma')
-      .slice(0, 3)
-      .map((siparis) => ({
-        id: `tedarik-${siparis.tedarikciUid}-${siparis.siparisNo}`,
-        tur: 'stok',
-        baslik: `${siparis.urun} için otomatik sipariş açıldı`,
-        detay:
-          `${siparis.firmaAdi} üzerinden ${siparis.miktar} adet sipariş oluşturuldu. ` +
-          `Sipariş no ${siparis.siparisNo}, durum ${siparis.durum.toLocaleLowerCase('tr-TR')} olarak izleniyor.`,
-        zaman: tarihFormatla(siparis.tarih),
-        sayfa: 'alicilar',
-        sekme: 'siparisler',
-      }))
+  const [backendBildirimler, setBackendBildirimler] = useState([])
+  const [loading, setLoading] = useState(false)
 
-    const kritikStokBildirimleri = dashboardCanliOzetler.kritikStokluUrunler.slice(0, 3).map((urun) => ({
-      id: `kritik-${urun.uid}`,
-      tur: 'kritik',
-      baslik: `${urun.ad} kritik stokta`,
-      detay: `Minimum ${urun.minimumStok}, mevcut ${urun.magazaStok}. Yeniden sipariş planlanmalı.`,
-      zaman: 'Az önce',
-      sayfa: 'envanter',
+  // Bildirimleri API'den çek
+  const bildirimleriGetir = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await notificationApi.getAll()
+      setBackendBildirimler(data)
+    } catch (error) {
+      console.error('Bildirimler yüklenemedi:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    bildirimleriGetir()
+    // Periyodik olarak kontrol et (isteğe bağlı)
+    const interval = setInterval(bildirimleriGetir, 60000)
+    return () => clearInterval(interval)
+  }, [bildirimleriGetir])
+
+  const bildirimler = useMemo(() => {
+    return backendBildirimler.map(b => ({
+      id: b.id,
+      tur: b.type,
+      baslik: b.title,
+      detay: b.details,
+      zaman: tarihFormatla(b.created_at),
+      sayfa: b.page,
+      sekme: b.tab,
+      is_read: b.is_read
     }))
-
-    const stokLogBildirimleri = stokDegisimLoglari.slice(0, 3).map((log) => ({
-      id: `stok-log-${log.id}`,
-      tur: 'stok',
-      baslik: `${log.urun} için ${log.islem.toLocaleLowerCase('tr-TR')}`,
-      detay: `${log.eskiStok} adetten ${log.yeniStok} adede güncellendi. ${log.aciklama}`,
-      zaman: log.tarih,
-      sayfa: 'urun-duzenleme',
-      sekme: 'stok-gecmisi',
-    }))
-
-    const sonSatisBildirimleri = siraliSiparisler.slice(0, 3).map((siparis) => ({
-      id: `satis-${siparis.siparisNo}`,
-      tur: 'satis',
-      baslik: `${siparis.siparisNo} numaralı sipariş kaydedildi`,
-      detay: `${siparis.musteri} için ${siparis.urun} satıldı. Tutar ${paraFormatla(siparis.toplamTutar)}.`,
-      zaman: tarihFormatla(siparis.siparisTarihi),
-      sayfa: 'siparisler',
-    }))
-
-    const bekleyenTahsilatBildirimleri = siraliSiparisler
-      .filter((siparis) => siparis.odemeDurumu === 'Beklemede')
-      .slice(0, 2)
-      .map((siparis) => ({
-        id: `bekleyen-${siparis.siparisNo}`,
-        tur: 'tahsilat',
-        baslik: `${siparis.siparisNo} tahsilat bekliyor`,
-        detay: `${siparis.musteri} için ${paraFormatla(siparis.toplamTutar)} tutarında ödeme bekleniyor.`,
-        zaman: tarihFormatla(siparis.siparisTarihi),
-        sayfa: 'odemeler',
-        sekme: 'gelen',
-      }))
-
-    return [
-      ...otomatikTedarikBildirimleri,
-      ...kritikStokBildirimleri,
-      ...stokLogBildirimleri,
-      ...sonSatisBildirimleri,
-      ...bekleyenTahsilatBildirimleri,
-    ].slice(0, 8)
-  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, stokDegisimLoglari, tedarikSiparisleri, tarihFormatla])
-
-  const bildirimler = useMemo(
-    () => tumBildirimler.filter((bildirim) => !temizlenenBildirimler.includes(bildirim.id)),
-    [temizlenenBildirimler, tumBildirimler],
-  )
+  }, [backendBildirimler, tarihFormatla])
 
   const okunmamisBildirimSayisi = useMemo(
-    () => bildirimler.filter((bildirim) => !okunanBildirimler.includes(bildirim.id)).length,
-    [bildirimler, okunanBildirimler],
+    () => bildirimler.length, // Backend zaten sadece okunmamışları ve arşivlenmemişleri gönderiyor (Controller kuralı)
+    [bildirimler],
   )
 
   const aiHazirCevaplar = useMemo(() => {
@@ -181,10 +147,8 @@ export default function useAppNotifications({
   }, [bildirimPanelKapaniyor])
 
   useEffect(() => {
-    const aktifBildirimIdleri = tumBildirimler.map((bildirim) => bildirim.id)
-    setOkunanBildirimler((onceki) => onceki.filter((id) => aktifBildirimIdleri.includes(id)))
-    setTemizlenenBildirimler((onceki) => onceki.filter((id) => aktifBildirimIdleri.includes(id)))
-  }, [tumBildirimler])
+    // Backend verisi geldiği için artık local cleanup'a gerek yok
+  }, [backendBildirimler])
 
   useEffect(() => {
     setAiTemaMenuAcik(false)
@@ -270,22 +234,37 @@ export default function useAppNotifications({
     bildirimPaneliAc()
   }
 
-  const bildirimiOkunduYap = (bildirimId) => {
-    setOkunanBildirimler((onceki) => (onceki.includes(bildirimId) ? onceki : [...onceki, bildirimId]))
+  const bildirimiOkunduYap = async (bildirimId) => {
+    try {
+      await notificationApi.markAsRead(bildirimId)
+      setBackendBildirimler(onceki => onceki.filter(b => b.id !== bildirimId))
+    } catch (err) {
+      toastGoster?.('hata', 'Bildirim okundu işaretlenemedi.')
+    }
   }
 
-  const bildirimiOkunmadiYap = (bildirimId) => {
-    setOkunanBildirimler((onceki) => onceki.filter((id) => id !== bildirimId))
+  const bildirimiOkunmadiYap = async (bildirimId) => {
+    // Bu özellik backend'de şu an için is_read: false yapacak şekilde update metodunda yok, 
+    // ama istersek ekleyebiliriz. Şimdilik arayüzden siliyoruz zaten.
   }
 
-  const bildirimiTemizle = (bildirimId) => {
-    setTemizlenenBildirimler((onceki) => (onceki.includes(bildirimId) ? onceki : [...onceki, bildirimId]))
-    setOkunanBildirimler((onceki) => onceki.filter((id) => id !== bildirimId))
+  const bildirimiTemizle = async (bildirimId) => {
+    try {
+      await notificationApi.delete(bildirimId)
+      setBackendBildirimler(onceki => onceki.filter(b => b.id !== bildirimId))
+    } catch (err) {
+      toastGoster?.('hata', 'Bildirim temizlenemedi.')
+    }
   }
 
-  const tumBildirimleriTemizle = () => {
-    setTemizlenenBildirimler(bildirimler.map((bildirim) => bildirim.id))
-    toastGoster?.('basari', 'Tüm bildirimler temizlendi.')
+  const tumBildirimleriTemizle = async () => {
+    try {
+      await notificationApi.clearAll()
+      setBackendBildirimler([])
+      toastGoster?.('basari', 'Tüm bildirimler temizlendi.')
+    } catch (err) {
+      toastGoster?.('hata', 'Bildirimler temizlenemedi.')
+    }
   }
 
   const bildirimdenSayfayaGit = (bildirim) => {

@@ -15,6 +15,7 @@ export default function OrdersPanel({ ordersData, paraFormatla, tarihFormatla, d
       paraFormatla={paraFormatla}
       tarihFormatla={tarihFormatla}
       durumSinifi={durumSinifi}
+      loading={ordersData.loading}
       setDetaySiparis={ordersData.setDetaySiparis}
       siparisDuzenlemeAc={ordersData.siparisDuzenlemeAc}
       siparisDurumGuncellemeAc={ordersData.siparisDurumGuncellemeAc}

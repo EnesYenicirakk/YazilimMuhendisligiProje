@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   baslangicFaturalari,
   bosFaturaFormu,
@@ -20,6 +20,7 @@ export default function useInvoices({ musteriler, tedarikciler, urunler, toastGo
   const [faturaDetayAcik, setFaturaDetayAcik] = useState(false)
   const [seciliFaturaId, setSeciliFaturaId] = useState(null)
   const [pdfOnizlemeAcik, setPdfOnizlemeAcik] = useState(false)
+  const [loading, setLoading] = useState(false) // Assuming no initial fetch yet
 
   const faturaKarsiTaraflar = useMemo(() => {
     if (faturaFormu.tur === 'Satış Faturası') {
@@ -376,5 +377,6 @@ export default function useInvoices({ musteriler, tedarikciler, urunler, toastGo
     faturaPdfOnizlemeAc,
     setFaturaDetayAcik,
     setPdfOnizlemeAcik,
+    loading,
   }
 }

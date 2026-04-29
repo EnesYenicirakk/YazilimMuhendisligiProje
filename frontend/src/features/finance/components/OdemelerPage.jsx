@@ -1,5 +1,5 @@
 import { paraFormatla } from '../../../shared/utils/constantsAndHelpers'
-import { tarihFormatla } from '../../../components/common/Ikonlar'
+import { tarihFormatla } from '../../../shared/utils/constantsAndHelpers'
 
 function odemeDurumuSinifi(durum) {
   const normalize = String(durum ?? '').trim().toLocaleLowerCase('tr-TR')
@@ -28,6 +28,7 @@ export default function OdemelerPage({
   gidenSayfa,
   setGidenSayfa,
   toplamGidenSayfa,
+  loading,
 }) {
   return (
     <section>
@@ -71,7 +72,14 @@ export default function OdemelerPage({
           </article>
         </section>
 
-        {odemeSekmesi === 'gelen' && (
+        {loading ? (
+          <div className="yukleniyor-alani">
+            <div className="yukleniyor-spinner"></div>
+            <p>Finansal veriler yükleniyor...</p>
+          </div>
+        ) : (
+          <>
+            {odemeSekmesi === 'gelen' && (
           <>
             <div className="panel-ust-cizgi">
               <h2>Tahsilat Listesi</h2>
@@ -360,6 +368,8 @@ export default function OdemelerPage({
             </div>
           </>
         )}
+      </>
+    )}
       </section>
     </section>
   )

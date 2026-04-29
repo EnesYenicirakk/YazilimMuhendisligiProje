@@ -1,4 +1,4 @@
-﻿import BosDurumKarti from '../../components/common/BosDurumKarti'
+import BosDurumKarti from '../../components/common/BosDurumKarti'
 import { KucukIkon } from '../../components/common/Ikonlar'
 import MobilKart from '../../components/common/MobilKart'
 import PageHeader from '../../shared/ui/PageHeader'
@@ -109,7 +109,14 @@ function SiparislerPaneli(props) {
           ]}
         />
 
-        {siparisSekmesi === 'aktif' && (
+        {props.loading ? (
+          <div className="yukleniyor-alani">
+            <div className="yukleniyor-spinner"></div>
+            <p>Siparişler yükleniyor...</p>
+          </div>
+        ) : (
+          <>
+            {siparisSekmesi === 'aktif' && (
           <>
             <section className="siparis-aktivite-kartlari" aria-label="Sipariş Aktivitesi">
               <article className="siparis-aktivite-karti">
@@ -377,6 +384,8 @@ function SiparislerPaneli(props) {
             )}
           </>
         )}
+      </>
+    )}
       </section>
     </section>
   )

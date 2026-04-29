@@ -1,8 +1,14 @@
-﻿
-import { tarihFormatla } from '../../components/common/Ikonlar';
-const FATURA_KDV_ORANI = 0.2; // needed inside
+
+export const tarihFormatla = (isoTarih) => {
+  if (!isoTarih) return ''
+  const tarih = new Date(isoTarih)
+  if (isNaN(tarih.getTime())) return isoTarih
+  return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(tarih)
+}
 
 export const envanterKategorileri = ['Tümü', 'Motor', 'Fren', 'Filtre', 'Elektrik', 'Şanzıman', 'Diğer']
+
+const FATURA_KDV_ORANI = 0.2
 
 export const avatarOlustur = (ad) =>
   ad
@@ -61,85 +67,7 @@ export const urunOlustur = (uid, urunId, kategori, ad, urunAdedi, magazaStok, mi
   favori: false,
 })
 
-export const baslangicUrunleri = [
-  urunOlustur(1, 'MTR-2001', 'Motor', 'Silindir Kapak Contası', 48, 22, 12, 740, 1090),
-  urunOlustur(2, 'MTR-2002', 'Motor', 'Piston Segman Takımı', 34, 18, 10, 1680, 2290),
-  urunOlustur(3, 'MTR-2003', 'Motor', 'Eksantrik Mili Sensörü', 52, 27, 12, 420, 690),
-  urunOlustur(4, 'MTR-2004', 'Motor', 'Krank Sensörü', 61, 31, 14, 390, 620),
-  urunOlustur(5, 'MTR-2005', 'Motor', 'Subap İtici Takımı', 28, 16, 8, 1320, 1840),
-  urunOlustur(6, 'MTR-2006', 'Motor', 'Yağ Pompası', 23, 11, 8, 1460, 1980),
-  urunOlustur(7, 'MTR-2007', 'Motor', 'Devirdaim Pompası', 39, 14, 10, 980, 1420),
-  urunOlustur(8, 'MTR-2008', 'Motor', 'Motor Takozu Sağ', 33, 19, 10, 560, 810),
-  urunOlustur(9, 'MTR-2009', 'Motor', 'Turbo Intercooler Hortumu', 44, 20, 12, 360, 590),
-  urunOlustur(10, 'MTR-2010', 'Motor', 'Gaz Kelebeği', 18, 9, 8, 2850, 3640),
-  urunOlustur(11, 'MTR-2011', 'Motor', 'Rölanti Valfi', 27, 12, 8, 790, 1180),
-  urunOlustur(12, 'MTR-2012', 'Motor', 'Motor Yağ Soğutucusu', 16, 7, 7, 1740, 2380),
-
-  urunOlustur(13, 'FRN-2101', 'Fren', 'Fren Balatası Ön Takım', 84, 7, 10, 1850, 2480),
-  urunOlustur(14, 'FRN-2102', 'Fren', 'Fren Balatası Arka Takım', 76, 24, 10, 1620, 2260),
-  urunOlustur(15, 'FRN-2103', 'Fren', 'Fren Diski Ön Çift', 31, 11, 8, 2740, 3580),
-  urunOlustur(16, 'FRN-2104', 'Fren', 'Fren Diski Arka Çift', 22, 9, 8, 2380, 3150),
-  urunOlustur(17, 'FRN-2105', 'Fren', 'ABS Sensörü Ön', 49, 18, 10, 690, 960),
-  urunOlustur(18, 'FRN-2106', 'Fren', 'El Fren Teli', 42, 15, 10, 430, 690),
-  urunOlustur(19, 'FRN-2107', 'Fren', 'Fren Hortumu Seti', 38, 17, 10, 360, 580),
-  urunOlustur(20, 'FRN-2108', 'Fren', 'Fren Merkezi', 14, 6, 6, 1940, 2590),
-  urunOlustur(21, 'FRN-2109', 'Fren', 'Balata Spreyi', 76, 34, 16, 95, 165),
-  urunOlustur(22, 'FRN-2110', 'Fren', 'Kampana Fren Yayı', 29, 13, 8, 210, 340),
-  urunOlustur(23, 'FRN-2111', 'Fren', 'Fren Müşürü', 35, 16, 8, 280, 450),
-  urunOlustur(24, 'FRN-2112', 'Fren', 'Vakum Pompası Fren', 11, 4, 5, 2160, 2920),
-
-  urunOlustur(25, 'FLT-2201', 'Filtre', 'Yağ Filtresi', 145, 72, 18, 180, 320),
-  urunOlustur(26, 'FLT-2202', 'Filtre', 'Hava Filtresi', 112, 61, 20, 240, 390),
-  urunOlustur(27, 'FLT-2203', 'Filtre', 'Polen Filtresi', 96, 55, 18, 210, 360),
-  urunOlustur(28, 'FLT-2204', 'Filtre', 'Yakıt Filtresi', 67, 28, 14, 260, 420),
-  urunOlustur(29, 'FLT-2205', 'Filtre', 'Şanzıman Yağ Filtresi', 34, 16, 10, 420, 670),
-  urunOlustur(30, 'FLT-2206', 'Filtre', 'Kabin Karbon Filtre', 88, 42, 16, 250, 410),
-  urunOlustur(31, 'FLT-2207', 'Filtre', 'Hava Kurutucu Filtresi', 22, 10, 8, 690, 960),
-  urunOlustur(32, 'FLT-2208', 'Filtre', 'Turbo Hava Filtre Elemanı', 18, 8, 8, 540, 780),
-  urunOlustur(33, 'FLT-2209', 'Filtre', 'Mazot Ön Filtre', 39, 17, 10, 230, 380),
-  urunOlustur(34, 'FLT-2210', 'Filtre', 'Partikül Filtre Sensörü', 14, 7, 6, 830, 1190),
-  urunOlustur(35, 'FLT-2211', 'Filtre', 'Krank Havalandırma Filtresi', 21, 9, 8, 190, 340),
-  urunOlustur(36, 'FLT-2212', 'Filtre', 'Yakıt Ayırıcı Filtre', 24, 11, 8, 310, 490),
-
-  urunOlustur(37, 'ELK-2301', 'Elektrik', 'Akü 72Ah', 21, 8, 12, 2150, 3060),
-  urunOlustur(38, 'ELK-2302', 'Elektrik', 'Şarj Dinamosu', 24, 7, 9, 3150, 4280),
-  urunOlustur(39, 'ELK-2303', 'Elektrik', 'Marş Motoru', 19, 8, 8, 2840, 3720),
-  urunOlustur(40, 'ELK-2304', 'Elektrik', 'Far Ampulü H7', 110, 44, 18, 75, 145),
-  urunOlustur(41, 'ELK-2305', 'Elektrik', 'Buji Takımı', 63, 25, 12, 620, 880),
-  urunOlustur(42, 'ELK-2306', 'Elektrik', 'Ateşleme Bobini', 28, 13, 8, 960, 1380),
-  urunOlustur(43, 'ELK-2307', 'Elektrik', 'Sigorta Kutusu', 16, 7, 6, 1240, 1710),
-  urunOlustur(44, 'ELK-2308', 'Elektrik', 'Cam Kriko Motoru', 22, 10, 8, 890, 1290),
-  urunOlustur(45, 'ELK-2309', 'Elektrik', 'Far Sensörü', 17, 9, 7, 470, 720),
-  urunOlustur(46, 'ELK-2310', 'Elektrik', 'Eksantrik Sensörü', 58, 21, 15, 430, 690),
-  urunOlustur(47, 'ELK-2311', 'Elektrik', 'ABS Sensörü Arka', 26, 11, 8, 650, 930),
-  urunOlustur(48, 'ELK-2312', 'Elektrik', 'Akü Şarj Regülatörü', 15, 6, 6, 520, 790),
-
-  urunOlustur(49, 'SAN-2401', 'Şanzıman', 'Debriyaj Seti', 38, 15, 10, 2780, 3910),
-  urunOlustur(50, 'SAN-2402', 'Şanzıman', 'Debriyaj Bilyası', 29, 12, 8, 740, 1090),
-  urunOlustur(51, 'SAN-2403', 'Şanzıman', 'Volan Dişlisi', 11, 5, 5, 2180, 2960),
-  urunOlustur(52, 'SAN-2404', 'Şanzıman', 'Vites Halatı', 26, 10, 8, 680, 980),
-  urunOlustur(53, 'SAN-2405', 'Şanzıman', 'Şanzıman Takozu', 24, 11, 8, 590, 860),
-  urunOlustur(54, 'SAN-2406', 'Şanzıman', 'Otomatik Şanzıman Filtre Kiti', 14, 7, 6, 1290, 1820),
-  urunOlustur(55, 'SAN-2407', 'Şanzıman', 'Şanzıman Yağ Soğutucu Hortumu', 18, 8, 7, 460, 710),
-  urunOlustur(56, 'SAN-2408', 'Şanzıman', 'Şanzıman Selenoidi', 13, 6, 6, 1540, 2140),
-  urunOlustur(57, 'SAN-2409', 'Şanzıman', 'Vites Topuzu Mekanizması', 21, 10, 8, 320, 520),
-  urunOlustur(58, 'SAN-2410', 'Şanzıman', 'Şanzıman Keçesi', 33, 14, 10, 150, 260),
-  urunOlustur(59, 'SAN-2411', 'Şanzıman', 'Baskı Balata Hidroliği', 19, 8, 7, 860, 1230),
-  urunOlustur(60, 'SAN-2412', 'Şanzıman', 'Diferansiyel Rulmanı', 12, 5, 5, 1360, 1890),
-
-  urunOlustur(61, 'DGR-2501', 'Diğer', 'Radyatör Üst Hortum', 46, 19, 15, 310, 520),
-  urunOlustur(62, 'DGR-2502', 'Diğer', 'Klima Kompresörü', 18, 7, 8, 6900, 8950),
-  urunOlustur(63, 'DGR-2503', 'Diğer', 'Direksiyon Kutusu', 12, 5, 6, 7450, 9380),
-  urunOlustur(64, 'DGR-2504', 'Diğer', 'Enjektör Takımı', 35, 16, 8, 4820, 6190),
-  urunOlustur(65, 'DGR-2505', 'Diğer', 'Turbo Hortumu', 22, 11, 12, 380, 610),
-  urunOlustur(66, 'DGR-2506', 'Diğer', 'Yağ Radyatörü', 17, 5, 7, 1710, 2380),
-  urunOlustur(67, 'DGR-2507', 'Diğer', 'Krank Kasnağı', 27, 12, 9, 920, 1380),
-  urunOlustur(68, 'DGR-2508', 'Diğer', 'Susturucu Arka', 14, 4, 6, 1280, 1820),
-  urunOlustur(69, 'DGR-2509', 'Diğer', 'Bijon Somunu Seti', 90, 41, 20, 110, 210),
-  urunOlustur(70, 'DGR-2510', 'Diğer', 'Triger Kayışı Seti', 52, 20, 14, 1240, 1760),
-  urunOlustur(71, 'DGR-2511', 'Diğer', 'Amortisör Ön Çift', 29, 9, 12, 3250, 4520),
-  urunOlustur(72, 'DGR-2512', 'Diğer', 'Direksiyon Rot Başı', 31, 13, 9, 410, 660),
-]
+export const baslangicUrunleri = []
 
 export const dashboardBolumSablonu = [
   { anahtar: 'canli', etiket: 'Canlı Özetler' },
@@ -342,68 +270,7 @@ export const faturaKaydiOlustur = ({ id, faturaNo, tur, karsiTarafUid, karsiTara
   }
 }
 
-export const baslangicFaturalari = [
-  faturaKaydiOlustur({
-    id: 1,
-    faturaNo: 'FTR-001',
-    tur: 'Satış Faturası',
-    karsiTarafUid: 1,
-    karsiTarafAdi: 'Yıldız Oto',
-    tarih: '2026-03-18',
-    odemeTarihi: '2026-03-20',
-    satirlar: [
-      { id: 11, urunUid: 13, urun: 'Fren Balatası Ön Takım', miktar: 2, birimFiyat: 450, kdvOrani: FATURA_KDV_ORANI },
-      { id: 12, urunUid: 25, urun: 'Yağ Filtresi', miktar: 1, birimFiyat: 120, kdvOrani: FATURA_KDV_ORANI },
-    ],
-    not: 'Şehir içi teslimat planlandı.',
-    durum: 'PDF Oluşturuldu',
-  }),
-  faturaKaydiOlustur({
-    id: 2,
-    faturaNo: 'FTR-002',
-    tur: 'Satış Faturası',
-    karsiTarafUid: 4,
-    karsiTarafAdi: 'Canan Şahin',
-    tarih: '2026-03-17',
-    odemeTarihi: '2026-03-19',
-    satirlar: [
-      { id: 21, urunUid: 49, urun: 'Debriyaj Seti', miktar: 1, birimFiyat: 3910, kdvOrani: FATURA_KDV_ORANI },
-      { id: 22, urunUid: 41, urun: 'Buji Takımı', miktar: 2, birimFiyat: 880, kdvOrani: FATURA_KDV_ORANI },
-    ],
-    not: 'Parça teslimi önceden teyit edildi.',
-    durum: 'Hazır',
-  }),
-  faturaKaydiOlustur({
-    id: 3,
-    faturaNo: 'FTR-003',
-    tur: 'Alış Faturası',
-    karsiTarafUid: 1,
-    karsiTarafAdi: 'Anadolu Filtre Sanayi',
-    tarih: '2026-03-16',
-    odemeTarihi: '2026-03-22',
-    satirlar: [
-      { id: 31, urunUid: 25, urun: 'Yağ Filtresi', miktar: 20, birimFiyat: 120, kdvOrani: FATURA_KDV_ORANI },
-      { id: 32, urunUid: 26, urun: 'Hava Filtresi', miktar: 12, birimFiyat: 145, kdvOrani: FATURA_KDV_ORANI },
-    ],
-    not: 'Depo giriş fişiyle eşleştirildi.',
-    durum: 'PDF Oluşturuldu',
-  }),
-  faturaKaydiOlustur({
-    id: 4,
-    faturaNo: 'FTR-004',
-    tur: 'Alış Faturası',
-    karsiTarafUid: 5,
-    karsiTarafAdi: 'MotorTek Endüstri',
-    tarih: '2026-03-15',
-    odemeTarihi: '2026-03-24',
-    satirlar: [
-      { id: 41, urunUid: 1, urun: 'Silindir Kapak Contası', miktar: 8, birimFiyat: 690, kdvOrani: FATURA_KDV_ORANI },
-      { id: 42, urunUid: 6, urun: 'Yağ Pompası', miktar: 4, birimFiyat: 1380, kdvOrani: FATURA_KDV_ORANI },
-    ],
-    not: 'Tedarikçi fiyat güncellemesi işlendi.',
-    durum: 'Hazır',
-  }),
-]
+export const baslangicFaturalari = []
 
 export const merkezMenusu = [
   { sayfa: 'dashboard', baslik: 'Dashboard', renk: 'turuncu', aciklama: 'Özet görünüm' },
@@ -483,11 +350,11 @@ export const faturaBelgeHtmlOlustur = (fatura, karsiTaraf) => {
   const guvenliTarih = htmlGuvenliMetin(tarihFormatla(fatura.tarih))
   const guvenliOdemeTarihi = htmlGuvenliMetin(tarihFormatla(fatura.odemeTarihi))
   const guvenliKarsiTarafAdi = htmlGuvenliMetin(fatura.karsiTarafAdi)
-  const guvenliTelefon = htmlGuvenliMetin(guvenliKarsiTaraf?.telefon ?? '0532 000 00 00')
-  const guvenliAdres = htmlGuvenliMetin(guvenliKarsiTaraf?.adres ?? 'Malatya Yeşilyurt / Malatya')
-  const guvenliVergiNo = htmlGuvenliMetin(guvenliKarsiTaraf?.vergiNumarasi ?? guvenliKarsiTaraf?.vergiNo ?? '1111111111')
+  const guvenliTelefon = htmlGuvenliMetin(guvenliKarsiTaraf?.telefon ?? '')
+  const guvenliAdres = htmlGuvenliMetin(guvenliKarsiTaraf?.adres ?? '')
+  const guvenliVergiNo = htmlGuvenliMetin(guvenliKarsiTaraf?.vergiNumarasi ?? guvenliKarsiTaraf?.vergiNo ?? '')
   const guvenliDurum = htmlGuvenliMetin(fatura.durum)
-  const guvenliNot = htmlGuvenliMetin(fatura.not || 'Standart ödeme ve teslimat koşulları geçerlidir.')
+  const guvenliNot = htmlGuvenliMetin(fatura.not || '')
 
   const satirlarHtml = fatura.satirlar
     .map((satir, index) => {

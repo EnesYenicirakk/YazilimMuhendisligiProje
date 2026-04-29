@@ -1,4 +1,4 @@
-﻿import BosDurumKarti from '../../components/common/BosDurumKarti'
+import BosDurumKarti from '../../components/common/BosDurumKarti'
 import { KucukIkon } from '../../components/common/Ikonlar'
 import MobilKart from '../../components/common/MobilKart'
 
@@ -60,7 +60,14 @@ function TedarikcilerPaneli(props) {
           </button>
         </div>
 
-        {tedarikciSekmesi === 'liste' && (
+        {props.loading ? (
+          <div className="yukleniyor-alani">
+            <div className="yukleniyor-spinner"></div>
+            <p>Tedarikçiler yükleniyor...</p>
+          </div>
+        ) : (
+          <>
+            {tedarikciSekmesi === 'liste' && (
           <>
             <div className="panel-ust-cizgi tedarikci-ust-cizgi">
               <h2>Tedarikçi Listesi</h2>
@@ -297,6 +304,8 @@ function TedarikcilerPaneli(props) {
             )}
           </>
         )}
+      </>
+    )}
       </section>
     </section>
   )

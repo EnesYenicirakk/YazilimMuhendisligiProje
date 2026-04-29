@@ -19,6 +19,7 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
   const [musteriFormu, setMusteriFormu] = useState(bosMusteriFormu)
   const [musteriNotMetni, setMusteriNotMetni] = useState('')
   const [silinecekMusteri, setSilinecekMusteri] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const filtreliMusteriler = useMemo(() => {
     const metin = musteriArama.trim().toLowerCase()
@@ -44,12 +45,15 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
     if (!isLoggedIn) return
 
     const musterileriYukle = async () => {
+      setLoading(true)
       try {
         const veriler = await customerApi.getAll()
         setMusteriler(veriler)
       } catch (error) {
         console.error('Müşteriler yüklenirken hata oluştu:', error)
         toastGoster?.('hata', 'Müşteri listesi veritabanından alınamadı.')
+      } finally {
+        setLoading(false)
       }
     }
     musterileriYukle()
@@ -266,5 +270,6 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
     musteriNotKaydet,
     musteriSil,
     musteriSayfayaGit,
+    loading,
   }
 }

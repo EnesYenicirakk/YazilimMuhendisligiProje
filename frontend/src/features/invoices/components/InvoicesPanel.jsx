@@ -1,4 +1,4 @@
-﻿import InvoicePreview from './InvoicePreview'
+import InvoicePreview from './InvoicePreview'
 
 export default function InvoicesPanel({ KucukIkon, invoicesData, paraFormatla, tarihFormatla, urunler }) {
   const {
@@ -42,7 +42,14 @@ export default function InvoicesPanel({ KucukIkon, invoicesData, paraFormatla, t
           </button>
         </div>
 
-        {faturaSekmesi === 'yeni' && (
+        {invoicesData.loading ? (
+          <div className="yukleniyor-alani">
+            <div className="yukleniyor-spinner"></div>
+            <p>Fatura verileri yükleniyor...</p>
+          </div>
+        ) : (
+          <>
+            {faturaSekmesi === 'yeni' && (
           <div className="fatura-grid">
             <div className="fatura-form-alani">
               <div className="panel-ust-cizgi">
@@ -200,6 +207,8 @@ export default function InvoicesPanel({ KucukIkon, invoicesData, paraFormatla, t
             </div>
           </>
         )}
+      </>
+    )}
       </section>
     </section>
   )

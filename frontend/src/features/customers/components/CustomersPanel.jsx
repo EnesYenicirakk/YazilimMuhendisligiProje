@@ -1,4 +1,4 @@
-﻿import BosDurumKarti from '../../../components/common/BosDurumKarti'
+import BosDurumKarti from '../../../components/common/BosDurumKarti'
 import { KucukIkon } from '../../../components/common/Ikonlar'
 import MobilKart from '../../../components/common/MobilKart'
 
@@ -55,7 +55,14 @@ export default function CustomersPanel({
           />
         </div>
 
-        {sayfadakiMusteriler.length > 0 ? (
+        {customersData.loading ? (
+          <div className="yukleniyor-alani">
+            <div className="yukleniyor-spinner"></div>
+            <p>Müşteriler yükleniyor...</p>
+          </div>
+        ) : (
+          <>
+            {sayfadakiMusteriler.length > 0 ? (
           <>
             <div className="tablo-sarmal masaustu-tablo">
               <table>
@@ -172,6 +179,8 @@ export default function CustomersPanel({
             }}
           />
         )}
+      </>
+    )}
       </section>
     </section>
   )

@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { stokDegisimLoglari as baslangicStokDegisimLoglari } from '../../../data/seeds/stockLogs.seed'
 import {
   avatarOlustur,
   barkodOlustur,
-  baslangicUrunleri,
   bosForm,
   bosUrunDuzenlemeFormu,
   favorileriOneTasi,
@@ -18,7 +16,8 @@ const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, 
 export default function useInventory({ toastGoster, isLoggedIn }) {
   const [urunler, setUrunler] = useState([])
   const [kategoriler, setKategoriler] = useState(['Tümü'])
-  const [stokDegisimLoglari, setStokDegisimLoglari] = useState(() => [...baslangicStokDegisimLoglari])
+  const [stokDegisimLoglari, setStokDegisimLoglari] = useState([])
+  const [loading, setLoading] = useState(true)
   const [aramaMetni, setAramaMetni] = useState('')
   const [envanterKategori, setEnvanterKategori] = useState('Tümü')
   const [envanterSayfa, setEnvanterSayfa] = useState(1)
@@ -164,6 +163,7 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     if (!isLoggedIn) return
 
     const urunleriYukle = async () => {
+      setLoading(true)
       try {
         const [urunVerileri, kategoriVerileri] = await Promise.all([
           productApi.getAll(),
@@ -174,6 +174,8 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
       } catch (error) {
         console.error('Veriler yüklenirken hata oluştu:', error)
         toastGoster?.('hata', 'Ürün verileri veritabanından alınamadı.')
+      } finally {
+        setLoading(false)
       }
     }
     urunleriYukle()
@@ -793,5 +795,6 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     envanterSayfayaGit,
     urunDuzenlemeSayfayaGit,
     inventoryModallariniKapat,
+    loading,
   }
 }

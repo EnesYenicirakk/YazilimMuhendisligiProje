@@ -45,6 +45,7 @@ export default function useOrders({
   const [siparisFormu, setSiparisFormu] = useState(bosSiparisFormu)
   const [siparisDurumFormu, setSiparisDurumFormu] = useState(BOS_DURUM_FORMU)
   const [gecmisSiparisler] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const musteriSecenekleri = useMemo(
     () =>
@@ -137,12 +138,15 @@ export default function useOrders({
     if (!isLoggedIn) return
 
     const siparisleriYukle = async () => {
+      setLoading(true)
       try {
         const veriler = await orderApi.getAll()
         setSiparisler(veriler)
       } catch (error) {
         console.error('Siparişler yüklenirken hata oluştu:', error)
         toastGoster?.('hata', 'Sipariş listesi veritabanından alınamadı.')
+      } finally {
+        setLoading(false)
       }
     }
     siparisleriYukle()
@@ -427,5 +431,6 @@ export default function useOrders({
     siparisMusteriAra,
     siparisMusteriAdiniGetir,
     siparisTelefonunuGetir,
+    loading,
   }
 }

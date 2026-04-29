@@ -4,7 +4,7 @@
 
 // Laravel 'php artisan serve' kullanıyorsan: http://127.0.0.1:8000/api
 // MAMP Virtual Host kullanıyorsan: http://localhost/api
-const BASE_URL = 'http://localhost:8000/api'; 
+const BASE_URL = 'http://127.0.0.1:8000/api'; 
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem('access_token');

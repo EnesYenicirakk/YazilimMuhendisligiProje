@@ -19,7 +19,7 @@ export const apiFetch = async (endpoint, options = {}) => {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || 'API isteği başarısız oldu.');
+    throw new Error(data.message || data.reply || 'API isteği başarısız oldu.');
   }
 
   return data;

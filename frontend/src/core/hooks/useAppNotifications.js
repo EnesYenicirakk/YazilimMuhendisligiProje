@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
-import { fetchAiResponse } from '../services/aiService'
+import { useEffect, useMemo, useState, useRef } from 'react'
+import { aiHizliKonular } from '../../shared/utils/constantsAndHelpers'
+import { apiFetch } from '../services/backendApiService'
 
 export default function useAppNotifications({
   aktifSayfa,
@@ -27,6 +27,8 @@ export default function useAppNotifications({
   const [aiTemaMenuAcik, setAiTemaMenuAcik] = useState(false)
   const [aiMesajMetni, setAiMesajMetni] = useState('')
   const [aiHizliKonularAcik, setAiHizliKonularAcik] = useState(true)
+  const [aiYukleniyor, setAiYukleniyor] = useState(false)
+  const aiGecmisRef = useRef([])
   const [aiMesajlar, setAiMesajlar] = useState([
     { id: 1, rol: 'bot', metin: 'Tekrardan hoş geldiniz, size nasıl yardımcı olabilirim?', saat: 'Şimdi' },
   ])
@@ -107,60 +109,6 @@ export default function useAppNotifications({
     [bildirimler, okunanBildirimler],
   )
 
-  const aiHazirCevaplar = useMemo(() => {
-    const enSonSiparis = siraliSiparisler[0]
-    const referansTarih = new Date()
-    const buAySiparisleri = siraliSiparisler.filter((siparis) => {
-      const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
-      return tarih.getMonth() === referansTarih.getMonth() && tarih.getFullYear() === referansTarih.getFullYear()
-    })
-
-    const buAyToplamSatis = buAySiparisleri.reduce((toplam, siparis) => toplam + siparis.toplamTutar, 0)
-    const enYuksekAylikSiparis = [...buAySiparisleri].sort((a, b) => b.toplamTutar - a.toplamTutar)[0]
-    const dusukStokluUrunler = [...urunler]
-      .filter((urun) => dashboardCanliOzetler.kritikStokluUrunler.some((kritikUrun) => kritikUrun.uid === urun.uid))
-      .sort((a, b) => a.magazaStok - b.magazaStok)
-      .slice(0, 4)
-    const kargolananSiparisler = siraliSiparisler.filter(
-      (siparis) =>
-        siparis.teslimatDurumu === 'Yolda' ||
-        siparis.teslimatDurumu === 'Kargoda' ||
-        siparis.teslimatDurumu === 'Teslim Edildi',
-    )
-    const teslimEdilenler = kargolananSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Teslim Edildi')
-    const yoldakiler = kargolananSiparisler.filter(
-      (siparis) => siparis.teslimatDurumu === 'Yolda' || siparis.teslimatDurumu === 'Kargoda',
-    )
-    const kargolanmayanSiparisler = siraliSiparisler.filter((siparis) => siparis.teslimatDurumu === 'Hazırlanıyor')
-    const kargolanmayanOzet = kargolanmayanSiparisler.slice(0, 3).map((siparis) => `${siparis.siparisNo} - ${siparis.urun}`).join(', ')
-
-    const enCokSatanlar = enCokSatilanUrunleriHesapla(siraliSiparisler, 3)
-      .map((urun) => `${urun.ad} (${urun.miktar} adet)`)
-      .join(', ')
-
-    return {
-      [metniNormalizeEt('Bu ay gerçekleşen satışlar hakkında bilgi ver.')]:
-        `Bu ay toplam ${buAySiparisleri.length} siparişten ${paraFormatla(buAyToplamSatis)} ciro oluştu. En yüksek tutarlı sipariş ${enYuksekAylikSiparis?.siparisNo ?? '-'} numaralı kayıtta, ${enYuksekAylikSiparis?.musteri ?? '-'} için ${paraFormatla(enYuksekAylikSiparis?.toplamTutar ?? 0)} olarak görünüyor.`,
-      [metniNormalizeEt('Bana stokları azalan ürünlerimiz hakkında bilgi ver.')]:
-        dusukStokluUrunler.length > 0
-          ? `Kritik stok seviyesine düşen ürünler: ${dusukStokluUrunler.map((urun) => `${urun.ad} (minimum ${urun.minimumStok} / mevcut ${urun.magazaStok})`).join(', ')}. Bu ürünler için yeniden sipariş açılması gerekiyor.`
-          : 'Şu an kritik eşik altında görünen bir ürün yok. Envanter genel olarak dengeli görünüyor.',
-      [metniNormalizeEt('Kargolanan siparişlerin teslimi yapıldı mı')]:
-        `Toplam ${kargolananSiparisler.length} sipariş kargoya çıktı. Bunların ${teslimEdilenler.length} adedi teslim edildi, ${yoldakiler.length} adedi ise hâlâ yolda. En yakın teslimat beklenen kayıtlar dashboarddaki son siparişler tablosunda da görünüyor.`,
-      [metniNormalizeEt('Hangi siparişlerimiz henüz kargolanmadı')]:
-        kargolanmayanSiparisler.length > 0
-          ? `Şu an ${kargolanmayanSiparisler.length} sipariş henüz kargolanmadı. Öne çıkan kayıtlar: ${kargolanmayanOzet}. Bu siparişlerin durumu siparişler ekranında "Hazırlanıyor" olarak işaretli.`
-          : 'Şu anda kargolanmamış açık sipariş görünmüyor. Tüm kayıtlar ya yolda ya da teslim edilmiş durumda.',
-      [metniNormalizeEt('En çok satan ürünlerimizden bana bahset.')]:
-        enCokSatanlar
-          ? `Sipariş kaydına göre öne çıkan ürünler: ${enCokSatanlar}. Bu ürünler dashboarddaki "En Çok Satılan Ürünler" alanıyla aynı veriden hesaplanıyor.`
-          : 'Teslim edilmiş siparişlere göre öne çıkan bir ürün verisi henüz oluşmadı.',
-      [metniNormalizeEt('En son gerçekleşen satışın ayrıntılarını anlat.')]:
-        enSonSiparis
-          ? `En son satış ${enSonSiparis.siparisNo} numarasıyla ${tarihFormatla(enSonSiparis.siparisTarihi)} tarihinde oluşturuldu. Ürün ${enSonSiparis.urun}, müşteri ${enSonSiparis.musteri}, tutar ${paraFormatla(enSonSiparis.toplamTutar)} ve teslimat durumu ${enSonSiparis.teslimatDurumu.toLocaleLowerCase('tr-TR')} olarak kayıtlı.`
-          : 'En son satış kaydı şu anda bulunamadı.',
-    }
-  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, tarihFormatla, urunler])
 
   useEffect(() => {
     if (!aiPanelKapaniyor) return undefined
@@ -199,39 +147,59 @@ export default function useAppNotifications({
 
   const aiMesajGonder = (hazirMetin) => {
     const metin = (hazirMetin ?? aiMesajMetni).trim()
-    if (!metin) return
+    if (!metin || aiYukleniyor) return
 
-    const normalizeMetin = metniNormalizeEt(metin)
-    setAiHizliKonularAcik(false)
-    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    setAiMesajlar((onceki) => [...onceki, { id: uniqueId, rol: 'kullanici', metin, saat: 'Şimdi' }])
     if (!hazirMetin) setAiMesajMetni('')
 
-    if (normalizeMetin === metniNormalizeEt('Diğer')) return
-
-    const hazirCevap = aiHazirCevaplar[normalizeMetin]
-    if (hazirCevap) {
-      window.setTimeout(() => {
-        const botHazirId = `${Date.now()}-bot-ready`
-        setAiMesajlar((onceki) => [...onceki, { id: botHazirId, rol: 'bot', metin: hazirCevap, saat: 'Şimdi' }])
-      }, 320)
-    } else {
-      // Dış API'den cevap al
-      const botMesajId = `${Date.now()}-bot-async`
-      setAiMesajlar((onceki) => [...onceki, { id: botMesajId, rol: 'bot', metin: 'Düşünüyorum...', saat: 'Şimdi' }])
-
-      fetchAiResponse(metin)
-        .then((cevap) => {
-          setAiMesajlar((onceki) => 
-            onceki.map(m => m.id === botMesajId ? { ...m, metin: cevap } : m)
-          )
-        })
-        .catch((error) => {
-          setAiMesajlar((onceki) => 
-            onceki.map(m => m.id === botMesajId ? { ...m, metin: 'Üzgünüm, şu an cevap veremiyorum. ' + error.message } : m)
-          )
-        })
+    if (metin === 'Diğer') {
+      setAiHizliKonularAcik(false)
+      return
     }
+
+    const saatStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+    const mesajId = Date.now().toString()
+    const typingId = mesajId + '-typing'
+
+    setAiMesajlar((onceki) => [
+      ...onceki,
+      { id: mesajId, rol: 'kullanici', metin, saat: saatStr },
+      { id: typingId, rol: 'bot', metin: '...', saat: '', yukleniyor: true }
+    ])
+    
+    setAiHizliKonularAcik(false)
+    setAiYukleniyor(true)
+
+    const gecmis = aiGecmisRef.current.slice(-20)
+
+    apiFetch('/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message: metin, history: gecmis })
+    })
+      .then((data) => {
+        const yanit = data.reply || 'Yanıt alınamadı.'
+        
+        aiGecmisRef.current = [
+          ...aiGecmisRef.current,
+          { role: 'user', content: metin },
+          { role: 'assistant', content: yanit }
+        ].slice(-20)
+
+        const yanitSaat = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+        setAiMesajlar((onceki) =>
+          onceki.map((m) => (m.id === typingId ? { ...m, metin: yanit, saat: yanitSaat, yukleniyor: false } : m))
+        )
+      })
+      .catch((err) => {
+        const hataMesaji = err?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.'
+        setAiMesajlar((onceki) =>
+          onceki.map((m) =>
+            m.id === typingId ? { ...m, metin: `⚠️ ${hataMesaji}`, saat: 'Hata', yukleniyor: false } : m
+          )
+        )
+      })
+      .finally(() => {
+        setAiYukleniyor(false)
+      })
   }
 
   const aiPaneliAc = () => {
@@ -245,6 +213,15 @@ export default function useAppNotifications({
   const aiPaneliKapat = () => {
     setAiTemaMenuAcik(false)
     setAiPanelKapaniyor(true)
+  }
+
+  const sohbetiTemizle = () => {
+    setAiMesajlar([
+      { id: 1, rol: 'bot', metin: 'Tekrardan hoş geldiniz, size nasıl yardımcı olabilirim?', saat: 'Şimdi' },
+    ])
+    aiGecmisRef.current = []
+    setAiHizliKonularAcik(true)
+    setAiMesajMetni('')
   }
 
   const aiPanelDugmeTikla = () => {
@@ -338,5 +315,7 @@ export default function useAppNotifications({
     setAiPanelKucuk,
     setAiTemaMenuAcik,
     tumBildirimleriTemizle,
+    aiYukleniyor,
+    sohbetiTemizle,
   }
 }

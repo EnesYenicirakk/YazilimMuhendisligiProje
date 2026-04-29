@@ -121,11 +121,22 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
   }
 
   const musteriFavoriDegistir = (uid) => {
-    setMusteriler((onceki) =>
-      onceki.map((musteri) =>
-        musteri.uid === uid ? { ...musteri, favori: !musteri.favori } : musteri,
-      ),
-    )
+    const musteri = musteriler.find((m) => m.uid === uid)
+    if (!musteri) return
+
+    const guncellenenMusteriData = {
+      ...musteri,
+      favori: !musteri.favori,
+    }
+
+    customerApi.update(uid, guncellenenMusteriData).then((sunucuVerisi) => {
+      setMusteriler((onceki) =>
+        onceki.map((m) => (m.uid === uid ? sunucuVerisi : m)),
+      )
+    }).catch(err => {
+      console.error('Müşteri favori durumu güncellenirken hata:', err)
+      toastGoster?.('hata', 'Favori durumu güncellenirken hata oluştu.')
+    })
   }
 
   const musteriKaydet = (mod) => {
@@ -179,14 +190,23 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
     }
 
     const seciliMusteri = musteriler.find((musteri) => musteri.uid === seciliMusteriUid)
+    if (!seciliMusteri) return
 
-    setMusteriler((onceki) =>
-      onceki.map((musteri) =>
-        musteri.uid === seciliMusteriUid ? { ...musteri, not: temizNot } : musteri,
-      ),
-    )
-    musteriNotKapat()
-    toastGoster?.('basari', `${seciliMusteri?.ad ?? 'Müşteri'} notu kaydedildi.`)
+    const guncellenenMusteriData = {
+      ...seciliMusteri,
+      not: temizNot,
+    }
+
+    customerApi.update(seciliMusteriUid, guncellenenMusteriData).then((sunucuVerisi) => {
+      setMusteriler((onceki) =>
+        onceki.map((m) => (m.uid === seciliMusteriUid ? sunucuVerisi : m)),
+      )
+      musteriNotKapat()
+      toastGoster?.('basari', `${seciliMusteri.ad} notu kaydedildi.`)
+    }).catch(err => {
+      console.error('Müşteri notu güncellenirken hata:', err)
+      toastGoster?.('hata', 'Not kaydedilirken sunucu hatası oluştu.')
+    })
   }
 
   const musteriSil = () => {

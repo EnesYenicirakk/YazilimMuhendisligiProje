@@ -1,4 +1,4 @@
-﻿/* Shared data table and mobile card styles */
+/* Shared data table and mobile card styles */
 
 .tablo-sarmal {
   overflow-x: auto;
@@ -402,11 +402,12 @@ th {
 }
 
 .sayfalama {
-  margin-top: 12px;
+  margin-top: 24px;
+  margin-bottom: 8px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 @media (max-width: 900px) {

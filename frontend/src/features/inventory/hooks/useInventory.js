@@ -446,9 +446,22 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
   }
 
   const favoriDegistir = (uid) => {
-    setUrunler((onceki) =>
-      onceki.map((urun) => (urun.uid === uid ? { ...urun, favori: !urun.favori } : urun)),
-    )
+    const urun = urunler.find((u) => u.uid === uid)
+    if (!urun) return
+
+    const guncellenenUrunData = {
+      ...urun,
+      favori: !urun.favori,
+    }
+
+    productApi.update(uid, guncellenenUrunData).then((sunucuVerisi) => {
+      setUrunler((onceki) =>
+        onceki.map((u) => (u.uid === uid ? sunucuVerisi : u)),
+      )
+    }).catch(err => {
+      console.error('Ürün favori durumu güncellenirken hata:', err)
+      toastGoster?.('hata', 'Favori durumu güncellenirken hata oluştu.')
+    })
   }
 
   const otomatikStokKorumasiniUygula = ({ urunUid, miktar, hedefStok, tedarikciAdi, siparisNo }) => {
@@ -640,51 +653,61 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
       return
     }
 
-    setUrunler((onceki) =>
-      onceki.map((urun) => {
-        const kalem = barkodSepeti.find((item) => item.uid === urun.uid)
-        if (!kalem) return urun
+    const updateData = {
+      items: barkodSepeti.map((kalem) => ({ uid: kalem.uid, miktar: kalem.miktar })),
+      type: barkodIslemTuru,
+    }
+
+    productApi.bulkStockUpdate(updateData).then(() => {
+      setUrunler((onceki) =>
+        onceki.map((urun) => {
+          const kalem = barkodSepeti.find((item) => item.uid === urun.uid)
+          if (!kalem) return urun
+
+          const yeniStok = barkodIslemTuru === 'alis'
+            ? urun.magazaStok + kalem.miktar
+            : urun.magazaStok - kalem.miktar
+
+          return {
+            ...urun,
+            magazaStok: yeniStok,
+          }
+        }),
+      )
+
+      barkodSepeti.forEach((kalem) => {
+        const ilgiliUrun = urunler.find((urun) => urun.uid === kalem.uid)
+        if (!ilgiliUrun) return
 
         const yeniStok = barkodIslemTuru === 'alis'
-          ? urun.magazaStok + kalem.miktar
-          : urun.magazaStok - kalem.miktar
+          ? ilgiliUrun.magazaStok + kalem.miktar
+          : ilgiliUrun.magazaStok - kalem.miktar
 
-        return {
-          ...urun,
-          magazaStok: yeniStok,
-        }
-      }),
-    )
-
-    barkodSepeti.forEach((kalem) => {
-      const ilgiliUrun = urunler.find((urun) => urun.uid === kalem.uid)
-      if (!ilgiliUrun) return
-
-      const yeniStok = barkodIslemTuru === 'alis'
-        ? ilgiliUrun.magazaStok + kalem.miktar
-        : ilgiliUrun.magazaStok - kalem.miktar
-
-      stokLoguEkle({
-        urun: ilgiliUrun.ad,
-        urunId: ilgiliUrun.urunId,
-        eskiStok: ilgiliUrun.magazaStok,
-        yeniStok,
-        islem: barkodIslemTuru === 'alis' ? 'Stok artışı' : 'Stok düşüşü',
-        aciklama:
-          barkodIslemTuru === 'alis'
-            ? `Barkod ekranından ${kalem.miktar} adet stok girişi yapıldı.`
-            : `Barkod ekranından ${kalem.miktar} adet stok çıkışı yapıldı.`,
+        stokLoguEkle({
+          urun: ilgiliUrun.ad,
+          urunId: ilgiliUrun.urunId,
+          eskiStok: ilgiliUrun.magazaStok,
+          yeniStok,
+          islem: barkodIslemTuru === 'alis' ? 'Stok artışı' : 'Stok düşüşü',
+          aciklama:
+            barkodIslemTuru === 'alis'
+              ? `Barkod ekranından ${kalem.miktar} adet stok girişi yapıldı.`
+              : `Barkod ekranından ${kalem.miktar} adet stok çıkışı yapıldı.`,
+        })
       })
+
+      toastGoster?.(
+        'basari',
+        barkodIslemTuru === 'alis'
+          ? `${barkodToplamKalem} kalem için stok girişi tamamlandı.`
+          : `${barkodToplamKalem} kalem için stok çıkışı tamamlandı.`,
+      )
+
+      barkodModaliniKapat()
+    }).catch((err) => {
+      console.error('Stoklar güncellenirken hata:', err)
+      toastGoster?.('hata', 'Stoklar güncellenirken sunucu hatası oluştu.')
     })
-
-    toastGoster?.(
-      'basari',
-      barkodIslemTuru === 'alis'
-        ? `${barkodToplamKalem} kalem için stok girişi tamamlandı.`
-        : `${barkodToplamKalem} kalem için stok çıkışı tamamlandı.`,
-    )
-
-    barkodModaliniKapat()
   }
 
   const inventoryModallariniKapat = () => {

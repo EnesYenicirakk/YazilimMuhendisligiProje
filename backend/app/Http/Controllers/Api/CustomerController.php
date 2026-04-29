@@ -48,6 +48,7 @@ class CustomerController extends Controller
             'tax_number' => $request->vergiNumarasi,
             'notes' => $request->not,
             'last_purchase_date' => $request->sonAlim,
+            'is_favorite' => $request->favori ?? $customer->is_favorite,
         ]);
 
         return response()->json($this->mapCustomerToFrontend($customer));
@@ -70,7 +71,7 @@ class CustomerController extends Controller
             'vergiNumarasi' => $customer->tax_number,
             'sonAlim' => $customer->last_purchase_date ? $customer->last_purchase_date->format('Y-m-d') : null,
             'not' => $customer->notes,
-            'favori' => false,
+            'favori' => (bool)$customer->is_favorite,
         ];
     }
 }

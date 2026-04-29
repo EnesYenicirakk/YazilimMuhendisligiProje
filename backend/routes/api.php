@@ -13,6 +13,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::post('/products/bulk-stock-update', [ProductController::class, 'bulkStockUpdate']);
 Route::apiResource('products', ProductController::class);
 Route::apiResource('customers', CustomerController::class);
 Route::apiResource('orders', OrderController::class);

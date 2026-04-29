@@ -1,4 +1,4 @@
-﻿/* Reusable button styles */
+/* Reusable button styles */
 
 .sifre-goster-buton {
   position: absolute;
@@ -263,26 +263,43 @@
 
 .sayfa-buton,
 .sayfa-ok {
-  min-width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: 1px solid #d6e4f5;
   background: #fff;
   color: #355173;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 180ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.sayfa-buton:hover,
+.sayfa-ok:not(:disabled):hover {
+  background: #f0f7ff;
+  border-color: #accfff;
+  color: #1d5fad;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(29, 95, 173, 0.1);
 }
 
 .sayfa-buton.aktif {
-  background: #e7f1ff;
-  border-color: #b7d3fa;
-  color: #1d5fad;
+  background: linear-gradient(180deg, #2f7dd6 0%, #1d5fad 100%);
+  border-color: #1d5fad;
+  color: #fff;
   font-weight: 700;
+  box-shadow: 0 4px 10px rgba(29, 95, 173, 0.25);
 }
 
 .sayfa-ok:disabled {
-  opacity: 0.45;
+  opacity: 0.35;
   cursor: not-allowed;
+  background: #f5f8fb;
 }
 
 .modal-aksiyon button {

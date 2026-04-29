@@ -208,7 +208,24 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
   const tedarikciDetayAc = (tedarikci) => { setSeciliTedarikciUid(tedarikci.uid); setTedarikciDetaySekmesi('genel'); setTedarikciDetayAcik(true) }
   const tedarikciNotAc = (tedarikci) => { setSeciliTedarikciUid(tedarikci.uid); setTedarikciNotMetni(tedarikci.not); setTedarikciNotAcik(true) }
   const tedarikciFormuGuncelle = (alan, deger) => setTedarikciFormu((onceki) => ({ ...onceki, [alan]: deger }))
-  const tedarikciFavoriDegistir = (uid) => setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === uid ? { ...tedarikci, favori: !tedarikci.favori } : tedarikci)))
+  const tedarikciFavoriDegistir = (uid) => {
+    const tedarikci = tedarikciler.find((t) => t.uid === uid)
+    if (!tedarikci) return
+
+    const guncellenenTedarikciData = {
+      ...tedarikci,
+      favori: !tedarikci.favori,
+    }
+
+    supplierApi.update(uid, guncellenenTedarikciData).then((sunucuVerisi) => {
+      setTedarikciler((onceki) =>
+        onceki.map((t) => (t.uid === uid ? sunucuVerisi : t)),
+      )
+    }).catch(err => {
+      console.error('Tedarikçi favori durumu güncellenirken hata:', err)
+      toastGoster?.('hata', 'Favori durumu güncellenirken hata oluştu.')
+    })
+  }
 
   const epostaGecerliMi = (eposta) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eposta)
 
@@ -280,9 +297,23 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
       return
     }
     const secili = tedarikciler.find((tedarikci) => tedarikci.uid === seciliTedarikciUid)
-    setTedarikciler((onceki) => onceki.map((tedarikci) => (tedarikci.uid === seciliTedarikciUid ? { ...tedarikci, not: temizNot } : tedarikci)))
-    tedarikciNotKapat()
-    toastGoster?.('basari', `${secili?.firmaAdi ?? 'Tedarikçi'} notu kaydedildi.`)
+    if (!secili) return
+
+    const guncellenenTedarikciData = {
+      ...secili,
+      not: temizNot,
+    }
+
+    supplierApi.update(seciliTedarikciUid, guncellenenTedarikciData).then((sunucuVerisi) => {
+      setTedarikciler((onceki) =>
+        onceki.map((t) => (t.uid === seciliTedarikciUid ? sunucuVerisi : t)),
+      )
+      tedarikciNotKapat()
+      toastGoster?.('basari', `${secili.firmaAdi} notu kaydedildi.`)
+    }).catch(err => {
+      console.error('Tedarikçi notu güncellenirken hata:', err)
+      toastGoster?.('hata', 'Not kaydedilirken sunucu hatası oluştu.')
+    })
   }
 
   const tedarikciSiparisFormuGuncelle = (alan, deger) => setTedarikciSiparisFormu((onceki) => ({ ...onceki, [alan]: deger }))

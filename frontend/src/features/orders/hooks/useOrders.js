@@ -300,28 +300,30 @@ export default function useOrders({
       return
     }
 
-    setSiparisler((onceki) =>
-      onceki.map((siparis) =>
-        siparis.siparisNo === duzenlenenSiparisNo
-          ? {
-              ...siparis,
-              musteriUid: seciliMusteri.uid,
-              musteri: seciliMusteri.ad,
-              urun,
-              toplamTutar,
-              siparisTarihi,
-              odemeDurumu,
-              urunHazirlik,
-              teslimatDurumu,
-              teslimatSuresi,
-            }
-          : siparis,
-      ),
-    )
+    const guncellenenSiparisData = {
+      musteriUid,
+      urun,
+      toplamTutar,
+      siparisTarihi,
+      odemeDurumu,
+      urunHazirlik,
+      teslimatDurumu,
+      teslimatSuresi,
+    }
 
-    setDuzenlenenSiparisNo(null)
-    setSiparisFormu(bosSiparisFormu)
-    toastGoster?.('basari', `${seciliMusteri.ad} için sipariş kaydı güncellendi.`)
+    orderApi.update(duzenlenenSiparisNo, guncellenenSiparisData).then((sunucuVerisi) => {
+      setSiparisler((onceki) =>
+        onceki.map((siparis) =>
+          siparis.siparisNo === duzenlenenSiparisNo ? sunucuVerisi : siparis,
+        ),
+      )
+      setDuzenlenenSiparisNo(null)
+      setSiparisFormu(bosSiparisFormu)
+      toastGoster?.('basari', `${seciliMusteri.ad} için sipariş kaydı güncellendi.`)
+    }).catch(err => {
+      console.error('Sipariş güncellenirken hata:', err)
+      toastGoster?.('hata', 'Sipariş güncellenirken sunucu hatası oluştu.')
+    })
   }
 
   const siparisDurumKaydet = () => {
@@ -336,16 +338,29 @@ export default function useOrders({
       return
     }
 
-    setSiparisler((onceki) =>
-      onceki.map((siparis) =>
-        siparis.siparisNo === durumGuncellenenSiparisNo
-          ? { ...siparis, odemeDurumu, urunHazirlik, teslimatDurumu, teslimatSuresi }
-          : siparis,
-      ),
-    )
+    const mevcutSiparis = siparisler.find(s => s.siparisNo === durumGuncellenenSiparisNo)
+    if (!mevcutSiparis) return
 
-    setDurumGuncellenenSiparisNo(null)
-    toastGoster?.('basari', `${durumGuncellenenSiparisNo} durumu güncellendi.`)
+    const guncellenenSiparisData = {
+      ...mevcutSiparis,
+      odemeDurumu,
+      urunHazirlik,
+      teslimatDurumu,
+      teslimatSuresi,
+    }
+
+    orderApi.update(durumGuncellenenSiparisNo, guncellenenSiparisData).then((sunucuVerisi) => {
+      setSiparisler((onceki) =>
+        onceki.map((siparis) =>
+          siparis.siparisNo === durumGuncellenenSiparisNo ? sunucuVerisi : siparis,
+        ),
+      )
+      setDurumGuncellenenSiparisNo(null)
+      toastGoster?.('basari', `${durumGuncellenenSiparisNo} durumu güncellendi.`)
+    }).catch(err => {
+      console.error('Sipariş durumu güncellenirken hata:', err)
+      toastGoster?.('hata', 'Sipariş durumu güncellenirken sunucu hatası oluştu.')
+    })
   }
 
   const siparisSil = () => {
@@ -353,20 +368,13 @@ export default function useOrders({
     const silinenSiparis = { ...silinecekSiparis }
     const silinenNo = silinenSiparis.siparisNo
     const silinenIndex = siparisler.findIndex((siparis) => siparis.siparisNo === silinenNo)
-    setSiparisler((onceki) => onceki.filter((siparis) => siparis.siparisNo !== silinenNo))
-    setSilinecekSiparis(null)
-    toastGoster?.('basari', `${silinenNo} siparişi silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        setSiparisler((onceki) => {
-          if (onceki.some((siparis) => siparis.siparisNo === silinenNo)) return onceki
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenSiparis)
-          return yeni
-        })
-        toastGoster?.('basari', `${silinenNo} geri alındı.`)
-      },
+    orderApi.delete(silinenNo).then(() => {
+      setSiparisler((onceki) => onceki.filter((siparis) => siparis.siparisNo !== silinenNo))
+      setSilinecekSiparis(null)
+      toastGoster?.('basari', `${silinenNo} siparişi kalıcı olarak silindi.`)
+    }).catch(err => {
+      console.error('Sipariş silinirken hata:', err)
+      toastGoster?.('hata', 'Sipariş silinirken sunucu hatası oluştu.')
     })
   }
 

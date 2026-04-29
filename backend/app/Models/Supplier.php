@@ -14,6 +14,12 @@ class Supplier extends Model
         'address',
         'tax_number',
         'product_group',
+        'notes',
+        'is_favorite',
+    ];
+
+    protected $casts = [
+        'is_favorite' => 'boolean',
     ];
 
     public function orders()

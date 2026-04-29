@@ -15,10 +15,12 @@ class Customer extends Model
         'tax_number',
         'last_purchase_date',
         'notes',
+        'is_favorite',
     ];
 
     protected $casts = [
         'last_purchase_date' => 'date',
+        'is_favorite' => 'boolean',
     ];
 
     public function orders(): HasMany

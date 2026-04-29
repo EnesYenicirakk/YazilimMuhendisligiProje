@@ -31,6 +31,7 @@ export const productApi = {
   create: (data) => apiFetch('/products', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => apiFetch(`/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => apiFetch(`/products/${id}`, { method: 'DELETE' }),
+  bulkStockUpdate: (data) => apiFetch('/products/bulk-stock-update', { method: 'POST', body: JSON.stringify(data) }),
 };
 
 export const customerApi = {
@@ -43,6 +44,8 @@ export const customerApi = {
 export const orderApi = {
   getAll: () => apiFetch('/orders'),
   create: (data) => apiFetch('/orders', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => apiFetch(`/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => apiFetch(`/orders/${id}`, { method: 'DELETE' }),
 };
 
 export const categoryApi = {

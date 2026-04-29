@@ -82,6 +82,28 @@ class ProductController extends Controller
         return response()->json(['message' => 'Ürün silindi']);
     }
 
+    public function bulkStockUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*.uid' => 'required|exists:products,id',
+            'items.*.miktar' => 'required|integer|min:1',
+            'type' => 'required|in:alis,satis',
+        ]);
+
+        foreach ($request->items as $item) {
+            $product = Product::find($item['uid']);
+            if ($request->type === 'alis') {
+                $product->increment('store_stock', $item['miktar']);
+            } else {
+                // Satışta stok eksiye düşmemesi için kontrol (opsiyonel, bazen eksi stok istenir)
+                $product->decrement('store_stock', $item['miktar']);
+            }
+        }
+
+        return response()->json(['message' => 'Stoklar başarıyla güncellendi']);
+    }
+
     private function mapProductToFrontend($product) {
         return [
             'uid' => $product->id,

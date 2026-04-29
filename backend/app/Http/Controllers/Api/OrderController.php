@@ -52,10 +52,39 @@ class OrderController extends Controller
                     'quantity' => 1,
                     'unit_price' => $request->toplamTutar,
                 ]);
+
+                // Otomatik Stok Düşümü
+                if ($product->store_stock > 0) {
+                    $product->decrement('store_stock', 1);
+                }
             }
 
             return response()->json($this->mapOrderToFrontend($order), 201);
         });
+    }
+
+    public function update(Request $request, $id)
+    {
+        $order = CustomerOrder::findOrFail($id);
+
+        $order->update([
+            'customer_id' => $request->musteriUid,
+            'total_amount' => $request->toplamTutar,
+            'order_date' => $request->siparisTarihi,
+            'payment_status' => $this->mapPaymentStatusToBackend($request->odemeDurumu),
+            'preparation_status' => $this->mapPrepStatusToBackend($request->urunHazirlik),
+            'delivery_status' => $this->mapDeliveryStatusToBackend($request->teslimatDurumu),
+        ]);
+
+        return response()->json($this->mapOrderToFrontend($order));
+    }
+
+    public function destroy($id)
+    {
+        $order = CustomerOrder::findOrFail($id);
+        $order->delete();
+
+        return response()->json(['message' => 'Sipariş silindi']);
     }
 
     private function mapOrderToFrontend($order) {

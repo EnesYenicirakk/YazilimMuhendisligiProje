@@ -32,6 +32,8 @@ class SupplierController extends Controller
             'address' => $request->adres ?? '',
             'tax_number' => $request->vergiNumarasi ?? '',
             'product_group' => $request->urunGrubu ?? '',
+            'notes' => $request->not ?? '',
+            'is_favorite' => $request->favori ?? false,
         ]);
 
         return response()->json($this->mapSupplierToFrontend($supplier), 201);
@@ -49,6 +51,8 @@ class SupplierController extends Controller
             'address' => $request->adres,
             'tax_number' => $request->vergiNumarasi,
             'product_group' => $request->urunGrubu,
+            'notes' => $request->not,
+            'is_favorite' => $request->favori ?? $supplier->is_favorite,
         ]);
 
         return response()->json($this->mapSupplierToFrontend($supplier));
@@ -71,14 +75,14 @@ class SupplierController extends Controller
             'adres' => $supplier->address,
             'vergiNumarasi' => $supplier->tax_number,
             'urunGrubu' => $supplier->product_group,
-            'not' => '', 
-            'toplamAlisSayisi' => 0,
-            'ortalamaTeslimSuresi' => '3 iş günü',
-            'toplamHarcama' => 0,
+            'not' => $supplier->notes, 
+            'toplamAlisSayisi' => 0, // Placeholder
+            'ortalamaTeslimSuresi' => '3 iş günü', // Placeholder
+            'toplamHarcama' => 0, // Placeholder
             'alinanUrunler' => [],
             'siparisler' => [],
             'fiyatGecmisi' => [],
-            'favori' => false,
+            'favori' => (bool)$supplier->is_favorite,
         ];
     }
 }

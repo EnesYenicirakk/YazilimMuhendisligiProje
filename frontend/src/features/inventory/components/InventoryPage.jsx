@@ -1,4 +1,4 @@
-﻿import { envanterKategorileri, kritikStoktaMi } from '../../../shared/utils/constantsAndHelpers'
+import { envanterKategorileri, kritikStoktaMi } from '../../../shared/utils/constantsAndHelpers'
 
 export default function InventoryPage({
   KucukIkon,
@@ -83,7 +83,12 @@ export default function InventoryPage({
                       <td>{String(sayfaBaslangic + index + 1).padStart(2, '0')}</td>
                       <td>
                         <div className="urun-hucre">
-                          <span className="urun-avatar">{urun.avatar}</span>
+                          <span
+                            className="urun-avatar"
+                            style={urun.avatar?.startsWith('#') ? { backgroundColor: urun.avatar, color: '#fff', border: 'none', textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
+                          >
+                            {urun.avatar?.startsWith('#') ? (urun.ad?.charAt(0) || '') : (urun.avatar || urun.ad?.charAt(0) || '?')}
+                          </span>
                           <strong className="urun-ad-satiri">
                             <span>{urun.ad}</span>
                             {kritikStoktaMi(urun) && (
@@ -138,7 +143,12 @@ export default function InventoryPage({
                   govde={(
                     <>
                       <div className="mobil-kart-kisi">
-                        <span className="urun-avatar">{urun.avatar}</span>
+                        <span
+                          className="urun-avatar"
+                          style={urun.avatar?.startsWith('#') ? { backgroundColor: urun.avatar, color: '#fff', border: 'none', textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
+                        >
+                          {urun.avatar?.startsWith('#') ? (urun.ad?.charAt(0) || '') : (urun.avatar || urun.ad?.charAt(0) || '?')}
+                        </span>
                         <div className="mobil-kisi-metin">
                           <strong className="urun-ad-satiri">
                             <span>{urun.ad}</span>

@@ -1,4 +1,4 @@
-﻿/* Inventory feature styles */
+/* Inventory feature styles */
 
 /* Inventory entry card */
 .urun-ekle-karti {
@@ -61,6 +61,8 @@
   font-size: 0.73rem;
   font-weight: 700;
   border: 1px solid #c8defe;
+  flex-shrink: 0;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
 }
 
 .urun-ad-satiri {

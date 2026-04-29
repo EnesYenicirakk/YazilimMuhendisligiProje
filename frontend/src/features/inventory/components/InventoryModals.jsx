@@ -1,4 +1,4 @@
-﻿export default function InventoryModals({ inventoryData }) {
+export default function InventoryModals({ inventoryData }) {
   const {
     eklemeAcik,
     duzenlemeAcik,
@@ -25,7 +25,10 @@
       {eklemeAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Ürün Ekle</h3>
+            <div className="modal-baslik">
+              <h3>Ürün Ekle</h3>
+              <button type="button" className="modal-kapat" onClick={eklemePenceresiniKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Ürün İsmi</label>
               <input value={form.ad} onChange={(event) => formGuncelle('ad', event.target.value)} />
@@ -49,7 +52,10 @@
       {duzenlemeAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Ürünü Düzenle</h3>
+            <div className="modal-baslik">
+              <h3>Ürünü Düzenle</h3>
+              <button type="button" className="modal-kapat" onClick={duzenlemePenceresiniKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Ürün İsmi</label>
               <input value={form.ad} onChange={(event) => formGuncelle('ad', event.target.value)} />
@@ -73,7 +79,10 @@
       {urunDuzenlemeModalAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Ürünü Düzenle</h3>
+            <div className="modal-baslik">
+              <h3>Ürünü Düzenle</h3>
+              <button type="button" className="modal-kapat" onClick={urunDuzenlemeModaliniKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Ürün İsmi</label>
               <input value={urunDuzenlemeFormu.ad} onChange={(event) => urunDuzenlemeFormuGuncelle('ad', event.target.value)} />
@@ -99,7 +108,10 @@
       {silinecekUrun && (
         <div className="modal-kaplama">
           <div className="modal-kutu kucuk">
-            <h3>Silmek istediğinizden emin misiniz</h3>
+            <div className="modal-baslik">
+              <h3>Silmek istediğinizden emin misiniz</h3>
+              <button type="button" className="modal-kapat" onClick={() => setSilinecekUrun(null)} aria-label="Kapat">×</button>
+            </div>
             <p><strong>{silinecekUrun.ad}</strong> envanterden kaldırılacak.</p>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setSilinecekUrun(null)}>Hayır</button>
@@ -112,7 +124,10 @@
       {silinecekDuzenlemeUrunu && (
         <div className="modal-kaplama">
           <div className="modal-kutu kucuk">
-            <h3>Silmek istediğinizden emin misiniz</h3>
+            <div className="modal-baslik">
+              <h3>Silmek istediğinizden emin misiniz</h3>
+              <button type="button" className="modal-kapat" onClick={() => setSilinecekDuzenlemeUrunu(null)} aria-label="Kapat">×</button>
+            </div>
             <p><strong>{silinecekDuzenlemeUrunu.ad}</strong> ürün düzenleme listesinden kaldırılacak.</p>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setSilinecekDuzenlemeUrunu(null)}>Hayır</button>

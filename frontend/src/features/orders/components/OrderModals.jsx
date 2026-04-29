@@ -1,4 +1,4 @@
-﻿export default function OrderModals({ ordersData, paraFormatla, tarihFormatla }) {
+export default function OrderModals({ ordersData, paraFormatla, tarihFormatla }) {
   const {
     yeniSiparisAcik,
     setYeniSiparisAcik,
@@ -30,7 +30,10 @@
       {yeniSiparisAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Yeni Sipariş Oluştur</h3>
+            <div className="modal-baslik">
+              <h3>Yeni Sipariş Oluştur</h3>
+              <button type="button" className="modal-kapat" onClick={() => setYeniSiparisAcik(false)} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Müşteri</label>
               <select value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
@@ -78,7 +81,10 @@
       {detaySiparis && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Sipariş Detayı</h3>
+            <div className="modal-baslik">
+              <h3>Sipariş Detayı</h3>
+              <button type="button" className="modal-kapat" onClick={() => setDetaySiparis(null)} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form siparis-detay-icerik">
               <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detaySiparis.siparisNo}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Müşteri</span><strong>{siparisMusteriAdiniGetir(detaySiparis)}</strong></div>
@@ -101,7 +107,10 @@
       {detayGecmisSiparis && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Geçmiş Sipariş Detayı</h3>
+            <div className="modal-baslik">
+              <h3>Geçmiş Sipariş Detayı</h3>
+              <button type="button" className="modal-kapat" onClick={() => setDetayGecmisSiparis(null)} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form siparis-detay-icerik">
               <div className="mobil-bilgi-satiri"><span>Log No</span><strong>{detayGecmisSiparis.logNo}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Sipariş No</span><strong>{detayGecmisSiparis.siparisNo}</strong></div>
@@ -124,7 +133,10 @@
       {duzenlenenSiparisNo && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Siparişi Düzenle</h3>
+            <div className="modal-baslik">
+              <h3>Siparişi Düzenle</h3>
+              <button type="button" className="modal-kapat" onClick={() => setDuzenlenenSiparisNo(null)} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Müşteri</label>
               <select value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
@@ -172,7 +184,10 @@
       {durumGuncellenenSiparisNo && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Sipariş Durumu Güncelle</h3>
+            <div className="modal-baslik">
+              <h3>Sipariş Durumu Güncelle</h3>
+              <button type="button" className="modal-kapat" onClick={() => setDurumGuncellenenSiparisNo(null)} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Ödeme Durumu</label>
               <select value={siparisDurumFormu.odemeDurumu} onChange={(event) => siparisDurumFormuGuncelle('odemeDurumu', event.target.value)}>
@@ -205,7 +220,10 @@
       {silinecekSiparis && (
         <div className="modal-kaplama">
           <div className="modal-kutu kucuk">
-            <h3>Silmek istediğinizden emin misiniz?</h3>
+            <div className="modal-baslik">
+              <h3>Silmek istediğinizden emin misiniz?</h3>
+              <button type="button" className="modal-kapat" onClick={() => setSilinecekSiparis(null)} aria-label="Kapat">×</button>
+            </div>
             <p><strong>{silinecekSiparis.siparisNo}</strong> siparişi kaldırılacak.</p>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setSilinecekSiparis(null)}>Hayır</button>

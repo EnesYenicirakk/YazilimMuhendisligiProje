@@ -203,7 +203,8 @@ export default function useAppNotifications({
 
     const normalizeMetin = metniNormalizeEt(metin)
     setAiHizliKonularAcik(false)
-    setAiMesajlar((onceki) => [...onceki, { id: Date.now(), rol: 'kullanici', metin, saat: 'Şimdi' }])
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    setAiMesajlar((onceki) => [...onceki, { id: uniqueId, rol: 'kullanici', metin, saat: 'Şimdi' }])
     if (!hazirMetin) setAiMesajMetni('')
 
     if (normalizeMetin === metniNormalizeEt('Diğer')) return
@@ -211,11 +212,12 @@ export default function useAppNotifications({
     const hazirCevap = aiHazirCevaplar[normalizeMetin]
     if (hazirCevap) {
       window.setTimeout(() => {
-        setAiMesajlar((onceki) => [...onceki, { id: Date.now() + 1, rol: 'bot', metin: hazirCevap, saat: 'Şimdi' }])
+        const botHazirId = `${Date.now()}-bot-ready`
+        setAiMesajlar((onceki) => [...onceki, { id: botHazirId, rol: 'bot', metin: hazirCevap, saat: 'Şimdi' }])
       }, 320)
     } else {
       // Dış API'den cevap al
-      const botMesajId = Date.now() + 1
+      const botMesajId = `${Date.now()}-bot-async`
       setAiMesajlar((onceki) => [...onceki, { id: botMesajId, rol: 'bot', metin: 'Düşünüyorum...', saat: 'Şimdi' }])
 
       fetchAiResponse(metin)

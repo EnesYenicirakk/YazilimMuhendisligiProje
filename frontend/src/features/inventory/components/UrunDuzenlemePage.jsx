@@ -1,4 +1,4 @@
-﻿import { kritikStoktaMi, paraFormatla } from '../../../shared/utils/constantsAndHelpers'
+import { kritikStoktaMi, paraFormatla } from '../../../shared/utils/constantsAndHelpers'
 
 export default function UrunDuzenlemePage({
   KucukIkon,
@@ -93,7 +93,12 @@ export default function UrunDuzenlemePage({
                           <td>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')}</td>
                           <td>
                             <div className="urun-bilgi">
-                              <span className="urun-avatar">{urun.avatar}</span>
+                              <span
+                                className="urun-avatar"
+                                style={urun.avatar?.startsWith('#') ? { backgroundColor: urun.avatar, color: '#fff', border: 'none', textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
+                              >
+                                {urun.avatar?.startsWith('#') ? (urun.ad?.charAt(0) || '') : (urun.avatar || urun.ad?.charAt(0) || '?')}
+                              </span>
                               <span className="urun-ad-satiri">
                                 <span>{urun.ad}</span>
                                 {kritikStoktaMi(urun) && (
@@ -149,7 +154,12 @@ export default function UrunDuzenlemePage({
                       govde={(
                         <>
                           <div className="mobil-kart-kisi">
-                            <span className="urun-avatar">{urun.avatar}</span>
+                            <span
+                              className="urun-avatar"
+                              style={urun.avatar?.startsWith('#') ? { backgroundColor: urun.avatar, color: '#fff', border: 'none', textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
+                            >
+                              {urun.avatar?.startsWith('#') ? (urun.ad?.charAt(0) || '') : (urun.avatar || urun.ad?.charAt(0) || '?')}
+                            </span>
                             <div className="mobil-kisi-metin">
                               <strong className="urun-ad-satiri">
                                 <span>{urun.ad}</span>

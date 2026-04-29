@@ -1,4 +1,4 @@
-﻿/* Shared modal shells */
+/* Shared modal shells */
 
 .modal-kaplama {
   position: fixed;
@@ -13,10 +13,15 @@
 .modal-kutu {
   width: 100%;
   max-width: 430px;
+  max-height: 90dvh;
   background: #fff;
   border-radius: 12px;
   border: 1px solid #dce8f5;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
 }
 
 .modal-kutu.kucuk {
@@ -46,9 +51,39 @@
   flex-shrink: 0;
 }
 
+.modal-baslik {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f6fb;
+}
+
 .modal-kutu h3 {
-  margin: 0 0 12px;
+  margin: 0;
   color: var(--metin);
+}
+
+.modal-kapat {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: #f1f6fb;
+  color: #64748b;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.modal-kapat:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 .modal-kutu p {

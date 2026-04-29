@@ -1,4 +1,4 @@
-﻿export default function CustomerModals({ customersData }) {
+export default function CustomerModals({ customersData }) {
   const {
     musteriEklemeAcik,
     musteriDuzenlemeAcik,
@@ -22,7 +22,10 @@
       {musteriEklemeAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Müşteri Ekle</h3>
+            <div className="modal-baslik">
+              <h3>Müşteri Ekle</h3>
+              <button type="button" className="modal-kapat" onClick={musteriEklemeKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Müşteri Adı</label>
               <input value={musteriFormu.ad} onChange={(event) => musteriFormuGuncelle('ad', event.target.value)} />
@@ -44,7 +47,10 @@
       {musteriDuzenlemeAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Müşteriyi Düzenle</h3>
+            <div className="modal-baslik">
+              <h3>Müşteriyi Düzenle</h3>
+              <button type="button" className="modal-kapat" onClick={musteriDuzenlemeKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Müşteri Adı</label>
               <input value={musteriFormu.ad} onChange={(event) => musteriFormuGuncelle('ad', event.target.value)} />
@@ -66,7 +72,10 @@
       {musteriNotAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Müşteri Notu</h3>
+            <div className="modal-baslik">
+              <h3>Müşteri Notu</h3>
+              <button type="button" className="modal-kapat" onClick={musteriNotKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Not</label>
               <textarea value={musteriNotMetni} onChange={(event) => setMusteriNotMetni(event.target.value)} />
@@ -82,7 +91,10 @@
       {silinecekMusteri && (
         <div className="modal-kaplama">
           <div className="modal-kutu kucuk">
-            <h3>Silmek istediğinizden emin misiniz</h3>
+            <div className="modal-baslik">
+              <h3>Silmek istediğinizden emin misiniz</h3>
+              <button type="button" className="modal-kapat" onClick={musteriSilmeKapat} aria-label="Kapat">×</button>
+            </div>
             <p><strong>{silinecekMusteri.ad}</strong> müşteri listesinden kaldırılacak.</p>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={musteriSilmeKapat}>Hayır</button>

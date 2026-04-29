@@ -1,4 +1,4 @@
-﻿export default function SupplierModals({
+export default function SupplierModals({
   suppliersData,
   paraFormatla,
   tarihFormatla,
@@ -108,7 +108,10 @@
       {tedarikciEklemeAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu modal-kutu-form-buyuk">
-            <h3>Tedarikçi Ekle</h3>
+            <div className="modal-baslik">
+              <h3>Tedarikçi Ekle</h3>
+              <button type="button" className="modal-kapat" onClick={tedarikciEklemeKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form modal-form-iki-kolonlu">
               {renderTedarikciFormAlanlari()}
             </div>
@@ -123,7 +126,10 @@
       {tedarikciDuzenlemeAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu modal-kutu-form-buyuk">
-            <h3>Tedarikçiyi Düzenle</h3>
+            <div className="modal-baslik">
+              <h3>Tedarikçiyi Düzenle</h3>
+              <button type="button" className="modal-kapat" onClick={tedarikciDuzenlemeKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form modal-form-iki-kolonlu">
               {renderTedarikciFormAlanlari()}
             </div>
@@ -138,7 +144,10 @@
       {tedarikciNotAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Tedarikçi Notu</h3>
+            <div className="modal-baslik">
+              <h3>Tedarikçi Notu</h3>
+              <button type="button" className="modal-kapat" onClick={tedarikciNotKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Not</label>
               <textarea value={tedarikciNotMetni} onChange={(event) => setTedarikciNotMetni(event.target.value)} />
@@ -154,17 +163,9 @@
       {tedarikciDetayAcik && seciliTedarikci && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <div className="modal-ust-baslik" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="modal-baslik">
               <h3>{seciliTedarikci.firmaAdi}</h3>
-              <button
-                type="button"
-                className="ikon-dugme kapat-x"
-                onClick={tedarikciDetayKapat}
-                aria-label="Kapat"
-                style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}
-              >
-                ✕
-              </button>
+              <button type="button" className="modal-kapat" onClick={tedarikciDetayKapat} aria-label="Kapat">×</button>
             </div>
             <div className="odeme-sekme-alani">
               <button
@@ -221,7 +222,10 @@
       {tedarikciSiparisEklemeAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Tedarikçi Siparişi Oluştur</h3>
+            <div className="modal-baslik">
+              <h3>Tedarikçi Siparişi Oluştur</h3>
+              <button type="button" className="modal-kapat" onClick={tedarikciSiparisKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Sipariş No</label>
               <input value={tedarikciSiparisFormu.siparisNo} onChange={(event) => tedarikciSiparisFormuGuncelle('siparisNo', event.target.value)} />
@@ -247,7 +251,10 @@
       {genelTedarikSiparisAcik && (
         <div className="modal-kaplama">
           <div className="modal-kutu">
-            <h3>Yeni Tedarik Siparişi</h3>
+            <div className="modal-baslik">
+              <h3>Yeni Tedarik Siparişi</h3>
+              <button type="button" className="modal-kapat" onClick={genelTedarikSiparisKapat} aria-label="Kapat">×</button>
+            </div>
             <div className="modal-form">
               <label>Tedarikçi</label>
               <select value={genelTedarikSiparisFormu.tedarikciUid} onChange={(event) => genelTedarikSiparisFormuGuncelle('tedarikciUid', event.target.value)}>
@@ -280,7 +287,10 @@
       {silinecekTedarikci && (
         <div className="modal-kaplama">
           <div className="modal-kutu kucuk">
-            <h3>Silmek istediğinizden emin misiniz?</h3>
+            <div className="modal-baslik">
+              <h3>Silmek istediğinizden emin misiniz?</h3>
+              <button type="button" className="modal-kapat" onClick={tedarikciSilmeKapat} aria-label="Kapat">×</button>
+            </div>
             <p><strong>{silinecekTedarikci.firmaAdi}</strong> tedarikçi listesinden kaldırılacak.</p>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={tedarikciSilmeKapat}>Hayır</button>

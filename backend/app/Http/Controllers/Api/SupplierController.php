@@ -13,12 +13,13 @@ class SupplierController extends Controller
         $suppliers = Supplier::all()->map(function ($supplier) {
             return $this->mapSupplierToFrontend($supplier);
         });
+
         return response()->json($suppliers);
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'firmaAdi' => 'required|string',
             'yetkiliKisi' => 'required|string',
             'telefon' => 'required|string',
@@ -32,6 +33,9 @@ class SupplierController extends Controller
             'address' => $request->adres ?? '',
             'tax_number' => $request->vergiNumarasi ?? '',
             'product_group' => $request->urunGrubu ?? '',
+            'total_purchase_count' => $request->toplamAlisSayisi ?? 0,
+            'average_delivery_time' => $request->ortalamaTeslimSuresi ?? '',
+            'total_spent' => $request->toplamHarcama ?? 0,
             'notes' => $request->not ?? '',
             'is_favorite' => $request->favori ?? false,
         ]);
@@ -51,6 +55,9 @@ class SupplierController extends Controller
             'address' => $request->adres,
             'tax_number' => $request->vergiNumarasi,
             'product_group' => $request->urunGrubu,
+            'total_purchase_count' => $request->toplamAlisSayisi ?? $supplier->total_purchase_count,
+            'average_delivery_time' => $request->ortalamaTeslimSuresi ?? $supplier->average_delivery_time,
+            'total_spent' => $request->toplamHarcama ?? $supplier->total_spent,
             'notes' => $request->not,
             'is_favorite' => $request->favori ?? $supplier->is_favorite,
         ]);
@@ -62,10 +69,12 @@ class SupplierController extends Controller
     {
         $supplier = Supplier::findOrFail($id);
         $supplier->delete();
-        return response()->json(['message' => 'Tedarikçi silindi']);
+
+        return response()->json(['message' => 'Tedarikci silindi']);
     }
 
-    private function mapSupplierToFrontend($supplier) {
+    private function mapSupplierToFrontend($supplier)
+    {
         return [
             'uid' => $supplier->id,
             'firmaAdi' => $supplier->company_name,
@@ -75,14 +84,14 @@ class SupplierController extends Controller
             'adres' => $supplier->address,
             'vergiNumarasi' => $supplier->tax_number,
             'urunGrubu' => $supplier->product_group,
-            'not' => $supplier->notes, 
-            'toplamAlisSayisi' => 0, // Placeholder
-            'ortalamaTeslimSuresi' => '3 iş günü', // Placeholder
-            'toplamHarcama' => 0, // Placeholder
+            'not' => $supplier->notes,
+            'toplamAlisSayisi' => (int) ($supplier->total_purchase_count ?? 0),
+            'ortalamaTeslimSuresi' => $supplier->average_delivery_time ?? '',
+            'toplamHarcama' => (float) ($supplier->total_spent ?? 0),
             'alinanUrunler' => [],
             'siparisler' => [],
             'fiyatGecmisi' => [],
-            'favori' => (bool)$supplier->is_favorite,
+            'favori' => (bool) $supplier->is_favorite,
         ];
     }
 }

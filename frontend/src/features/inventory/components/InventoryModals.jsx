@@ -35,11 +35,11 @@ export default function InventoryModals({ inventoryData }) {
               <label>Ürün ID</label>
               <input value={form.urunId} onChange={(event) => formGuncelle('urunId', event.target.value)} />
               <label>Ürün Adedi</label>
-              <input type="number" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
+              <input type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
               <label>Minimum Stok</label>
-              <input type="number" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />
+              <input type="number" min="0" step="1" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />
               <label>Mağazadaki Ürün Sayısı</label>
-              <input type="number" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />
+              <input type="number" min="0" step="1" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={eklemePenceresiniKapat}>İptal</button>
@@ -62,11 +62,11 @@ export default function InventoryModals({ inventoryData }) {
               <label>Ürün ID</label>
               <input value={form.urunId} onChange={(event) => formGuncelle('urunId', event.target.value)} />
               <label>Ürün Adedi</label>
-              <input type="number" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
+              <input type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
               <label>Minimum Stok</label>
-              <input type="number" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />
+              <input type="number" min="0" step="1" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />
               <label>Mağazadaki Ürün Sayısı</label>
-              <input type="number" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />
+              <input type="number" min="0" step="1" value={form.magazaStok} onChange={(event) => formGuncelle('magazaStok', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={duzenlemePenceresiniKapat}>İptal</button>
@@ -89,13 +89,13 @@ export default function InventoryModals({ inventoryData }) {
               <label>Ürün ID</label>
               <input value={urunDuzenlemeFormu.urunId} onChange={(event) => urunDuzenlemeFormuGuncelle('urunId', event.target.value)} />
               <label>Ürün Adedi</label>
-              <input type="number" value={urunDuzenlemeFormu.urunAdedi} onChange={(event) => urunDuzenlemeFormuGuncelle('urunAdedi', event.target.value)} />
+              <input type="number" min="0" step="1" value={urunDuzenlemeFormu.urunAdedi} onChange={(event) => urunDuzenlemeFormuGuncelle('urunAdedi', event.target.value)} />
               <label>Alış Fiyatı</label>
-              <input type="number" value={urunDuzenlemeFormu.alisFiyati} onChange={(event) => urunDuzenlemeFormuGuncelle('alisFiyati', event.target.value)} />
+              <input type="number" min="0" step="0.01" value={urunDuzenlemeFormu.alisFiyati} onChange={(event) => urunDuzenlemeFormuGuncelle('alisFiyati', event.target.value)} />
               <label>Satış Fiyatı</label>
-              <input type="number" value={urunDuzenlemeFormu.satisFiyati} onChange={(event) => urunDuzenlemeFormuGuncelle('satisFiyati', event.target.value)} />
+              <input type="number" min="0" step="0.01" value={urunDuzenlemeFormu.satisFiyati} onChange={(event) => urunDuzenlemeFormuGuncelle('satisFiyati', event.target.value)} />
               <label>Mağazadaki Ürün Sayısı</label>
-              <input type="number" value={urunDuzenlemeFormu.magazaStok} onChange={(event) => urunDuzenlemeFormuGuncelle('magazaStok', event.target.value)} />
+              <input type="number" min="0" step="1" value={urunDuzenlemeFormu.magazaStok} onChange={(event) => urunDuzenlemeFormuGuncelle('magazaStok', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={urunDuzenlemeModaliniKapat}>İptal</button>

@@ -12,6 +12,15 @@ import { productApi, categoryApi } from '../../../core/services/backendApiServic
 const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
 const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, '').toLocaleLowerCase('tr-TR')
+const NEGATIF_OLAMAZ_ALANLAR = new Set(['urunAdedi', 'magazaStok', 'minimumStok', 'alisFiyati', 'satisFiyati'])
+
+const negatifOlmayanSayiyaDonustur = (deger) => {
+  const temizDeger = String(deger ?? '').replace(',', '.').replace(/[^\d.]/g, '')
+  const ilkNokta = temizDeger.indexOf('.')
+  if (ilkNokta === -1) return temizDeger
+
+  return `${temizDeger.slice(0, ilkNokta + 1)}${temizDeger.slice(ilkNokta + 1).replace(/\./g, '')}`
+}
 
 export default function useInventory({ toastGoster, isLoggedIn }) {
   const [urunler, setUrunler] = useState([])
@@ -200,7 +209,8 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
   }, [urunDuzenlemeSayfa, toplamUrunDuzenlemeSayfa])
 
   const formGuncelle = (alan, deger) => {
-    setForm((onceki) => ({ ...onceki, [alan]: deger }))
+    const sonrakiDeger = NEGATIF_OLAMAZ_ALANLAR.has(alan) ? negatifOlmayanSayiyaDonustur(deger) : deger
+    setForm((onceki) => ({ ...onceki, [alan]: sonrakiDeger }))
   }
 
   const formuTemizle = () => {
@@ -365,7 +375,8 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
   }
 
   const urunDuzenlemeFormuGuncelle = (alan, deger) => {
-    setUrunDuzenlemeFormu((onceki) => ({ ...onceki, [alan]: deger }))
+    const sonrakiDeger = NEGATIF_OLAMAZ_ALANLAR.has(alan) ? negatifOlmayanSayiyaDonustur(deger) : deger
+    setUrunDuzenlemeFormu((onceki) => ({ ...onceki, [alan]: sonrakiDeger }))
   }
 
   const urunDuzenlemeKaydet = () => {

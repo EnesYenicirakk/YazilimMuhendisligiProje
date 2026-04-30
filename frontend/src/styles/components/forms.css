@@ -179,6 +179,107 @@
   resize: vertical;
 }
 
+.urun-secici {
+  position: relative;
+}
+
+.urun-secici-alan {
+  position: relative;
+}
+
+.urun-secici-alan input {
+  width: 100%;
+  padding-right: 46px;
+}
+
+.urun-secici-dugme {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #5f7793;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.urun-secici.acik .urun-secici-dugme {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.urun-secici-dugme:hover {
+  background: rgba(47, 125, 214, 0.08);
+  color: #2f61a9;
+}
+
+.urun-secici-liste {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 12;
+  display: grid;
+  gap: 6px;
+  max-height: 228px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid #d6e4f5;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 20px 34px rgba(31, 48, 68, 0.12);
+}
+
+.urun-secici-secenek {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #f8fbff;
+  color: #324a65;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.urun-secici-secenek strong {
+  font-size: 0.95rem;
+  color: #22364f;
+}
+
+.urun-secici-secenek span {
+  font-size: 0.8rem;
+  color: #607790;
+}
+
+.urun-secici-secenek:hover,
+.urun-secici-secenek.secili {
+  border-color: #c7daf3;
+  background: #eef5ff;
+}
+
+.urun-secici-bos {
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fbff;
+  color: #607790;
+  font-size: 0.88rem;
+}
+
 .fatura-form-grid select,
 .fatura-satir-grid select,
 .siparis-kontrol select,

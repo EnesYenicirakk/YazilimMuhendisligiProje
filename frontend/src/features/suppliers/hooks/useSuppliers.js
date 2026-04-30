@@ -246,7 +246,7 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     const toplamHarcama = Number(tedarikciFormu.toplamHarcama)
     const ortalamaTeslimSuresi = tedarikciFormu.ortalamaTeslimSuresi.trim()
 
-    if (!firmaAdi || !yetkiliKisi || !telefon || !email || !adres || !vergiNumarasi || !urunGrubu || !not || !ortalamaTeslimSuresi || Number.isNaN(toplamAlisSayisi) || Number.isNaN(toplamHarcama)) {
+    if (!firmaAdi || !yetkiliKisi || !telefon) {
       toastGoster?.('hata', 'Tedarikçi formunda eksik veya hatalı alan var.')
       return
     }
@@ -254,11 +254,11 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
       toastGoster?.('hata', 'Telefon numarası 0 ile başlamalı ve 11 haneli olmalı.')
       return
     }
-    if (!epostaGecerliMi(email)) {
+    if (email && !epostaGecerliMi(email)) {
       toastGoster?.('hata', 'Geçerli bir e-posta adresi girin.')
       return
     }
-    if (!/^\d{10}$/.test(telefonuNormalizeEt(vergiNumarasi))) {
+    if (vergiNumarasi && !/^\d{10}$/.test(telefonuNormalizeEt(vergiNumarasi))) {
       toastGoster?.('hata', 'Vergi numarası 10 haneli olmalı.')
       return
     }

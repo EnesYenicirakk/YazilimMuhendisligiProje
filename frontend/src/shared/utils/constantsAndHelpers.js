@@ -181,6 +181,7 @@ export const bosMusteriFormu = {
   telefon: '',
   sonAlim: '',
   not: '',
+  toplamHarcama: '',
 }
 
 export const bosTedarikciFormu = {

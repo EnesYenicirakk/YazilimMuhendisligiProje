@@ -29,7 +29,7 @@
                 <option value="Kısmi">Kısmi</option>
               </select>
               <label>Tutar</label>
-              <input type="number" value={odemeFormu.tutar} onChange={(event) => odemeFormuGuncelle('tutar', event.target.value)} />
+              <input type="number" min="0" step="0.01" value={odemeFormu.tutar} onChange={(event) => odemeFormuGuncelle('tutar', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={odemeDuzenlemeKapat}>İptal</button>

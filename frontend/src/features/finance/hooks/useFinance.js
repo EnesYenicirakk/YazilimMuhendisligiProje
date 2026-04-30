@@ -9,6 +9,14 @@ import {
 
 const ODEME_SAYFA_BASINA = 10
 const BOS_ODEME_FORMU = { taraf: '', tarih: '', durum: '', tutar: '' }
+const negatifOlmayanSayiyaDonustur = (deger) => {
+  const temizDeger = String(deger ?? '').replace(',', '.').replace(/[^\d.]/g, '')
+  const ilkNokta = temizDeger.indexOf('.')
+  if (ilkNokta === -1) return temizDeger
+
+  return `${temizDeger.slice(0, ilkNokta + 1)}${temizDeger.slice(ilkNokta + 1).replace(/\./g, '')}`
+}
+
 export default function useFinance({ toastGoster, isLoggedIn }) {
   const [gelenNakitListesi, setGelenNakitListesi] = useState([])
   const [gidenNakitListesi, setGidenNakitListesi] = useState([])
@@ -113,7 +121,8 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
   }
 
   const odemeFormuGuncelle = (alan, deger) => {
-    setOdemeFormu((onceki) => ({ ...onceki, [alan]: deger }))
+    const sonrakiDeger = alan === 'tutar' ? negatifOlmayanSayiyaDonustur(deger) : deger
+    setOdemeFormu((onceki) => ({ ...onceki, [alan]: sonrakiDeger }))
   }
 
   const odemeDuzenlemeKaydet = () => {

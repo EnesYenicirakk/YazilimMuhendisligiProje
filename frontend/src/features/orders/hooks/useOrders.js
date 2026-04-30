@@ -10,6 +10,14 @@ const BOS_DURUM_FORMU = {
   teslimatSuresi: '',
 }
 
+const negatifOlmayanSayiyaDonustur = (deger) => {
+  const temizDeger = String(deger ?? '').replace(',', '.').replace(/[^\d.]/g, '')
+  const ilkNokta = temizDeger.indexOf('.')
+  if (ilkNokta === -1) return temizDeger
+
+  return `${temizDeger.slice(0, ilkNokta + 1)}${temizDeger.slice(ilkNokta + 1).replace(/\./g, '')}`
+}
+
 const siparisIcinMusteriBul = (kayit, musteriListesi) => {
   if (kayit?.musteriUid == null || kayit?.musteriUid === '') return null
 
@@ -54,6 +62,20 @@ export default function useOrders({
         ad: musteri.ad,
       })),
     [musteriler],
+  )
+
+  const urunSecenekleri = useMemo(
+    () =>
+      [...urunler]
+        .map((urun) => ({
+          uid: urun.uid,
+          ad: urun.ad,
+          urunId: urun.urunId,
+          kategori: urun.kategori,
+          stok: urun.magazaStok,
+        }))
+        .sort((a, b) => a.ad.localeCompare(b.ad, 'tr')),
+    [urunler],
   )
 
   const siraliSiparisler = useMemo(
@@ -202,7 +224,8 @@ export default function useOrders({
   }
 
   const siparisFormuGuncelle = (alan, deger) => {
-    setSiparisFormu((onceki) => ({ ...onceki, [alan]: deger }))
+    const sonrakiDeger = alan === 'toplamTutar' ? negatifOlmayanSayiyaDonustur(deger) : deger
+    setSiparisFormu((onceki) => ({ ...onceki, [alan]: sonrakiDeger }))
   }
 
   const siparisDurumFormuGuncelle = (alan, deger) => {
@@ -419,6 +442,7 @@ export default function useOrders({
     sayfadakiGecmisSiparisler,
     siparisAktivitesi,
     musteriSecenekleri,
+    urunSecenekleri,
     siparisFormuGuncelle,
     siparisDurumFormuGuncelle,
     yeniSiparisPenceresiniAc,

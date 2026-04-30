@@ -477,6 +477,22 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     })
   }
 
+  const urunStokunuAzalt = ({ urunUid, miktar }) => {
+    const dusulecekMiktar = Number(miktar)
+    if (!Number.isFinite(dusulecekMiktar) || dusulecekMiktar <= 0) return
+
+    setUrunler((onceki) =>
+      onceki.map((urun) => {
+        if (String(urun.uid) !== String(urunUid)) return urun
+
+        return {
+          ...urun,
+          magazaStok: Math.max(0, Number(urun.magazaStok ?? 0) - dusulecekMiktar),
+        }
+      }),
+    )
+  }
+
   const otomatikStokKorumasiniUygula = ({ urunUid, miktar, hedefStok, tedarikciAdi, siparisNo }) => {
     const siparisMiktari = Number(miktar)
     if (!Number.isFinite(siparisMiktari) || siparisMiktari <= 0) return null
@@ -802,6 +818,7 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     barkodSepetiniTemizle,
     barkodStoklariniGuncelle,
     favoriDegistir,
+    urunStokunuAzalt,
     otomatikStokKorumasiniUygula,
     envanterSayfayaGit,
     urunDuzenlemeSayfayaGit,

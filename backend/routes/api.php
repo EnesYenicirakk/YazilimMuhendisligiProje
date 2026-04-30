@@ -34,3 +34,4 @@ Route::apiResource('orders', OrderController::class);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/finance', [FinanceController::class, 'index']);
 Route::apiResource('suppliers', SupplierController::class);
+Route::post('/suppliers/{id}/orders', [SupplierController::class, 'storeOrder']);

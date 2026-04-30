@@ -128,6 +128,9 @@ function App() {
     urunler: inventoryData.urunler,
     toastGoster,
     isLoggedIn: auth.isLoggedIn,
+    onSiparisOlusturuldu: ({ urunUid, urunAdedi }) => {
+      inventoryData.urunStokunuAzalt({ urunUid, miktar: urunAdedi })
+    },
     telefonAramasiBaslat: (telefon, etiket = 'Kayıt') => {
       if (!telefon) {
         toastGoster('hata', `${etiket} için phone bilgisi bulunamadı.`)

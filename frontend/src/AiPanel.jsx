@@ -39,28 +39,6 @@ export default function AiPanel({
     <section className={`ai-panel ai-tema-acik ${aiPanelKapaniyor ? 'kapaniyor' : 'aciliyor'}`}>
       <header className="ai-panel-ust">
         <div className="ai-panel-kontroller">
-          <button
-            type="button"
-            className="ai-ikon-buton"
-            aria-label="Tema menüsü"
-            onClick={() => setAiTemaMenuAcik((onceki) => !onceki)}
-          >
-            <KucukIkon tip="ayar" />
-          </button>
-          {aiTemaMenuAcik && (
-            <div className="ai-tema-menu">
-              <button
-                type="button"
-                className="aktif"
-                onClick={() => {
-                  setAiTemaMenuAcik(false)
-                }}
-              >
-                <TemaIkonu tema="acik" />
-                <span>Açık Tema</span>
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="ai-panel-baslik">
@@ -93,20 +71,15 @@ export default function AiPanel({
             type="button"
             className="ai-ikon-buton"
             aria-label="Alta al"
+            title="Küçült"
             onClick={() => {
               setAiPanelKucuk(true)
               setAiTemaMenuAcik(false)
             }}
           >
-            -
-          </button>
-          <button
-            type="button"
-            className="ai-ikon-buton"
-            aria-label="Kapat"
-            onClick={aiPaneliKapat}
-          >
-            ×
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '14px', height: '14px' }}>
+              <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
           </button>
         </div>
       </header>

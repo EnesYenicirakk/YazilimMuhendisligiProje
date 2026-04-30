@@ -289,6 +289,13 @@ export default function useAppNotifications({
     }
   }
 
+  const sohbetiTemizle = useCallback(() => {
+    setAiMesajlar([
+      { id: Date.now(), rol: 'bot', metin: 'Tekrardan hoş geldiniz, size nasıl yardımcı olabilirim?', saat: 'Şimdi' },
+    ])
+    setAiHizliKonularAcik(true)
+  }, [])
+
   return {
     aiHizliKonular,
     aiHizliKonularAcik,
@@ -316,6 +323,7 @@ export default function useAppNotifications({
     setAiMesajMetni,
     setAiPanelKucuk,
     setAiTemaMenuAcik,
+    sohbetiTemizle,
     tumBildirimleriTemizle,
   }
 }

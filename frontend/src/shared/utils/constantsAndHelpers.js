@@ -207,7 +207,9 @@ export const bosTedarikciSiparisFormu = {
 
 export const bosSiparisFormu = {
   musteriUid: '',
+  urunUid: '',
   urun: '',
+  urunAdedi: '1',
   toplamTutar: '',
   siparisTarihi: '',
   odemeDurumu: 'Beklemede',

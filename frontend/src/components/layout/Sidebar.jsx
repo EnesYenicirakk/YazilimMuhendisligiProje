@@ -60,6 +60,8 @@ export default function Sidebar({
           src="/ytu-logo.png"
           alt="MTÜ Sanayi logosu"
           className="sayfa-logo menu-logo"
+          style={{ cursor: 'pointer' }}
+          onClick={() => sayfaDegistir('dashboard')}
           onError={(event) => {
             event.currentTarget.onerror = null
             event.currentTarget.src = '/ytu-logo.svg'

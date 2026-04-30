@@ -28,8 +28,8 @@ function UrunSecici({ value, onChange, urunSecenekleri }) {
       .slice(0, 8)
   }, [urunSecenekleri, value])
 
-  const urunSec = (urunAdi) => {
-    onChange(urunAdi)
+  const urunSec = (urun) => {
+    onChange(urun)
     setAcik(false)
   }
 
@@ -39,7 +39,10 @@ function UrunSecici({ value, onChange, urunSecenekleri }) {
         <input
           value={value}
           onChange={(event) => {
-            onChange(event.target.value)
+            onChange({
+              ad: event.target.value,
+              uid: '',
+            })
             setAcik(true)
           }}
           onFocus={() => setAcik(true)}
@@ -66,7 +69,7 @@ function UrunSecici({ value, onChange, urunSecenekleri }) {
                 key={urun.uid}
                 type="button"
                 className={`urun-secici-secenek ${urun.ad === value ? 'secili' : ''}`}
-                onClick={() => urunSec(urun.ad)}
+                onClick={() => urunSec(urun)}
               >
                 <strong>{urun.ad}</strong>
                 <span>{urun.urunId} · {urun.kategori} · Stok: {urun.stok}</span>
@@ -131,9 +134,14 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <label>Urun</label>
               <UrunSecici
                 value={siparisFormu.urun}
-                onChange={(deger) => siparisFormuGuncelle('urun', deger)}
+                onChange={(urun) => {
+                  siparisFormuGuncelle('urun', urun.ad)
+                  siparisFormuGuncelle('urunUid', urun.uid)
+                }}
                 urunSecenekleri={urunSecenekleri}
               />
+              <label>Siparis Verilen Urun Adedi</label>
+              <input type="number" min="1" step="1" value={siparisFormu.urunAdedi} onChange={(event) => siparisFormuGuncelle('urunAdedi', event.target.value)} />
               <label>Toplam Tutar</label>
               <input type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
               <label>Siparis Tarihi</label>
@@ -155,8 +163,6 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
-              <label>Teslimat Suresi</label>
-              <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setYeniSiparisAcik(false)}>Iptal</button>
@@ -178,12 +184,12 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <div className="mobil-bilgi-satiri"><span>Musteri</span><strong>{siparisMusteriAdiniGetir(detaySiparis)}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Telefon</span><strong>{siparisTelefonunuGetir(detaySiparis)}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Urun</span><strong>{detaySiparis.urun}</strong></div>
+              <div className="mobil-bilgi-satiri"><span>Adet</span><strong>{detaySiparis.urunAdedi}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Tutar</span><strong>{paraFormatla(detaySiparis.toplamTutar)}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Tarih</span><strong>{tarihFormatla(detaySiparis.siparisTarihi)}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Odeme</span><strong>{detaySiparis.odemeDurumu}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Hazirlik</span><strong>{detaySiparis.urunHazirlik}</strong></div>
               <div className="mobil-bilgi-satiri"><span>Teslimat</span><strong>{detaySiparis.teslimatDurumu}</strong></div>
-              <div className="mobil-bilgi-satiri"><span>Tahmini Sure</span><strong>{detaySiparis.teslimatSuresi}</strong></div>
             </div>
             <div className="modal-aksiyon">
               <button type="button" onClick={() => setDetaySiparis(null)}>Kapat</button>
@@ -238,9 +244,14 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <label>Urun</label>
               <UrunSecici
                 value={siparisFormu.urun}
-                onChange={(deger) => siparisFormuGuncelle('urun', deger)}
+                onChange={(urun) => {
+                  siparisFormuGuncelle('urun', urun.ad)
+                  siparisFormuGuncelle('urunUid', urun.uid)
+                }}
                 urunSecenekleri={urunSecenekleri}
               />
+              <label>Siparis Verilen Urun Adedi</label>
+              <input type="number" min="1" step="1" value={siparisFormu.urunAdedi} onChange={(event) => siparisFormuGuncelle('urunAdedi', event.target.value)} />
               <label>Toplam Tutar</label>
               <input type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
               <label>Siparis Tarihi</label>
@@ -262,8 +273,6 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
-              <label>Teslimat Suresi</label>
-              <input value={siparisFormu.teslimatSuresi} onChange={(event) => siparisFormuGuncelle('teslimatSuresi', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setDuzenlenenSiparisNo(null)}>Iptal</button>

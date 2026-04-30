@@ -8,73 +8,97 @@ use App\Models\CustomerOrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        $orders = CustomerOrder::with(['customer', 'items.product'])->get()->map(function ($order) {
-            return $this->mapOrderToFrontend($order);
-        });
+        $orders = CustomerOrder::with(['customer', 'items.product'])
+            ->get()
+            ->map(fn (CustomerOrder $order) => $this->mapOrderToFrontend($order));
 
         return response()->json($orders);
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'musteriUid' => 'required',
-            'urun' => 'required|string',
-            'toplamTutar' => 'required|numeric',
-            'siparisTarihi' => 'required|date',
-        ]);
+        $validated = $this->validateOrderRequest($request);
 
-        return DB::transaction(function () use ($request) {
+        $order = DB::transaction(function () use ($validated) {
+            $product = Product::query()->lockForUpdate()->findOrFail($validated['urunUid']);
+            $quantity = (int) $validated['urunAdedi'];
+
+            $this->ensureSufficientStock($product, $quantity);
+
             $order = CustomerOrder::create([
-                'customer_id' => $request->musteriUid,
-                'total_amount' => $request->toplamTutar,
-                'order_date' => $request->siparisTarihi,
-                'payment_status' => $this->mapPaymentStatusToBackend($request->odemeDurumu ?? 'Beklemede'),
-                'preparation_status' => $this->mapPrepStatusToBackend($request->urunHazirlik ?? 'Hazırlanıyor'),
-                'delivery_status' => $this->mapDeliveryStatusToBackend($request->teslimatDurumu ?? 'Hazırlanıyor'),
+                'customer_id' => $validated['musteriUid'],
+                'total_amount' => $validated['toplamTutar'],
+                'order_date' => $validated['siparisTarihi'],
+                'payment_status' => $this->mapPaymentStatusToBackend($validated['odemeDurumu'] ?? 'Beklemede'),
+                'preparation_status' => $this->mapPrepStatusToBackend($validated['urunHazirlik'] ?? 'Hazirlaniyor'),
+                'delivery_status' => $this->mapDeliveryStatusToBackend($validated['teslimatDurumu'] ?? 'Hazirlaniyor'),
             ]);
 
-            // For now, since the frontend sends a single 'urun' string, 
-            // we don't know the exact product IDs and quantities in detail.
-            // In a real app, the frontend would send an array of items.
-            // As a fallback, we'll just store the order without items or with a placeholder if needed.
-            // But let's try to find the product if possible.
-            $product = Product::where('name', $request->urun)->first();
-            if ($product) {
-                CustomerOrderItem::create([
-                    'customer_order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => 1,
-                    'unit_price' => $request->toplamTutar,
-                ]);
+            CustomerOrderItem::create([
+                'customer_order_id' => $order->id,
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'unit_price' => $quantity > 0 ? round(((float) $validated['toplamTutar']) / $quantity, 2) : 0,
+            ]);
 
-                // Otomatik Stok Düşümü
-                if ($product->store_stock > 0) {
-                    $product->decrement('store_stock', 1);
-                }
-            }
+            $product->decrement('store_stock', $quantity);
 
-            return response()->json($this->mapOrderToFrontend($order), 201);
+            return $order->load(['customer', 'items.product']);
         });
+
+        return response()->json($this->mapOrderToFrontend($order), 201);
     }
 
     public function update(Request $request, $id)
     {
-        $order = CustomerOrder::findOrFail($id);
+        $validated = $this->validateOrderRequest($request);
 
-        $order->update([
-            'customer_id' => $request->musteriUid,
-            'total_amount' => $request->toplamTutar,
-            'order_date' => $request->siparisTarihi,
-            'payment_status' => $this->mapPaymentStatusToBackend($request->odemeDurumu),
-            'preparation_status' => $this->mapPrepStatusToBackend($request->urunHazirlik),
-            'delivery_status' => $this->mapDeliveryStatusToBackend($request->teslimatDurumu),
-        ]);
+        $order = DB::transaction(function () use ($validated, $id) {
+            $order = CustomerOrder::with(['items.product', 'customer'])->findOrFail($id);
+            $currentItem = $order->items->first();
+            $newProduct = Product::query()->lockForUpdate()->findOrFail($validated['urunUid']);
+            $newQuantity = (int) $validated['urunAdedi'];
+
+            if ($currentItem?->product) {
+                $oldProduct = Product::query()->lockForUpdate()->findOrFail($currentItem->product_id);
+                $oldProduct->increment('store_stock', (int) $currentItem->quantity);
+            }
+
+            $this->ensureSufficientStock($newProduct, $newQuantity);
+            $newProduct->decrement('store_stock', $newQuantity);
+
+            $order->update([
+                'customer_id' => $validated['musteriUid'],
+                'total_amount' => $validated['toplamTutar'],
+                'order_date' => $validated['siparisTarihi'],
+                'payment_status' => $this->mapPaymentStatusToBackend($validated['odemeDurumu'] ?? 'Beklemede'),
+                'preparation_status' => $this->mapPrepStatusToBackend($validated['urunHazirlik'] ?? 'Hazirlaniyor'),
+                'delivery_status' => $this->mapDeliveryStatusToBackend($validated['teslimatDurumu'] ?? 'Hazirlaniyor'),
+            ]);
+
+            if ($currentItem) {
+                $currentItem->update([
+                    'product_id' => $newProduct->id,
+                    'quantity' => $newQuantity,
+                    'unit_price' => $newQuantity > 0 ? round(((float) $validated['toplamTutar']) / $newQuantity, 2) : 0,
+                ]);
+            } else {
+                CustomerOrderItem::create([
+                    'customer_order_id' => $order->id,
+                    'product_id' => $newProduct->id,
+                    'quantity' => $newQuantity,
+                    'unit_price' => $newQuantity > 0 ? round(((float) $validated['toplamTutar']) / $newQuantity, 2) : 0,
+                ]);
+            }
+
+            return $order->load(['customer', 'items.product']);
+        });
 
         return response()->json($this->mapOrderToFrontend($order));
     }
@@ -84,58 +108,95 @@ class OrderController extends Controller
         $order = CustomerOrder::findOrFail($id);
         $order->delete();
 
-        return response()->json(['message' => 'Sipariş silindi']);
+        return response()->json(['message' => 'Siparis silindi']);
     }
 
-    private function mapOrderToFrontend($order) {
+    private function validateOrderRequest(Request $request): array
+    {
+        return $request->validate([
+            'musteriUid' => 'required|exists:customers,id',
+            'urunUid' => 'required|exists:products,id',
+            'urun' => 'required|string',
+            'urunAdedi' => 'required|integer|min:1',
+            'toplamTutar' => 'required|numeric|min:0',
+            'siparisTarihi' => 'required|date',
+            'odemeDurumu' => 'nullable|string',
+            'urunHazirlik' => 'nullable|string',
+            'teslimatDurumu' => 'nullable|string',
+        ]);
+    }
+
+    private function ensureSufficientStock(Product $product, int $quantity): void
+    {
+        if ((int) $product->store_stock < $quantity) {
+            throw ValidationException::withMessages([
+                'urunAdedi' => 'Secilen urun icin yeterli stok bulunmuyor.',
+            ]);
+        }
+    }
+
+    private function mapOrderToFrontend(CustomerOrder $order): array
+    {
         $firstItem = $order->items->first();
-        $productName = $firstItem && $firstItem->product ? $firstItem->product->name : 'Bilinmeyen Ürün';
+        $productName = $firstItem && $firstItem->product ? $firstItem->product->name : 'Bilinmeyen Urun';
+        $productId = $firstItem?->product?->id;
+        $quantity = (int) ($firstItem?->quantity ?? 1);
+
         if ($order->items->count() > 1) {
             $productName .= ' (+' . ($order->items->count() - 1) . ')';
         }
 
         return [
             'id' => $order->id,
-            'siparisNo' => (string)$order->id,
-            'musteri' => $order->customer ? $order->customer->full_name : 'Bilinmeyen Müşteri',
+            'siparisNo' => (string) $order->id,
+            'musteri' => $order->customer ? $order->customer->full_name : 'Bilinmeyen Musteri',
             'musteriUid' => $order->customer_id,
+            'urunUid' => $productId,
             'urun' => $productName,
-            'toplamTutar' => (float)$order->total_amount,
+            'urunAdedi' => $quantity,
+            'miktar' => $quantity,
+            'toplamTutar' => (float) $order->total_amount,
             'siparisTarihi' => $order->order_date ? $order->order_date->format('Y-m-d') : null,
             'odemeDurumu' => $this->mapPaymentStatusToFrontend($order->payment_status),
             'urunHazirlik' => $this->mapPrepStatusToFrontend($order->preparation_status),
             'teslimatDurumu' => $this->mapDeliveryStatusToFrontend($order->delivery_status),
-            'teslimatSuresi' => '2 iş günü', // Placeholder
+            'teslimatSuresi' => '',
         ];
     }
 
-    private function mapPaymentStatusToFrontend($status) {
+    private function mapPaymentStatusToFrontend(?string $status): string
+    {
         $map = ['paid' => 'Ödendi', 'pending' => 'Beklemede', 'cancelled' => 'İptal'];
         return $map[$status] ?? 'Beklemede';
     }
 
-    private function mapPrepStatusToFrontend($status) {
+    private function mapPrepStatusToFrontend(?string $status): string
+    {
         $map = ['ready' => 'Hazır', 'preparing' => 'Hazırlanıyor', 'pending' => 'Hazırlanıyor'];
         return $map[$status] ?? 'Hazırlanıyor';
     }
 
-    private function mapDeliveryStatusToFrontend($status) {
+    private function mapDeliveryStatusToFrontend(?string $status): string
+    {
         $map = ['delivered' => 'Teslim Edildi', 'shipped' => 'Yolda', 'pending' => 'Hazırlanıyor'];
         return $map[$status] ?? 'Hazırlanıyor';
     }
 
-    private function mapPaymentStatusToBackend($status) {
+    private function mapPaymentStatusToBackend(?string $status): string
+    {
         $map = ['Ödendi' => 'paid', 'Beklemede' => 'pending', 'İptal' => 'cancelled'];
         return $map[$status] ?? 'pending';
     }
 
-    private function mapPrepStatusToBackend($status) {
+    private function mapPrepStatusToBackend(?string $status): string
+    {
         $map = ['Hazır' => 'ready', 'Hazırlanıyor' => 'preparing'];
         return $map[$status] ?? 'pending';
     }
 
-    private function mapDeliveryStatusToBackend($status) {
-        $map = ['Teslim Edildi' => 'delivered', 'Yolda' => 'shipped', 'Hazırlanıyor' => 'pending'];
+    private function mapDeliveryStatusToBackend(?string $status): string
+    {
+        $map = ['Teslim Edildi' => 'delivered', 'Yolda' => 'shipped', 'Hazirlaniyor' => 'pending'];
         return $map[$status] ?? 'pending';
     }
 }

@@ -453,6 +453,7 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
       urun: urun.ad,
       urunId: urun.urunId,
       miktar: siparisMiktari,
+      birimFiyat,
       otomatik: true,
       kaynak: 'stok-koruma',
       oncekiStok: Number(oncekiStok ?? urun.magazaStok ?? 0),
@@ -460,6 +461,7 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
       beklenenStok: Number(oncekiStok ?? urun.magazaStok ?? 0) + siparisMiktari,
     }
 
+    // Önce local state'i güncelle
     setTedarikciler((onceki) =>
       onceki.map((tedarikci) => {
         if (tedarikci.uid !== eslesenTedarikci.uid) return tedarikci
@@ -491,6 +493,13 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
       }),
     )
     setTedarikciSiparisSayfa(1)
+
+    // Backend'e kaydet
+    supplierApi.createOrder(eslesenTedarikci.uid, siparis).catch((err) => {
+      console.error('Otomatik tedarik siparişi kaydedilemedi:', err)
+    })
+
+    toastGoster?.('bilgi', `${urun.ad} için ${eslesenTedarikci.firmaAdi} üzerinden otomatik tedarik siparişi oluşturuldu.`)
 
     return {
       ...siparis,

@@ -60,7 +60,6 @@ export default function useOrders({
   const [siparisSayfa, setSiparisSayfa] = useState(1)
   const [gecmisSiparisArama, setGecmisSiparisArama] = useState('')
   const [gecmisSiparisSayfa, setGecmisSiparisSayfa] = useState(1)
-  const [iptalEdilenSiparisler, setIptalEdilenSiparisler] = useState([])
   const [iptalEdilecekSiparis, setIptalEdilecekSiparis] = useState(null)
   const [iptalNotu, setIptalNotu] = useState('')
   const [iptalSiparisArama, setIptalSiparisArama] = useState('')
@@ -103,14 +102,27 @@ export default function useOrders({
     [siparisler],
   )
 
-  // Aktif siparişler: ödeme tamamlanmamış VEYA teslim edilmemiş
+  // Aktif siparişler: ödeme tamamlanmamış VEYA teslim edilmemiş (iptal edilenler hariç)
   const aktifSiparisler = useMemo(() => {
     return siraliSiparisler.filter((siparis) => {
+      if (siparis.odemeDurumu === 'İptal') return false
       const odemeTamamlanmadimi = siparis.odemeDurumu !== 'Ödendi'
       const teslimatTamamlanmadimi = siparis.teslimatDurumu !== 'Teslim Edildi'
       return odemeTamamlanmadimi || teslimatTamamlanmadimi
     })
   }, [siraliSiparisler])
+
+  // İptal edilen siparişler: odemeDurumu === 'İptal' olanlar
+  const iptalEdilenSiparisler = useMemo(() =>
+    siraliSiparisler
+      .filter((s) => s.odemeDurumu === 'İptal')
+      .map((s) => ({
+        ...s,
+        logNo: `IPTAL-${s.siparisNo}`,
+        iptalNedeni: s.iptalNotu ?? '',
+      })),
+    [siraliSiparisler]
+  )
 
   // Geçmiş siparişler: ödeme tamamlanmış VE teslim edilmiş (SiparislerPaneli formatında)
   const gecmisSiparislerHesap = useMemo(() => {
@@ -232,18 +244,22 @@ export default function useOrders({
       toastGoster?.('hata', 'İptal nedeni boş bırakılamaz.')
       return
     }
-    const iptalKaydi = {
-      ...iptalEdilecekSiparis,
-      logNo: `IPTAL-${iptalEdilecekSiparis.siparisNo}`,
-      iptalTarihi: new Date().toISOString().slice(0, 10),
-      iptalNedeni: iptalNotu.trim(),
-      durum: 'İptal Edildi',
-    }
-    setIptalEdilenSiparisler((onceki) => [iptalKaydi, ...onceki])
-    setSiparisler((onceki) => onceki.filter((s) => s.siparisNo !== iptalEdilecekSiparis.siparisNo))
-    toastGoster?.('basari', `${iptalEdilecekSiparis.siparisNo} siparişi iptal edildi.`)
-    setIptalEdilecekSiparis(null)
-    setIptalNotu('')
+    orderApi
+      .cancel(iptalEdilecekSiparis.siparisNo, { iptalNotu: iptalNotu.trim() })
+      .then((sunucuVerisi) => {
+        setSiparisler((onceki) =>
+          onceki.map((s) =>
+            s.siparisNo === iptalEdilecekSiparis.siparisNo ? sunucuVerisi : s
+          )
+        )
+        toastGoster?.('basari', `${iptalEdilecekSiparis.siparisNo} siparişi iptal edildi.`)
+        setIptalEdilecekSiparis(null)
+        setIptalNotu('')
+      })
+      .catch((err) => {
+        console.error('Sipariş iptal edilirken hata:', err)
+        toastGoster?.('hata', 'Sipariş iptal edilirken sunucu hatası oluştu.')
+      })
   }
 
   useEffect(() => {
@@ -483,14 +499,7 @@ export default function useOrders({
     const mevcutSiparis = siparisler.find(s => s.siparisNo === durumGuncellenenSiparisNo)
     if (!mevcutSiparis) return
 
-    const guncellenenSiparisData = {
-      ...mevcutSiparis,
-      odemeDurumu,
-      urunHazirlik,
-      teslimatDurumu,
-    }
-
-    orderApi.update(durumGuncellenenSiparisNo, guncellenenSiparisData).then((sunucuVerisi) => {
+    orderApi.updateStatus(durumGuncellenenSiparisNo, { odemeDurumu, urunHazirlik, teslimatDurumu }).then((sunucuVerisi) => {
       setSiparisler((onceki) =>
         onceki.map((siparis) =>
           siparis.siparisNo === durumGuncellenenSiparisNo ? sunucuVerisi : siparis,

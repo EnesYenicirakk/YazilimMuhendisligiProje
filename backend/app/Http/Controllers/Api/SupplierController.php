@@ -24,6 +24,8 @@ class SupplierController extends Controller
             'firmaAdi' => 'required|string',
             'yetkiliKisi' => 'required|string',
             'telefon' => 'required|string',
+            'toplamAlisSayisi' => 'nullable|integer|min:0',
+            'toplamHarcama' => 'nullable|numeric|min:0',
         ]);
 
         $supplier = Supplier::create([

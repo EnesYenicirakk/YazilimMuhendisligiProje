@@ -86,7 +86,7 @@ export default function SupplierModals({
       </label>
       <label className="modal-form-grup">
         <span>Toplam Alış Sayısı</span>
-        <input type="number" value={tedarikciFormu.toplamAlisSayisi} onChange={(event) => tedarikciFormuGuncelle('toplamAlisSayisi', event.target.value)} />
+        <input type="number" min="0" step="1" value={tedarikciFormu.toplamAlisSayisi} onChange={(event) => tedarikciFormuGuncelle('toplamAlisSayisi', event.target.value)} />
       </label>
       <label className="modal-form-grup">
         <span>Ortalama Teslim Süresi</span>
@@ -94,7 +94,7 @@ export default function SupplierModals({
       </label>
       <label className="modal-form-grup">
         <span>Toplam Harcama</span>
-        <input type="number" value={tedarikciFormu.toplamHarcama} onChange={(event) => tedarikciFormuGuncelle('toplamHarcama', event.target.value)} />
+        <input type="number" min="0" step="0.01" value={tedarikciFormu.toplamHarcama} onChange={(event) => tedarikciFormuGuncelle('toplamHarcama', event.target.value)} />
       </label>
       <label className="modal-form-grup modal-form-grup-tam">
         <span>Not</span>
@@ -232,7 +232,7 @@ export default function SupplierModals({
               <label>Tarih</label>
               <input type="date" value={tedarikciSiparisFormu.tarih} onChange={(event) => tedarikciSiparisFormuGuncelle('tarih', event.target.value)} />
               <label>Tutar</label>
-              <input type="number" value={tedarikciSiparisFormu.tutar} onChange={(event) => tedarikciSiparisFormuGuncelle('tutar', event.target.value)} />
+              <input type="number" min="0" step="0.01" value={tedarikciSiparisFormu.tutar} onChange={(event) => tedarikciSiparisFormuGuncelle('tutar', event.target.value)} />
               <label>Durum</label>
               <select value={tedarikciSiparisFormu.durum} onChange={(event) => tedarikciSiparisFormuGuncelle('durum', event.target.value)}>
                 <option>Bekliyor</option>
@@ -268,7 +268,7 @@ export default function SupplierModals({
               <label>Tarih</label>
               <input type="date" value={genelTedarikSiparisFormu.tarih} onChange={(event) => genelTedarikSiparisFormuGuncelle('tarih', event.target.value)} />
               <label>Tutar</label>
-              <input type="number" value={genelTedarikSiparisFormu.tutar} onChange={(event) => genelTedarikSiparisFormuGuncelle('tutar', event.target.value)} />
+              <input type="number" min="0" step="0.01" value={genelTedarikSiparisFormu.tutar} onChange={(event) => genelTedarikSiparisFormuGuncelle('tutar', event.target.value)} />
               <label>Durum</label>
               <select value={genelTedarikSiparisFormu.durum} onChange={(event) => genelTedarikSiparisFormuGuncelle('durum', event.target.value)}>
                 <option>Bekliyor</option>

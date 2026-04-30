@@ -111,6 +111,48 @@ class OrderController extends Controller
         return response()->json(['message' => 'Siparis silindi']);
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'odemeDurumu'   => 'required|string',
+            'urunHazirlik'  => 'required|string',
+            'teslimatDurumu' => 'required|string',
+        ]);
+
+        $order = CustomerOrder::with(['customer', 'items.product'])->findOrFail($id);
+
+        $order->update([
+            'payment_status'      => $this->mapPaymentStatusToBackend($validated['odemeDurumu']),
+            'preparation_status'  => $this->mapPrepStatusToBackend($validated['urunHazirlik']),
+            'delivery_status'     => $this->mapDeliveryStatusToBackend($validated['teslimatDurumu']),
+        ]);
+
+        return response()->json($this->mapOrderToFrontend($order->fresh(['customer', 'items.product'])));
+    }
+
+    public function cancel(Request $request, $id)
+    {
+        $request->validate([
+            'iptalNotu' => 'required|string|max:1000',
+        ]);
+
+        $order = CustomerOrder::with(['items.product', 'customer'])->findOrFail($id);
+
+        // Stoku geri iade et
+        foreach ($order->items as $item) {
+            if ($item->product) {
+                $item->product->increment('store_stock', (int) $item->quantity);
+            }
+        }
+
+        $order->update([
+            'payment_status'    => 'cancelled',
+            'cancellation_note' => $request->iptalNotu,
+        ]);
+
+        return response()->json($this->mapOrderToFrontend($order->fresh(['customer', 'items.product'])));
+    }
+
     private function validateOrderRequest(Request $request): array
     {
         return $request->validate([
@@ -161,6 +203,7 @@ class OrderController extends Controller
             'urunHazirlik' => $this->mapPrepStatusToFrontend($order->preparation_status),
             'teslimatDurumu' => $this->mapDeliveryStatusToFrontend($order->delivery_status),
             'teslimatSuresi' => '',
+            'iptalNotu' => $order->cancellation_note ?? '',
         ];
     }
 
@@ -172,7 +215,7 @@ class OrderController extends Controller
 
     private function mapPrepStatusToFrontend(?string $status): string
     {
-        $map = ['ready' => 'Hazır', 'preparing' => 'Hazırlanıyor', 'pending' => 'Hazırlanıyor'];
+        $map = ['ready' => 'Hazır', 'preparing' => 'Hazırlanıyor', 'pending' => 'Tedarik Bekleniyor'];
         return $map[$status] ?? 'Hazırlanıyor';
     }
 

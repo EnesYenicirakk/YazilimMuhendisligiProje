@@ -30,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/products/bulk-stock-update', [ProductController::class, 'bulkStockUpdate']);
 Route::apiResource('products', ProductController::class);
 Route::apiResource('customers', CustomerController::class);
+Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 Route::apiResource('orders', OrderController::class);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/finance', [FinanceController::class, 'index']);

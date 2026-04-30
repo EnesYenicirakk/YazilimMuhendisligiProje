@@ -61,6 +61,8 @@ export const orderApi = {
   create: (data) => apiFetch('/orders', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => apiFetch(`/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => apiFetch(`/orders/${id}`, { method: 'DELETE' }),
+  cancel: (id, data) => apiFetch(`/orders/${id}/cancel`, { method: 'POST', body: JSON.stringify(data) }),
+  updateStatus: (id, data) => apiFetch(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify(data) }),
 };
 
 export const categoryApi = {

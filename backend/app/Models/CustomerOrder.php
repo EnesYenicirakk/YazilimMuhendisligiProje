@@ -15,6 +15,7 @@ class CustomerOrder extends Model
         'payment_status',
         'preparation_status',
         'delivery_status',
+        'cancellation_note',
     ];
 
     protected $casts = [

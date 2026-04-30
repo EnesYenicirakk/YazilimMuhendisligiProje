@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 
 export default function AiPanel({
   KucukIkon,
-  TemaIkonu,
   aiHizliKonular,
   aiHizliKonularAcik,
   aiMesajGonder,
@@ -10,7 +9,6 @@ export default function AiPanel({
   aiMesajlar,
   aiPanelKapaniyor,
   aiPaneliKapat,
-  aiTemaMenuAcik,
   aiYukleniyor,
   setAiMesajMetni,
   setAiHizliKonularAcik,

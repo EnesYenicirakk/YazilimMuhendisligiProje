@@ -1,7 +1,5 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useState, useMemo, useEffect } from 'react'
 import './App.css'
-import { useMemo } from 'react'
-import { useEffect } from 'react'
 import IndexPage from './features/home/components/IndexPage'
 import DashboardPage from './features/dashboard/components/DashboardPage'
 import OdemelerPage from './features/finance/components/OdemelerPage'
@@ -46,27 +44,6 @@ const InventoryModals = lazy(() => import('./features/inventory/components/Inven
 const SuppliersPanel = lazy(() => import('./features/suppliers/components/SuppliersPanel'))
 const SupplierModals = lazy(() => import('./features/suppliers/components/SupplierModals'))
 const CustomerModals = lazy(() => import('./features/customers/components/CustomerModals'))
-
-function TemaIkonu({ tema }) {
-  if (tema === 'acik') {
-    return (
-      <span className="ai-tema-ikon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="4.2" />
-          <path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2 5.5 5.5" />
-        </svg>
-      </span>
-    )
-  }
-
-  return (
-    <span className="ai-tema-ikon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 15.2A8.5 8.5 0 1 1 10.1 4a6.8 6.8 0 0 0 9.9 11.2z" />
-      </svg>
-    </span>
-  )
-}
 
 function App() {
   const [aktifSayfa, setAktifSayfa] = useState('merkez')
@@ -574,7 +551,6 @@ function App() {
         <Suspense fallback={<section className="panel-kart lazy-panel-bekleme">Asistan yükleniyor...</section>}>
           <AiPanel
             KucukIkon={KucukIkon}
-            TemaIkonu={TemaIkonu}
             aiHizliKonular={appNotifications.aiHizliKonular}
             aiHizliKonularAcik={appNotifications.aiHizliKonularAcik}
             aiMesajGonder={appNotifications.aiMesajGonder}
@@ -582,7 +558,6 @@ function App() {
             aiMesajlar={appNotifications.aiMesajlar}
             aiPanelKapaniyor={appNotifications.aiPanelKapaniyor}
             aiPaneliKapat={appNotifications.aiPaneliKapat}
-            aiTemaMenuAcik={appNotifications.aiTemaMenuAcik}
             aiYukleniyor={appNotifications.aiYukleniyor}
             setAiMesajMetni={appNotifications.setAiMesajMetni}
             setAiHizliKonularAcik={appNotifications.setAiHizliKonularAcik}

@@ -98,6 +98,11 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
     duzenlenenSiparisNo,
     setDuzenlenenSiparisNo,
     siparisDuzenlemeKaydet,
+    iptalEdilecekSiparis,
+    setIptalEdilecekSiparis,
+    iptalNotu,
+    setIptalNotu,
+    siparisIptalKaydet,
     durumGuncellenenSiparisNo,
     setDurumGuncellenenSiparisNo,
     siparisDurumFormu,
@@ -146,26 +151,26 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <input type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
               <label>Siparis Tarihi</label>
               <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
-              <label>Odeme Durumu</label>
+              <label>Ödeme Durumu</label>
               <select value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)}>
                 <option>Beklemede</option>
-                <option>Odendi</option>
+                <option>Ödendi</option>
               </select>
-              <label>Urun Hazirlik</label>
+              <label>Ürün Hazırlık</label>
               <select value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)}>
-                <option>Hazirlaniyor</option>
+                <option>Hazırlanıyor</option>
                 <option>Tedarik Bekleniyor</option>
-                <option>Hazir</option>
+                <option>Hazır</option>
               </select>
               <label>Teslimat Durumu</label>
               <select value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)}>
-                <option>Hazirlaniyor</option>
+                <option>Hazırlanıyor</option>
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
             </div>
             <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={() => setYeniSiparisAcik(false)}>Iptal</button>
+              <button type="button" className="ikinci" onClick={() => setYeniSiparisAcik(false)}>İptal</button>
               <button type="button" onClick={yeniSiparisKaydet}>Siparisi Olustur</button>
             </div>
           </div>
@@ -256,26 +261,26 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <input type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
               <label>Siparis Tarihi</label>
               <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
-              <label>Odeme Durumu</label>
+              <label>Ödeme Durumu</label>
               <select value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)}>
                 <option>Beklemede</option>
-                <option>Odendi</option>
+                <option>Ödendi</option>
               </select>
-              <label>Urun Hazirlik</label>
+              <label>Ürün Hazırlık</label>
               <select value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)}>
-                <option>Hazirlaniyor</option>
+                <option>Hazırlanıyor</option>
                 <option>Tedarik Bekleniyor</option>
-                <option>Hazir</option>
+                <option>Hazır</option>
               </select>
               <label>Teslimat Durumu</label>
               <select value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)}>
-                <option>Hazirlaniyor</option>
+                <option>Hazırlanıyor</option>
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
             </div>
             <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={() => setDuzenlenenSiparisNo(null)}>Iptal</button>
+              <button type="button" className="ikinci" onClick={() => setDuzenlenenSiparisNo(null)}>İptal</button>
               <button type="button" onClick={siparisDuzenlemeKaydet}>Kaydet</button>
             </div>
           </div>
@@ -290,20 +295,20 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <button type="button" className="modal-kapat" onClick={() => setDurumGuncellenenSiparisNo(null)} aria-label="Kapat">×</button>
             </div>
             <div className="modal-form">
-              <label>Odeme Durumu</label>
+              <label>Ödeme Durumu</label>
               <select value={siparisDurumFormu.odemeDurumu} onChange={(event) => siparisDurumFormuGuncelle('odemeDurumu', event.target.value)}>
                 <option>Beklemede</option>
-                <option>Odendi</option>
+                <option>Ödendi</option>
               </select>
-              <label>Urun Hazirlik</label>
+              <label>Ürün Hazırlık</label>
               <select value={siparisDurumFormu.urunHazirlik} onChange={(event) => siparisDurumFormuGuncelle('urunHazirlik', event.target.value)}>
-                <option>Hazirlaniyor</option>
+                <option>Hazırlanıyor</option>
                 <option>Tedarik Bekleniyor</option>
-                <option>Hazir</option>
+                <option>Hazır</option>
               </select>
               <label>Teslimat Durumu</label>
               <select value={siparisDurumFormu.teslimatDurumu} onChange={(event) => siparisDurumFormuGuncelle('teslimatDurumu', event.target.value)}>
-                <option>Hazirlaniyor</option>
+                <option>Hazırlanıyor</option>
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
@@ -329,6 +334,32 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={() => setSilinecekSiparis(null)}>Hayir</button>
               <button type="button" className="tehlike" onClick={siparisSil}>Evet</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {iptalEdilecekSiparis && (
+        <div className="modal-kaplama">
+          <div className="modal-kutu kucuk">
+            <div className="modal-baslik">
+              <h3>Siparişi İptal Et</h3>
+              <button type="button" className="modal-kapat" onClick={() => setIptalEdilecekSiparis(null)} aria-label="Kapat">×</button>
+            </div>
+            <p><strong>{iptalEdilecekSiparis.siparisNo}</strong> siparişini iptal etmek üzeresiniz.</p>
+            <div className="modal-form">
+              <label>İptal Nedeni</label>
+              <textarea
+                rows={4}
+                placeholder="Sipariş neden iptal ediliyor?"
+                value={iptalNotu}
+                onChange={(event) => setIptalNotu(event.target.value)}
+                style={{ resize: 'vertical' }}
+              />
+            </div>
+            <div className="modal-aksiyon">
+              <button type="button" className="ikinci" onClick={() => setIptalEdilecekSiparis(null)}>Vazgeç</button>
+              <button type="button" className="tehlike" onClick={siparisIptalKaydet}>İptal Et</button>
             </div>
           </div>
         </div>

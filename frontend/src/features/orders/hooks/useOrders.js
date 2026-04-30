@@ -60,6 +60,11 @@ export default function useOrders({
   const [siparisSayfa, setSiparisSayfa] = useState(1)
   const [gecmisSiparisArama, setGecmisSiparisArama] = useState('')
   const [gecmisSiparisSayfa, setGecmisSiparisSayfa] = useState(1)
+  const [iptalEdilenSiparisler, setIptalEdilenSiparisler] = useState([])
+  const [iptalEdilecekSiparis, setIptalEdilecekSiparis] = useState(null)
+  const [iptalNotu, setIptalNotu] = useState('')
+  const [iptalSiparisArama, setIptalSiparisArama] = useState('')
+  const [iptalSiparisSayfa, setIptalSiparisSayfa] = useState(1)
   const [yeniSiparisAcik, setYeniSiparisAcik] = useState(false)
   const [detaySiparis, setDetaySiparis] = useState(null)
   const [detayGecmisSiparis, setDetayGecmisSiparis] = useState(null)
@@ -113,7 +118,7 @@ export default function useOrders({
       .filter((siparis) => {
         return siparis.odemeDurumu === 'Ödendi' && siparis.teslimatDurumu === 'Teslim Edildi'
       })
-      .map((siparis, index) => ({
+      .map((siparis) => ({
         // Geçmiş sipariş formatı
         logNo: `LOG-${siparis.siparisNo}`,
         siparisNo: siparis.siparisNo,
@@ -199,6 +204,47 @@ export default function useOrders({
   useEffect(() => {
     if (gecmisSiparisSayfa > toplamGecmisSiparisSayfa) setGecmisSiparisSayfa(toplamGecmisSiparisSayfa)
   }, [gecmisSiparisSayfa, toplamGecmisSiparisSayfa])
+
+  const filtreliIptalSiparisler = useMemo(() => {
+    const metin = iptalSiparisArama.trim().toLowerCase()
+    if (!metin) return iptalEdilenSiparisler
+    return iptalEdilenSiparisler.filter((s) =>
+      s.siparisNo.toLowerCase().includes(metin) ||
+      s.musteri.toLowerCase().includes(metin) ||
+      s.urun.toLowerCase().includes(metin)
+    )
+  }, [iptalEdilenSiparisler, iptalSiparisArama])
+
+  const toplamIptalSiparisSayfa = Math.max(1, Math.ceil(filtreliIptalSiparisler.length / SIPARIS_SAYFA_BASINA))
+  const sayfadakiIptalSiparisler = useMemo(() => {
+    const baslangic = (iptalSiparisSayfa - 1) * SIPARIS_SAYFA_BASINA
+    return filtreliIptalSiparisler.slice(baslangic, baslangic + SIPARIS_SAYFA_BASINA)
+  }, [filtreliIptalSiparisler, iptalSiparisSayfa])
+
+  const siparisIptalAc = (siparis) => {
+    setIptalEdilecekSiparis(siparis)
+    setIptalNotu('')
+  }
+
+  const siparisIptalKaydet = () => {
+    if (!iptalEdilecekSiparis) return
+    if (!iptalNotu.trim()) {
+      toastGoster?.('hata', 'İptal nedeni boş bırakılamaz.')
+      return
+    }
+    const iptalKaydi = {
+      ...iptalEdilecekSiparis,
+      logNo: `IPTAL-${iptalEdilecekSiparis.siparisNo}`,
+      iptalTarihi: new Date().toISOString().slice(0, 10),
+      iptalNedeni: iptalNotu.trim(),
+      durum: 'İptal Edildi',
+    }
+    setIptalEdilenSiparisler((onceki) => [iptalKaydi, ...onceki])
+    setSiparisler((onceki) => onceki.filter((s) => s.siparisNo !== iptalEdilecekSiparis.siparisNo))
+    toastGoster?.('basari', `${iptalEdilecekSiparis.siparisNo} siparişi iptal edildi.`)
+    setIptalEdilecekSiparis(null)
+    setIptalNotu('')
+  }
 
   useEffect(() => {
     setSiparisSayfa(1)
@@ -428,9 +474,8 @@ export default function useOrders({
     const odemeDurumu = siparisDurumFormu.odemeDurumu.trim()
     const urunHazirlik = siparisDurumFormu.urunHazirlik.trim()
     const teslimatDurumu = siparisDurumFormu.teslimatDurumu.trim()
-    const teslimatSuresi = siparisDurumFormu.teslimatSuresi.trim()
 
-    if (!odemeDurumu || !urunHazirlik || !teslimatDurumu || !teslimatSuresi) {
+    if (!odemeDurumu || !urunHazirlik || !teslimatDurumu) {
       toastGoster?.('hata', 'Durum güncelleme alanlarında boşluk bırakılamaz.')
       return
     }
@@ -443,7 +488,6 @@ export default function useOrders({
       odemeDurumu,
       urunHazirlik,
       teslimatDurumu,
-      teslimatSuresi,
     }
 
     orderApi.update(durumGuncellenenSiparisNo, guncellenenSiparisData).then((sunucuVerisi) => {
@@ -477,6 +521,20 @@ export default function useOrders({
 
   return {
     siparisler,
+    gecmisSiparisler: gecmisSiparislerHesap,
+    iptalEdilenSiparisler,
+    iptalEdilecekSiparis,
+    setIptalEdilecekSiparis,
+    iptalNotu,
+    setIptalNotu,
+    iptalSiparisArama,
+    setIptalSiparisArama,
+    iptalSiparisSayfa,
+    setIptalSiparisSayfa,
+    toplamIptalSiparisSayfa,
+    sayfadakiIptalSiparisler,
+    siparisIptalAc,
+    siparisIptalKaydet,
     siparisArama,
     setSiparisArama,
     siparisOdemeFiltresi,

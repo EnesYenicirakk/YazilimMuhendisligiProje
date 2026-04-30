@@ -21,6 +21,7 @@ export default function OrdersPanel({ ordersData, paraFormatla, tarihFormatla, d
       siparisDurumGuncellemeAc={ordersData.siparisDurumGuncellemeAc}
       setSilinecekSiparis={ordersData.setSilinecekSiparis}
       siparisMusteriAra={ordersData.siparisMusteriAra}
+      siparisIptalAc={ordersData.siparisIptalAc}
       siparisSayfa={ordersData.siparisSayfa}
       setSiparisSayfa={ordersData.setSiparisSayfa}
       toplamSiparisSayfa={ordersData.toplamSiparisSayfa}
@@ -31,6 +32,12 @@ export default function OrdersPanel({ ordersData, paraFormatla, tarihFormatla, d
       setDetayGecmisSiparis={ordersData.setDetayGecmisSiparis}
       gecmisSiparisSayfa={ordersData.gecmisSiparisSayfa}
       toplamGecmisSiparisSayfa={ordersData.toplamGecmisSiparisSayfa}
+      iptalSiparisArama={ordersData.iptalSiparisArama}
+      setIptalSiparisArama={ordersData.setIptalSiparisArama}
+      setIptalSiparisSayfa={ordersData.setIptalSiparisSayfa}
+      sayfadakiIptalSiparisler={ordersData.sayfadakiIptalSiparisler}
+      iptalSiparisSayfa={ordersData.iptalSiparisSayfa}
+      toplamIptalSiparisSayfa={ordersData.toplamIptalSiparisSayfa}
     />
   )
 }

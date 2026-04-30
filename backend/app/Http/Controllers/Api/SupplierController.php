@@ -155,7 +155,7 @@ class SupplierController extends Controller
             'tarih'             => $order->order_date,
             'olusturulmaZamani' => $order->created_at?->toISOString(),
             'tutar'             => (float) $order->total_amount,
-            'durum'             => $order->status,
+            'durum'             => $this->mapOrderStatusToFrontend($order->status),
             'urun'              => $order->product_name ?? '',
             'urunId'            => $order->product_sku ?? '',
             'miktar'            => (int) ($order->quantity ?? 0),
@@ -167,5 +167,17 @@ class SupplierController extends Controller
             'beklenenStok'      => (int) ($order->expected_stock ?? 0),
             'id'                => $order->id,
         ];
+    }
+
+    private function mapOrderStatusToFrontend(?string $status): string
+    {
+        $map = [
+            'pending'    => 'Bekliyor',
+            'processing' => 'Hazırlanıyor',
+            'completed'  => 'Teslim alındı',
+            'cancelled'  => 'İptal',
+            'shipped'    => 'Kargoda',
+        ];
+        return $map[$status] ?? ($status ?? 'Bekliyor');
     }
 }

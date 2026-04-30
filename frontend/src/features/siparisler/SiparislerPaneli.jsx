@@ -71,7 +71,7 @@ function SiparislerPaneli(props) {
     setDetaySiparis,
     siparisDuzenlemeAc,
     siparisDurumGuncellemeAc,
-    setSilinecekSiparis,
+    siparisIptalAc,
     siparisMusteriAra,
     siparisSayfa,
     setSiparisSayfa,
@@ -83,6 +83,12 @@ function SiparislerPaneli(props) {
     setDetayGecmisSiparis,
     gecmisSiparisSayfa,
     toplamGecmisSiparisSayfa,
+    iptalSiparisArama,
+    setIptalSiparisArama,
+    setIptalSiparisSayfa,
+    sayfadakiIptalSiparisler,
+    iptalSiparisSayfa,
+    toplamIptalSiparisSayfa,
   } = props
 
   return (
@@ -106,6 +112,7 @@ function SiparislerPaneli(props) {
           options={[
             { id: 'aktif', label: 'Aktif Siparişler' },
             { id: 'gecmis', label: 'Geçmiş Siparişler' },
+            { id: 'iptal', label: 'İptal Edilen Siparişler' },
           ]}
         />
 
@@ -191,7 +198,7 @@ function SiparislerPaneli(props) {
                               <button type="button" className="ikon-dugme not" title="Detay" onClick={() => setDetaySiparis(siparis)}><KucukIkon tip="detay" /></button>
                               <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => siparisDuzenlemeAc(siparis)}><KucukIkon tip="duzenle" /></button>
                               <button type="button" className="ikon-dugme favori" title="Durum Güncelle" onClick={() => siparisDurumGuncellemeAc(siparis)}><KucukIkon tip="durum" /></button>
-                              <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekSiparis(siparis)}><KucukIkon tip="sil" /></button>
+                              <button type="button" className="ikon-dugme sil" title="İptal Et" onClick={() => siparisIptalAc(siparis)}><KucukIkon tip="sil" /></button>
                             </div>
                           </td>
                         </tr>
@@ -208,7 +215,7 @@ function SiparislerPaneli(props) {
                       solaEtiket="Sil"
                       sagaEtiket="Detay ve işlemler"
                       solaAksiyonlar={[
-                        { id: 'sil', etiket: 'Sil', varyant: 'tehlike', onClick: () => setSilinecekSiparis(siparis) },
+                        { id: 'iptal', etiket: 'İptal Et', varyant: 'tehlike', onClick: () => siparisIptalAc(siparis) },
                       ]}
                       sagaAksiyonlar={[
                         { id: 'detay', etiket: 'Detay', onClick: () => setDetaySiparis(siparis) },
@@ -267,6 +274,100 @@ function SiparislerPaneli(props) {
                   setSiparisOdemeFiltresi('Tüm Siparişler')
                   setSiparisSayfa(1)
                 }}
+              />
+            )}
+          </>
+        )}
+
+        {siparisSekmesi === 'iptal' && (
+          <>
+            <SectionToolbar
+              title="İptal Edilen Siparişler"
+              rightSlot={(
+                <input
+                  type="text"
+                  placeholder="Sipariş no, müşteri veya ürün ara"
+                  value={iptalSiparisArama}
+                  onChange={(event) => {
+                    setIptalSiparisArama(event.target.value)
+                    setIptalSiparisSayfa(1)
+                  }}
+                />
+              )}
+            />
+
+            {sayfadakiIptalSiparisler.length > 0 ? (
+              <>
+                <div className="tablo-sarmal masaustu-tablo">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Log No</th>
+                        <th>Sipariş No</th>
+                        <th>Müşteri</th>
+                        <th>Ürün</th>
+                        <th>Tarih</th>
+                        <th>Miktar</th>
+                        <th>Tutar</th>
+                        <th>İptal Nedeni</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sayfadakiIptalSiparisler.map((kayit) => (
+                        <tr key={kayit.logNo}>
+                          <td>{kayit.logNo}</td>
+                          <td>{kayit.siparisNo}</td>
+                          <td>{kayit.musteri}</td>
+                          <td>{kayit.urun}</td>
+                          <td>{tarihFormatla(kayit.siparisTarihi)}</td>
+                          <td>{kayit.urunAdedi}</td>
+                          <td>{paraFormatla(kayit.toplamTutar)}</td>
+                          <td>{kayit.iptalNedeni}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mobil-kart-listesi">
+                  {sayfadakiIptalSiparisler.map((kayit) => (
+                    <MobilKart
+                      key={`mobil-iptal-${kayit.logNo}`}
+                      className="siparis-mobil-kart"
+                      ust={
+                        <>
+                          <strong>{kayit.siparisNo}</strong>
+                          <StatusBadge label="İptal Edildi" tone="danger" variant="outline" />
+                        </>
+                      }
+                      govde={
+                        <>
+                          <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Log No</span><strong>{kayit.logNo}</strong></div>
+                          <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Müşteri</span><strong>{kayit.musteri}</strong></div>
+                          <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Ürün</span><strong>{kayit.urun}</strong></div>
+                          <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Tarih</span><strong>{tarihFormatla(kayit.siparisTarihi)}</strong></div>
+                          <div className="mobil-bilgi-satiri siparis-detay-satiri"><span>Tutar</span><strong>{paraFormatla(kayit.toplamTutar)}</strong></div>
+                          <div className="mobil-bilgi-satiri tam"><span>İptal Nedeni</span><strong>{kayit.iptalNedeni}</strong></div>
+                        </>
+                      }
+                    />
+                  ))}
+                </div>
+
+                <div className="sayfalama">
+                  <button type="button" className="sayfa-ok" onClick={() => setIptalSiparisSayfa(iptalSiparisSayfa - 1)} disabled={iptalSiparisSayfa === 1}>‹</button>
+                  {Array.from({ length: toplamIptalSiparisSayfa }, (_, i) => i + 1).map((sayfaNo) => (
+                    <button key={`iptal-sayfa-${sayfaNo}`} type="button" className={`sayfa-buton ${iptalSiparisSayfa === sayfaNo ? 'aktif' : ''}`} onClick={() => setIptalSiparisSayfa(sayfaNo)}>
+                      {sayfaNo}
+                    </button>
+                  ))}
+                  <button type="button" className="sayfa-ok" onClick={() => setIptalSiparisSayfa(iptalSiparisSayfa + 1)} disabled={iptalSiparisSayfa === toplamIptalSiparisSayfa}>›</button>
+                </div>
+              </>
+            ) : (
+              <BosDurumKarti
+                baslik="İptal edilen sipariş yok"
+                aciklama="Henüz iptal edilmiş sipariş kaydı bulunmuyor."
               />
             )}
           </>

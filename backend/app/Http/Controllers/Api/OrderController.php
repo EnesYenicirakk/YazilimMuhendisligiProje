@@ -190,13 +190,13 @@ class OrderController extends Controller
 
     private function mapPrepStatusToBackend(?string $status): string
     {
-        $map = ['Hazır' => 'ready', 'Hazırlanıyor' => 'preparing'];
+        $map = ['Hazır' => 'ready', 'Hazırlanıyor' => 'preparing', 'Tedarik Bekleniyor' => 'pending'];
         return $map[$status] ?? 'pending';
     }
 
     private function mapDeliveryStatusToBackend(?string $status): string
     {
-        $map = ['Teslim Edildi' => 'delivered', 'Yolda' => 'shipped', 'Hazirlaniyor' => 'pending'];
+        $map = ['Teslim Edildi' => 'delivered', 'Yolda' => 'shipped', 'Hazırlanıyor' => 'pending'];
         return $map[$status] ?? 'pending';
     }
 }

@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
   dashboardBolumSablonu,
-  enCokSatilanUrunleriHesapla,
   gerceklesenOdemeTutari,
   kritikStoktaMi,
   paraFormatla,
@@ -177,12 +176,22 @@ export default function useDashboard({
 
   const enCokSatilanUrunler = useMemo(() => {
     const referansGun = bugununBaslangiciniGetir()
-    const buAyTamamlananSiparisler = tamamlananSiparisler.filter((siparis) =>
+    const buAyKiSiparisler = siraliSiparisler.filter((siparis) =>
       ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), referansGun),
     )
 
-    return enCokSatilanUrunleriHesapla(buAyTamamlananSiparisler, 6)
-  }, [tamamlananSiparisler])
+    const satisOzetleri = buAyKiSiparisler.reduce((harita, siparis) => {
+      const urunAdi = String(siparis.urun ?? '').trim()
+      if (!urunAdi) return harita
+      harita.set(urunAdi, (harita.get(urunAdi) ?? 0) + siparisMiktariniGetir(siparis))
+      return harita
+    }, new Map())
+
+    return Array.from(satisOzetleri.entries())
+      .map(([ad, miktar]) => ({ ad, miktar }))
+      .sort((a, b) => b.miktar - a.miktar || a.ad.localeCompare(b.ad, 'tr'))
+      .slice(0, 6)
+  }, [siraliSiparisler])
 
   const bugunkuOncelikler = useMemo(() => {
     const bugun = bugununBaslangiciniGetir()

@@ -229,7 +229,7 @@ export default function DashboardPage({
                 </div>
 
                 <div className="kritik-stok-liste">
-                  {dashboardCanliOzetler.kritikStokluUrunler.slice(0, 4).map((urun) => (
+                  {dashboardCanliOzetler.kritikStokluUrunler.map((urun) => (
                     <article key={`kritik-${urun.uid}`} className="kritik-stok-karti">
                       <div className="kritik-stok-baslik">
                         <strong className="urun-ad-satiri">

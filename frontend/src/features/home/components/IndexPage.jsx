@@ -8,7 +8,7 @@ export default function IndexPage({
 }) {
   return (
     <>
-<section className={`merkez-ekrani ${gecisBalonu ? 'gecis-aktif' : ''} ${merkezGirisEfekti ? 'geri-giris' : ''}`}>
+<section className={`merkez-ekrani ${gecisBalonu ? 'gecis-aktif' : ''} ${merkezGirisEfekti ? 'geri-giris' : ''}`} data-testid="home-page">
                 <div className="merkez-sahne">
                   <div className="arka-plan-baloncuklari" aria-hidden="true">
                     <div className="arka-balon arka-balon-1">
@@ -117,6 +117,7 @@ export default function IndexPage({
                     <button
                       key={kart.sayfa}
                       type="button"
+                      data-testid={`home-${kart.sayfa}`}
                       className={`merkez-balon renk-${kart.renk} balon-${index + 1} ${gecisBalonu === kart.sayfa ? 'giriliyor' : ''}`}
                       onClick={() => merkezdenSayfayaGit(kart.sayfa)}
                     >

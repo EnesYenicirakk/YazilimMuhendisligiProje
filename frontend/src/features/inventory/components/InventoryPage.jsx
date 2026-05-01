@@ -21,13 +21,13 @@ export default function InventoryPage({
   loading,
 }) {
   return (
-    <section>
+    <section data-testid="inventory-page">
       <header className="ust-baslik envanter-baslik">
         <div>
           <h1>Envanter</h1>
           <p>Mağaza: Merkez Şube</p>
         </div>
-        <button type="button" className="urun-ekle-karti" onClick={eklemePenceresiniAc}>
+        <button type="button" className="urun-ekle-karti" data-testid="inventory-add-product" onClick={eklemePenceresiniAc}>
           <span className="urun-ekle-ikon" aria-hidden="true"><KucukIkon tip="urun-ekle" /></span>
           <span className="urun-ekle-metin">Yeni Ürün</span>
         </button>
@@ -54,6 +54,7 @@ export default function InventoryPage({
           <h2>Parça Listesi</h2>
           <input
             type="text"
+            data-testid="inventory-search"
             placeholder="Ürün veya ID ara"
             value={aramaMetni}
             onChange={(event) => {
@@ -73,7 +74,7 @@ export default function InventoryPage({
             {sayfadakiUrunler.length > 0 ? (
           <>
             <div className="tablo-sarmal masaustu-tablo">
-              <table>
+              <table data-testid="inventory-table">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -87,7 +88,7 @@ export default function InventoryPage({
                 </thead>
                 <tbody>
                   {sayfadakiUrunler.map((urun, index) => (
-                    <tr key={urun.uid}>
+                    <tr key={urun.uid} data-testid="inventory-product-row" data-product-sku={urun.urunId}>
                       <td>{String(sayfaBaslangic + index + 1).padStart(2, '0')}</td>
                       <td>
                         <div className="urun-hucre">
@@ -111,15 +112,15 @@ export default function InventoryPage({
                           </strong>
                         </div>
                       </td>
-                      <td>{urun.urunId}</td>
+                      <td data-testid="inventory-product-sku">{urun.urunId}</td>
                       <td>{urun.kategori}</td>
-                      <td>{urun.urunAdedi}</td>
-                      <td>{urun.magazaStok}</td>
+                      <td data-testid="inventory-warehouse-stock">{urun.urunAdedi}</td>
+                      <td data-testid="inventory-store-stock">{urun.magazaStok}</td>
                       <td>
                         <div className="islem-dugmeleri">
                           <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Otomatik Tedarik" onClick={() => favoriDegistir(urun.uid)}><KucukIkon tip="otomatik-tedarik" /></button>
-                          <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => duzenlemePenceresiniAc(urun)}><KucukIkon tip="duzenle" /></button>
-                          <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekUrun(urun)}><KucukIkon tip="sil" /></button>
+                          <button type="button" className="ikon-dugme duzenle" data-testid="inventory-edit-product" title="Düzenle" onClick={() => duzenlemePenceresiniAc(urun)}><KucukIkon tip="duzenle" /></button>
+                          <button type="button" className="ikon-dugme sil" data-testid="inventory-delete-product" title="Sil" onClick={() => setSilinecekUrun(urun)}><KucukIkon tip="sil" /></button>
                         </div>
                       </td>
                     </tr>

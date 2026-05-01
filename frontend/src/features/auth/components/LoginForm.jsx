@@ -27,10 +27,11 @@ export default function LoginForm({
       <h1>Giriş Yap</h1>
       <p className="subtitle">Envanter paneline erişmek için bilgilerinizi girin.</p>
 
-      <form onSubmit={onSubmit} className="login-form">
+      <form onSubmit={onSubmit} className="login-form" data-testid="login-form">
         <label htmlFor="username">Kullanıcı adı</label>
         <input
           id="username"
+          data-testid="login-username"
           type="text"
           value={username}
           onChange={(event) => onUsernameChange(event.target.value)}
@@ -42,6 +43,7 @@ export default function LoginForm({
         <div className="sifre-alani">
           <input
             id="password"
+            data-testid="login-password"
             type={sifreGorunur ? 'text' : 'password'}
             value={password}
             onChange={(event) => onPasswordChange(event.target.value)}
@@ -58,12 +60,12 @@ export default function LoginForm({
           </button>
         </div>
 
-        <button type="submit" className="login-giris-buton" disabled={isSubmitting}>
+        <button type="submit" className="login-giris-buton" data-testid="login-submit" disabled={isSubmitting}>
           {isSubmitting ? 'Yönlendiriliyor...' : 'Giriş yap'}
         </button>
       </form>
 
-      {error && <p className="message error">{error}</p>}
+      {error && <p className="message error" data-testid="login-error">{error}</p>}
     </section>
   )
 }

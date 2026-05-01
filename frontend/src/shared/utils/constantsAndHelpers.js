@@ -165,6 +165,8 @@ export const bosForm = {
   urunAdedi: '',
   magazaStok: '',
   minimumStok: '',
+  alisFiyati: '',
+  satisFiyati: '',
 }
 
 export const bosUrunDuzenlemeFormu = {

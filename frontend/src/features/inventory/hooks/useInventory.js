@@ -236,6 +236,8 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
       urunAdedi: String(urun.urunAdedi),
       magazaStok: String(urun.magazaStok),
       minimumStok: String(urun.minimumStok ?? 10),
+      alisFiyati: String(urun.alisFiyati ?? 0),
+      satisFiyati: String(urun.satisFiyati ?? 0),
     })
     setDuzenlemeAcik(true)
   }
@@ -251,13 +253,15 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     const urunAdedi = Number(form.urunAdedi)
     const magazaStok = Number(form.magazaStok)
     const minimumStok = Number(form.minimumStok)
+    const alisFiyati = Number(form.alisFiyati || 0)
+    const satisFiyati = Number(form.satisFiyati || 0)
 
-    if (!urunId || !ad || Number.isNaN(urunAdedi) || Number.isNaN(magazaStok) || Number.isNaN(minimumStok)) {
+    if (!urunId || !ad || [urunAdedi, magazaStok, minimumStok, alisFiyati, satisFiyati].some((deger) => Number.isNaN(deger))) {
       toastGoster?.('hata', 'Ürün bilgileri eksik veya hatalı görünüyor.')
       return
     }
 
-    if (negatifSayiVarMi(urunAdedi, magazaStok, minimumStok)) {
+    if (negatifSayiVarMi(urunAdedi, magazaStok, minimumStok, alisFiyati, satisFiyati)) {
       toastGoster?.('hata', 'Ürün adedi ve stok alanları negatif olamaz.')
       return
     }
@@ -277,6 +281,8 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
         urunAdedi,
         magazaStok,
         minimumStok,
+        alisFiyati,
+        satisFiyati,
         kategori: 'Diğer',
         barkod: barkodOlustur(Date.now()),
         avatar: avatarOlustur(ad),
@@ -310,6 +316,8 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
       urunAdedi,
       magazaStok,
       minimumStok,
+      alisFiyati,
+      satisFiyati,
     }
 
     productApi.update(seciliUid, guncellenenUrunData).then((sunucuVerisi) => {

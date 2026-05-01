@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:e2e": "cypress run"
+    "test:e2e": "set ELECTRON_RUN_AS_NODE=& cypress run"
   },
   "dependencies": {
     "@ericblade/quagga2": "^1.12.1",

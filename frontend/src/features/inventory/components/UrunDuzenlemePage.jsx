@@ -24,7 +24,7 @@ export default function UrunDuzenlemePage({
   toplamStokLogSayfa,
 }) {
   return (
-    <section>
+    <section data-testid="product-management-page">
       <header className="ust-baslik envanter-baslik">
         <div>
           <h1>Ürün Düzenleme</h1>
@@ -62,6 +62,7 @@ export default function UrunDuzenlemePage({
               <h2>Ürün Fiyat Listesi</h2>
               <input
                 type="text"
+                data-testid="product-management-search"
                 placeholder="Ürün veya ID ara"
                 value={urunDuzenlemeArama}
                 onChange={(event) => {
@@ -74,7 +75,7 @@ export default function UrunDuzenlemePage({
             {sayfadakiDuzenlemeUrunleri.length > 0 ? (
               <>
                 <div className="tablo-sarmal masaustu-tablo">
-                  <table>
+                  <table data-testid="product-management-table">
                     <thead>
                       <tr>
                         <th>No</th>
@@ -89,7 +90,7 @@ export default function UrunDuzenlemePage({
                     </thead>
                     <tbody>
                       {sayfadakiDuzenlemeUrunleri.map((urun, index) => (
-                        <tr key={`duzenleme-${urun.uid}`}>
+                        <tr key={`duzenleme-${urun.uid}`} data-testid="product-management-row" data-product-sku={urun.urunId}>
                           <td>{String(urunDuzenlemeBaslangic + index + 1).padStart(2, '0')}</td>
                           <td>
                             <div className="urun-bilgi">
@@ -113,16 +114,16 @@ export default function UrunDuzenlemePage({
                               </span>
                             </div>
                           </td>
-                          <td>{urun.urunId}</td>
-                          <td>{urun.urunAdedi}</td>
-                          <td>{paraFormatla(urun.alisFiyati ?? 0)}</td>
-                          <td>{paraFormatla(urun.satisFiyati ?? 0)}</td>
-                          <td>{urun.magazaStok}</td>
+                          <td data-testid="product-management-sku">{urun.urunId}</td>
+                          <td data-testid="product-management-warehouse-stock">{urun.urunAdedi}</td>
+                          <td data-testid="product-management-purchase-price">{paraFormatla(urun.alisFiyati ?? 0)}</td>
+                          <td data-testid="product-management-sale-price">{paraFormatla(urun.satisFiyati ?? 0)}</td>
+                          <td data-testid="product-management-store-stock">{urun.magazaStok}</td>
                           <td>
                             <div className="islem-dugmeleri">
                               <button type="button" className={`ikon-dugme favori ${urun.favori ? 'aktif' : ''}`} title="Otomatik Tedarik" onClick={() => favoriDegistir(urun.uid)}><KucukIkon tip="otomatik-tedarik" /></button>
-                              <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => urunDuzenlemeModaliniAc(urun)}><KucukIkon tip="duzenle" /></button>
-                              <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekDuzenlemeUrunu(urun)}><KucukIkon tip="sil" /></button>
+                              <button type="button" className="ikon-dugme duzenle" data-testid="product-management-edit" title="Düzenle" onClick={() => urunDuzenlemeModaliniAc(urun)}><KucukIkon tip="duzenle" /></button>
+                              <button type="button" className="ikon-dugme sil" data-testid="product-management-delete" title="Sil" onClick={() => setSilinecekDuzenlemeUrunu(urun)}><KucukIkon tip="sil" /></button>
                             </div>
                           </td>
                         </tr>

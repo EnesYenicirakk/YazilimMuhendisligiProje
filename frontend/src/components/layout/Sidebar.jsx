@@ -73,6 +73,7 @@ export default function Sidebar({
             <button
               key={oge.sayfa}
               type="button"
+              data-testid={`menu-${oge.sayfa}`}
               className={`menu-link ${aktifSayfa === oge.sayfa ? 'aktif' : ''}`}
               onClick={() => sayfaDegistir(oge.sayfa)}
             >

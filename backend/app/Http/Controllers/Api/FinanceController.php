@@ -10,31 +10,35 @@ class FinanceController extends Controller
 {
     public function index()
     {
-        $payments = Payment::with(['customer', 'supplier'])->get()->map(function ($payment) {
-            $taraf = 'Genel';
-            if ($payment->customer) {
-                $taraf = $payment->customer->full_name;
-            } elseif ($payment->supplier) {
-                $taraf = $payment->supplier->company_name;
-            } elseif ($payment->description) {
-                $taraf = $payment->description;
-            }
+        $data = \Illuminate\Support\Facades\Cache::remember('finance_summary', 600, function () {
+            $payments = Payment::with(['customer', 'supplier'])->get()->map(function ($payment) {
+                $taraf = 'Genel';
+                if ($payment->customer) {
+                    $taraf = $payment->customer->full_name;
+                } elseif ($payment->supplier) {
+                    $taraf = $payment->supplier->company_name;
+                } elseif ($payment->description) {
+                    $taraf = $payment->description;
+                }
+
+                return [
+                    'odemeNo' => (string)$payment->id,
+                    'taraf' => $taraf,
+                    'tarih' => $payment->payment_date ? $payment->payment_date->format('Y-m-d') : null,
+                    'durum' => $this->mapStatus($payment->status),
+                    'tutar' => (float)$payment->amount,
+                    'type' => $payment->type, // incoming / outgoing
+                    'favori' => false,
+                ];
+            });
 
             return [
-                'odemeNo' => (string)$payment->id,
-                'taraf' => $taraf,
-                'tarih' => $payment->payment_date ? $payment->payment_date->format('Y-m-d') : null,
-                'durum' => $this->mapStatus($payment->status),
-                'tutar' => (float)$payment->amount,
-                'type' => $payment->type, // incoming / outgoing
-                'favori' => false,
+                'gelen' => $payments->where('type', 'incoming')->values(),
+                'giden' => $payments->where('type', 'outgoing')->values(),
             ];
         });
 
-        return response()->json([
-            'gelen' => $payments->where('type', 'incoming')->values(),
-            'giden' => $payments->where('type', 'outgoing')->values(),
-        ]);
+        return response()->json($data);
     }
 
     private function mapStatus($status) {

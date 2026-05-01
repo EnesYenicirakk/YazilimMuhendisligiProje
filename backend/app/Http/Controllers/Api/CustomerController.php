@@ -10,8 +10,10 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        $customers = Customer::all()->map(function ($customer) {
-            return $this->mapCustomerToFrontend($customer);
+        $customers = \Illuminate\Support\Facades\Cache::remember('customers_list', 600, function () {
+            return Customer::all()->map(function ($customer) {
+                return $this->mapCustomerToFrontend($customer);
+            });
         });
         return response()->json($customers);
     }
@@ -33,6 +35,7 @@ class CustomerController extends Controller
             'last_purchase_date' => $request->sonAlim ?? now(),
         ]);
 
+        \Illuminate\Support\Facades\Cache::forget('customers_list');
         return response()->json($this->mapCustomerToFrontend($customer), 201);
     }
 
@@ -51,6 +54,7 @@ class CustomerController extends Controller
             'is_favorite' => $request->favori ?? $customer->is_favorite,
         ]);
 
+        \Illuminate\Support\Facades\Cache::forget('customers_list');
         return response()->json($this->mapCustomerToFrontend($customer));
     }
 
@@ -58,6 +62,7 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
         $customer->delete();
+        \Illuminate\Support\Facades\Cache::forget('customers_list');
         return response()->json(['message' => 'Müşteri silindi']);
     }
 

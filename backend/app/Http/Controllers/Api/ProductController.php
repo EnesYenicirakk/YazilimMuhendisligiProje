@@ -11,8 +11,10 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->get()->map(function ($product) {
-            return $this->mapProductToFrontend($product);
+        $products = \Illuminate\Support\Facades\Cache::remember('products_list', 600, function () {
+            return Product::with('category')->get()->map(function ($product) {
+                return $this->mapProductToFrontend($product);
+            });
         });
 
         return response()->json($products);
@@ -48,6 +50,7 @@ class ProductController extends Controller
             'is_favorite' => $request->favori ?? false,
         ]);
 
+        \Illuminate\Support\Facades\Cache::forget('products_list');
         return response()->json($this->mapProductToFrontend($product), 201);
     }
 
@@ -71,6 +74,7 @@ class ProductController extends Controller
             'is_favorite' => $request->favori,
         ]);
 
+        \Illuminate\Support\Facades\Cache::forget('products_list');
         return response()->json($this->mapProductToFrontend($product));
     }
 
@@ -79,6 +83,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
+        \Illuminate\Support\Facades\Cache::forget('products_list');
         return response()->json(['message' => 'Ürün silindi']);
     }
 

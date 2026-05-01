@@ -21,26 +21,26 @@ export default function CustomerModals({ customersData }) {
     <>
       {musteriEklemeAcik && (
         <div className="modal-kaplama">
-          <div className="modal-kutu">
+          <div className="modal-kutu" data-cy="customer-create-modal">
             <div className="modal-baslik">
               <h3>Müşteri Ekle</h3>
               <button type="button" className="modal-kapat" onClick={musteriEklemeKapat} aria-label="Kapat">×</button>
             </div>
             <div className="modal-form">
               <label>Müşteri Adı</label>
-              <input value={musteriFormu.ad} onChange={(event) => musteriFormuGuncelle('ad', event.target.value)} />
+              <input data-cy="customer-name-input" value={musteriFormu.ad} onChange={(event) => musteriFormuGuncelle('ad', event.target.value)} />
               <label>Telefon</label>
-              <input value={musteriFormu.telefon} onChange={(event) => musteriFormuGuncelle('telefon', event.target.value)} />
+              <input data-cy="customer-phone-input" value={musteriFormu.telefon} onChange={(event) => musteriFormuGuncelle('telefon', event.target.value)} />
               <label>Son Satın Alım</label>
-              <input type="date" value={musteriFormu.sonAlim} onChange={(event) => musteriFormuGuncelle('sonAlim', event.target.value)} />
+              <input data-cy="customer-date-input" type="date" value={musteriFormu.sonAlim} onChange={(event) => musteriFormuGuncelle('sonAlim', event.target.value)} />
               <label>Toplam Harcama</label>
               <input type="number" min="0" step="0.01" value={musteriFormu.toplamHarcama} onChange={(event) => musteriFormuGuncelle('toplamHarcama', event.target.value)} />
               <label>Not</label>
-              <textarea value={musteriFormu.not} onChange={(event) => musteriFormuGuncelle('not', event.target.value)} />
+              <textarea data-cy="customer-note-input" value={musteriFormu.not} onChange={(event) => musteriFormuGuncelle('not', event.target.value)} />
             </div>
             <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={musteriEklemeKapat}>İptal</button>
-              <button type="button" onClick={() => musteriKaydet('ekle')}>Kaydet</button>
+              <button type="button" className="ikinci" data-cy="customer-create-cancel" onClick={musteriEklemeKapat}>İptal</button>
+              <button type="button" data-cy="customer-create-submit" onClick={() => musteriKaydet('ekle')}>Kaydet</button>
             </div>
           </div>
         </div>
@@ -94,15 +94,15 @@ export default function CustomerModals({ customersData }) {
 
       {silinecekMusteri && (
         <div className="modal-kaplama">
-          <div className="modal-kutu kucuk">
+          <div className="modal-kutu kucuk" data-cy="customer-delete-modal">
             <div className="modal-baslik">
               <h3>Silmek istediğinizden emin misiniz</h3>
               <button type="button" className="modal-kapat" onClick={musteriSilmeKapat} aria-label="Kapat">×</button>
             </div>
             <p><strong>{silinecekMusteri.ad}</strong> müşteri listesinden kaldırılacak.</p>
             <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={musteriSilmeKapat}>Hayır</button>
-              <button type="button" className="tehlike" onClick={musteriSil}>Evet</button>
+              <button type="button" className="ikinci" data-cy="customer-delete-cancel" onClick={musteriSilmeKapat}>Hayır</button>
+              <button type="button" className="tehlike" data-cy="customer-delete-confirm" onClick={musteriSil}>Evet</button>
             </div>
           </div>
         </div>

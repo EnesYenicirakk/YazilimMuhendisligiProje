@@ -37,7 +37,7 @@ export default function DashboardPage({
 
   return (
     <>
-      <section>
+      <section data-cy="dashboard-page">
         <header className="ust-baslik envanter-baslik">
           <div>
             <h1>Dashboard</h1>
@@ -67,7 +67,7 @@ export default function DashboardPage({
                 </div>
               )}
             </div>
-            <button type="button" onClick={() => sayfaDegistir('envanter')}>
+            <button type="button" data-cy="dashboard-go-inventory" onClick={() => sayfaDegistir('envanter')}>
               Envantere Git
             </button>
           </div>
@@ -75,7 +75,7 @@ export default function DashboardPage({
 
         <div className="ozet-grid">
           {dashboardOzet.map((kart) => (
-            <article key={kart.baslik} className="ozet-kartcik">
+            <article key={kart.baslik} className="ozet-kartcik" data-cy="dashboard-summary-card">
               <div className="ozet-ust">
                 <span className="ozet-ikon"><KucukIkon tip={kart.ikon} /></span>
                 <div className="ozet-menu-sarmal">

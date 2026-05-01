@@ -7,6 +7,7 @@ use App\Models\CustomerOrder;
 use App\Models\CustomerOrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -51,6 +52,8 @@ class OrderController extends Controller
 
             return $order->load(['customer', 'items.product']);
         });
+
+        Cache::forget('products_list');
 
         return response()->json($this->mapOrderToFrontend($order), 201);
     }
@@ -99,6 +102,8 @@ class OrderController extends Controller
 
             return $order->load(['customer', 'items.product']);
         });
+
+        Cache::forget('products_list');
 
         return response()->json($this->mapOrderToFrontend($order));
     }
@@ -149,6 +154,8 @@ class OrderController extends Controller
             'payment_status'    => 'cancelled',
             'cancellation_note' => $request->iptalNotu,
         ]);
+
+        Cache::forget('products_list');
 
         return response()->json($this->mapOrderToFrontend($order->fresh(['customer', 'items.product'])));
     }

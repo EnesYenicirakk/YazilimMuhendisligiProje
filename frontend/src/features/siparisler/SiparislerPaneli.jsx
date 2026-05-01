@@ -92,13 +92,13 @@ function SiparislerPaneli(props) {
   } = props
 
   return (
-    <section>
+    <section data-cy="orders-page">
       <PageHeader
         title="Siparişler"
         description="En yeni siparişten en eski siparişe doğru listelenir."
         className="siparisler-baslik"
         actions={(
-          <button type="button" className="urun-ekle-karti" onClick={yeniSiparisPenceresiniAc}>
+          <button type="button" className="urun-ekle-karti" data-cy="order-add-button" onClick={yeniSiparisPenceresiniAc}>
             <span className="urun-ekle-ikon" aria-hidden="true"><KucukIkon tip="siparis-ekle" /></span>
             <span className="urun-ekle-metin">Yeni Sipariş</span>
           </button>
@@ -145,12 +145,13 @@ function SiparislerPaneli(props) {
 
             <div className="siparis-kontrol">
               <input
+                data-cy="order-search"
                 type="text"
                 placeholder="Sipariş no, müşteri veya ürün ara"
                 value={siparisArama}
                 onChange={(event) => setSiparisArama(event.target.value)}
               />
-              <select value={siparisOdemeFiltresi} onChange={(event) => setSiparisOdemeFiltresi(event.target.value)}>
+              <select data-cy="order-payment-filter" value={siparisOdemeFiltresi} onChange={(event) => setSiparisOdemeFiltresi(event.target.value)}>
                 <option>Tüm Siparişler</option>
                 <option>Ödendi</option>
                 <option>Beklemede</option>
@@ -160,7 +161,7 @@ function SiparislerPaneli(props) {
             {sayfadakiSiparisler.length > 0 ? (
               <>
                 <div className="tablo-sarmal masaustu-tablo">
-                  <table>
+                  <table data-cy="orders-table">
                     <thead>
                       <tr>
                         <th>Sipariş No</th>
@@ -175,9 +176,9 @@ function SiparislerPaneli(props) {
                     </thead>
                     <tbody>
                       {sayfadakiSiparisler.map((siparis) => (
-                        <tr key={siparis.siparisNo}>
-                          <td>{siparis.siparisNo}</td>
-                          <td>{siparis.musteri}</td>
+                        <tr key={siparis.siparisNo} data-cy="order-row" data-order-id={siparis.siparisNo}>
+                          <td data-cy="order-number">{siparis.siparisNo}</td>
+                          <td data-cy="order-customer">{siparis.musteri}</td>
                           <td>{paraFormatla(siparis.toplamTutar)}</td>
                           <td>{tarihFormatla(siparis.siparisTarihi)}</td>
                           <td>
@@ -195,10 +196,10 @@ function SiparislerPaneli(props) {
                           </td>
                           <td>
                             <div className="islem-dugmeleri siparis-islemleri">
-                              <button type="button" className="ikon-dugme not" title="Detay" onClick={() => setDetaySiparis(siparis)}><KucukIkon tip="detay" /></button>
-                              <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => siparisDuzenlemeAc(siparis)}><KucukIkon tip="duzenle" /></button>
-                              <button type="button" className="ikon-dugme favori" title="Durum Güncelle" onClick={() => siparisDurumGuncellemeAc(siparis)}><KucukIkon tip="durum" /></button>
-                              <button type="button" className="ikon-dugme sil" title="İptal Et" onClick={() => siparisIptalAc(siparis)}><KucukIkon tip="sil" /></button>
+                              <button type="button" className="ikon-dugme not" data-cy="order-detail-button" title="Detay" onClick={() => setDetaySiparis(siparis)}><KucukIkon tip="detay" /></button>
+                              <button type="button" className="ikon-dugme duzenle" data-cy="order-edit-button" title="Düzenle" onClick={() => siparisDuzenlemeAc(siparis)}><KucukIkon tip="duzenle" /></button>
+                              <button type="button" className="ikon-dugme favori" data-cy="order-status-button" title="Durum Güncelle" onClick={() => siparisDurumGuncellemeAc(siparis)}><KucukIkon tip="durum" /></button>
+                              <button type="button" className="ikon-dugme sil" data-cy="order-cancel-button" title="İptal Et" onClick={() => siparisIptalAc(siparis)}><KucukIkon tip="sil" /></button>
                             </div>
                           </td>
                         </tr>

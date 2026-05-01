@@ -25,7 +25,7 @@ export default function CustomersPanel({
   } = customersData
 
   return (
-    <section>
+    <section data-cy="customers-page">
       <header className="ust-baslik envanter-baslik">
         <div>
           <h1>Kayıtlı Müşteriler</h1>
@@ -33,7 +33,7 @@ export default function CustomersPanel({
             Daha önce alışveriş yapan müşterileri telefon ve not bilgileriyle birlikte yönetin.
           </p>
         </div>
-        <button type="button" className="urun-ekle-karti" onClick={musteriEklemeAc}>
+        <button type="button" className="urun-ekle-karti" data-cy="customer-add-button" onClick={musteriEklemeAc}>
           <span className="urun-ekle-ikon" aria-hidden="true">
             <KucukIkon tip="musteri-ekle" />
           </span>
@@ -45,6 +45,7 @@ export default function CustomersPanel({
         <div className="panel-ust-cizgi">
           <h2>Müşteri Listesi</h2>
           <input
+            data-cy="customer-search"
             type="text"
             placeholder="Müşteri adı veya telefon ara"
             value={musteriArama}
@@ -65,7 +66,7 @@ export default function CustomersPanel({
             {sayfadakiMusteriler.length > 0 ? (
           <>
             <div className="tablo-sarmal masaustu-tablo">
-              <table>
+              <table data-cy="customers-table">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -80,7 +81,7 @@ export default function CustomersPanel({
                 </thead>
                 <tbody>
                   {sayfadakiMusteriler.map((musteri, index) => (
-                    <tr key={musteri.uid}>
+                    <tr key={musteri.uid} data-cy="customer-row" data-customer-id={musteri.uid}>
                       <td>{String(musteriBaslangic + index + 1).padStart(2, '0')}</td>
                       <td>
                         <div className="urun-hucre">
@@ -103,8 +104,8 @@ export default function CustomersPanel({
                           <button type="button" className={`ikon-dugme favori ${musteri.favori ? 'aktif' : ''}`} title="Favori" onClick={() => musteriFavoriDegistir(musteri.uid)}><KucukIkon tip="favori" /></button>
                           <button type="button" className="ikon-dugme not" title="Not Ekle" onClick={() => musteriNotAc(musteri)}><KucukIkon tip="not" /></button>
                           <button type="button" className="ikon-dugme duzenle" title="Düzenle" onClick={() => musteriDuzenlemeAc(musteri)}><KucukIkon tip="duzenle" /></button>
-                          <button type="button" className="ikon-dugme telefon" title="Ara" onClick={() => telefonAramasiBaslat(musteri.telefon, musteri.ad)}><KucukIkon tip="telefon" /></button>
-                          <button type="button" className="ikon-dugme sil" title="Sil" onClick={() => setSilinecekMusteri(musteri)}><KucukIkon tip="sil" /></button>
+                          <button type="button" className="ikon-dugme telefon" data-cy="customer-call-button" title="Ara" onClick={() => telefonAramasiBaslat(musteri.telefon, musteri.ad)}><KucukIkon tip="telefon" /></button>
+                          <button type="button" className="ikon-dugme sil" data-cy="customer-delete-button" title="Sil" onClick={() => setSilinecekMusteri(musteri)}><KucukIkon tip="sil" /></button>
                         </div>
                       </td>
                     </tr>

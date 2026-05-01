@@ -34,9 +34,10 @@ function UrunSecici({ value, onChange, urunSecenekleri }) {
   }
 
   return (
-    <div className={`urun-secici ${acik ? 'acik' : ''}`} ref={kapsayiciRef}>
+    <div className={`urun-secici ${acik ? 'acik' : ''}`} data-cy="order-product-picker" ref={kapsayiciRef}>
       <div className="urun-secici-alan">
         <input
+          data-cy="order-product-input"
           value={value}
           onChange={(event) => {
             onChange({
@@ -62,12 +63,14 @@ function UrunSecici({ value, onChange, urunSecenekleri }) {
       </div>
 
       {acik && (
-        <div className="urun-secici-liste" role="listbox" aria-label="Urun secenekleri">
+        <div className="urun-secici-liste" data-cy="order-product-options" role="listbox" aria-label="Urun secenekleri">
           {filtreliUrunler.length > 0 ? (
             filtreliUrunler.map((urun) => (
               <button
                 key={urun.uid}
                 type="button"
+                data-cy="order-product-option"
+                data-product-sku={urun.urunId}
                 className={`urun-secici-secenek ${urun.ad === value ? 'secili' : ''}`}
                 onClick={() => urunSec(urun)}
               >
@@ -121,14 +124,14 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
     <>
       {yeniSiparisAcik && (
         <div className="modal-kaplama">
-          <div className="modal-kutu">
+          <div className="modal-kutu" data-cy="order-create-modal">
             <div className="modal-baslik">
               <h3>Yeni Siparis Olustur</h3>
               <button type="button" className="modal-kapat" onClick={() => setYeniSiparisAcik(false)} aria-label="Kapat">×</button>
             </div>
             <div className="modal-form">
               <label>Musteri</label>
-              <select value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
+              <select data-cy="order-customer-select" value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
                 <option value="">Musteri secin</option>
                 {musteriSecenekleri.map((musteri) => (
                   <option key={musteri.uid} value={musteri.uid}>
@@ -146,32 +149,32 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
                 urunSecenekleri={urunSecenekleri}
               />
               <label>Siparis Verilen Urun Adedi</label>
-              <input type="number" min="1" step="1" value={siparisFormu.urunAdedi} onChange={(event) => siparisFormuGuncelle('urunAdedi', event.target.value)} />
+              <input data-cy="order-quantity-input" type="number" min="1" step="1" value={siparisFormu.urunAdedi} onChange={(event) => siparisFormuGuncelle('urunAdedi', event.target.value)} />
               <label>Toplam Tutar</label>
-              <input type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
+              <input data-cy="order-total-input" type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
               <label>Siparis Tarihi</label>
-              <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
+              <input data-cy="order-date-input" type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
               <label>Ödeme Durumu</label>
-              <select value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)}>
+              <select data-cy="order-payment-status-select" value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)}>
                 <option>Beklemede</option>
                 <option>Ödendi</option>
               </select>
               <label>Ürün Hazırlık</label>
-              <select value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)}>
+              <select data-cy="order-prep-status-select" value={siparisFormu.urunHazirlik} onChange={(event) => siparisFormuGuncelle('urunHazirlik', event.target.value)}>
                 <option>Hazırlanıyor</option>
                 <option>Tedarik Bekleniyor</option>
                 <option>Hazır</option>
               </select>
               <label>Teslimat Durumu</label>
-              <select value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)}>
+              <select data-cy="order-delivery-status-select" value={siparisFormu.teslimatDurumu} onChange={(event) => siparisFormuGuncelle('teslimatDurumu', event.target.value)}>
                 <option>Hazırlanıyor</option>
                 <option>Yolda</option>
                 <option>Teslim Edildi</option>
               </select>
             </div>
             <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={() => setYeniSiparisAcik(false)}>İptal</button>
-              <button type="button" onClick={yeniSiparisKaydet}>Siparisi Olustur</button>
+              <button type="button" className="ikinci" data-cy="order-create-cancel" onClick={() => setYeniSiparisAcik(false)}>İptal</button>
+              <button type="button" data-cy="order-create-submit" onClick={yeniSiparisKaydet}>Siparisi Olustur</button>
             </div>
           </div>
         </div>
@@ -179,7 +182,7 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
 
       {detaySiparis && (
         <div className="modal-kaplama">
-          <div className="modal-kutu">
+          <div className="modal-kutu" data-cy="order-detail-modal">
             <div className="modal-baslik">
               <h3>Siparis Detayi</h3>
               <button type="button" className="modal-kapat" onClick={() => setDetaySiparis(null)} aria-label="Kapat">×</button>
@@ -325,7 +328,7 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
 
       {silinecekSiparis && (
         <div className="modal-kaplama">
-          <div className="modal-kutu kucuk">
+          <div className="modal-kutu kucuk" data-cy="order-delete-modal">
             <div className="modal-baslik">
               <h3>Silmek istediginizden emin misiniz?</h3>
               <button type="button" className="modal-kapat" onClick={() => setSilinecekSiparis(null)} aria-label="Kapat">×</button>
@@ -341,7 +344,7 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
 
       {iptalEdilecekSiparis && (
         <div className="modal-kaplama">
-          <div className="modal-kutu kucuk">
+          <div className="modal-kutu kucuk" data-cy="order-cancel-modal">
             <div className="modal-baslik">
               <h3>Siparişi İptal Et</h3>
               <button type="button" className="modal-kapat" onClick={() => setIptalEdilecekSiparis(null)} aria-label="Kapat">×</button>
@@ -350,6 +353,7 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
             <div className="modal-form">
               <label>İptal Nedeni</label>
               <textarea
+                data-cy="order-cancel-note"
                 rows={4}
                 placeholder="Sipariş neden iptal ediliyor?"
                 value={iptalNotu}
@@ -358,8 +362,8 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               />
             </div>
             <div className="modal-aksiyon">
-              <button type="button" className="ikinci" onClick={() => setIptalEdilecekSiparis(null)}>Vazgeç</button>
-              <button type="button" className="tehlike" onClick={siparisIptalKaydet}>İptal Et</button>
+              <button type="button" className="ikinci" data-cy="order-cancel-dismiss" onClick={() => setIptalEdilecekSiparis(null)}>Vazgeç</button>
+              <button type="button" className="tehlike" data-cy="order-cancel-confirm" onClick={siparisIptalKaydet}>İptal Et</button>
             </div>
           </div>
         </div>

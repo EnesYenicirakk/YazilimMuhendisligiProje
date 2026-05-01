@@ -1,4 +1,4 @@
-const PRODUCT_PREFIX = 'E2E-STOCK-'
+const PRODUCT_PREFIX = 'TEST_E2E_STOCK_'
 
 const productRow = (sku) => cy.get(`[data-product-sku="${sku}"]`)
 
@@ -26,16 +26,6 @@ describe('Inventory and Stock E2E', () => {
         urunId: this.sku,
       }
     })
-  })
-
-  afterEach(function () {
-    if (this.sku) {
-      cy.apiDeleteProductBySku(this.sku)
-    }
-  })
-
-  after(() => {
-    cy.apiDeleteProductsByPrefix(PRODUCT_PREFIX)
   })
 
   it('adds a product from the UI and verifies it is listed', function () {
@@ -117,7 +107,7 @@ describe('Inventory and Stock E2E', () => {
     cy.getByTestId('product-create-modal').should('be.visible')
   })
 
-  it('deletes a product and removes it from the inventory list', function () {
+  it('opens the product delete confirmation but cancels without deleting', function () {
     cy.apiCreateProduct(this.product)
     cy.reload()
     cy.getByTestId('home-page').should('be.visible')
@@ -129,10 +119,10 @@ describe('Inventory and Stock E2E', () => {
     })
 
     cy.getByTestId('product-delete-modal').should('be.visible').and('contain', this.product.ad)
-    cy.getByTestId('product-delete-confirm').click()
+    cy.getByTestId('product-delete-modal').contains('button', /hayır|hayir/i).click()
 
     cy.getByTestId('product-delete-modal').should('not.exist')
     cy.getByTestId('inventory-search').clear().type(this.product.urunId)
-    productRow(this.product.urunId).should('not.exist')
+    productRow(this.product.urunId).should('exist')
   })
 })

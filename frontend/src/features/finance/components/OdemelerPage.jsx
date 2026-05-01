@@ -31,7 +31,7 @@ export default function OdemelerPage({
   loading,
 }) {
   return (
-    <section>
+    <section data-cy="finance-page">
       <header className="ust-baslik envanter-baslik">
         <div>
           <h1>Finansal Akış</h1>
@@ -44,6 +44,7 @@ export default function OdemelerPage({
           <button
             type="button"
             className={`odeme-sekme ${odemeSekmesi === 'gelen' ? 'aktif' : ''}`}
+            data-cy="finance-income-tab"
             onClick={() => setOdemeSekmesi('gelen')}
           >
             Tahsilatlar
@@ -51,6 +52,7 @@ export default function OdemelerPage({
           <button
             type="button"
             className={`odeme-sekme ${odemeSekmesi === 'giden' ? 'aktif' : ''}`}
+            data-cy="finance-expense-tab"
             onClick={() => setOdemeSekmesi('giden')}
           >
             Ödemeler
@@ -58,15 +60,15 @@ export default function OdemelerPage({
         </div>
 
         <section className="dashboard-canli-grid">
-          <article className="canli-ozet-kart">
+          <article className="canli-ozet-kart" data-cy="finance-summary-income">
             <span className="canli-ozet-etiket">Toplam Tahsilat</span>
             <strong>{paraFormatla(toplamGelenNakit)}</strong>
           </article>
-          <article className="canli-ozet-kart">
+          <article className="canli-ozet-kart" data-cy="finance-summary-expense">
             <span className="canli-ozet-etiket">Toplam Ödeme</span>
             <strong>{paraFormatla(toplamGidenNakit)}</strong>
           </article>
-          <article className="canli-ozet-kart">
+          <article className="canli-ozet-kart" data-cy="finance-summary-net">
             <span className="canli-ozet-etiket">Net Durum</span>
             <strong>{paraFormatla(toplamGelenNakit - toplamGidenNakit)}</strong>
           </article>
@@ -87,7 +89,7 @@ export default function OdemelerPage({
             </div>
 
             <div className="tablo-sarmal masaustu-tablo">
-              <table>
+              <table data-cy="finance-income-table">
                 <thead>
                   <tr>
                     <th>Ödeme No</th>
@@ -232,7 +234,7 @@ export default function OdemelerPage({
             </div>
 
             <div className="tablo-sarmal masaustu-tablo">
-              <table>
+              <table data-cy="finance-expense-table">
                 <thead>
                   <tr>
                     <th>Ödeme No</th>

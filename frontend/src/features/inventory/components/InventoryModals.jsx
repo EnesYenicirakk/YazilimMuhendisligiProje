@@ -36,9 +36,9 @@ export default function InventoryModals({ inventoryData }) {
               <input data-testid="product-sku-input" value={form.urunId} onChange={(event) => formGuncelle('urunId', event.target.value)} />
               <label>Ürün Adedi</label>
               <input data-testid="product-warehouse-stock-input" type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
-              <label>AlÄ±ÅŸ FiyatÄ±</label>
+              <label>Alış Fiyatı</label>
               <input data-testid="product-purchase-price-input" type="number" min="0" step="0.01" value={form.alisFiyati} onChange={(event) => formGuncelle('alisFiyati', event.target.value)} />
-              <label>SatÄ±ÅŸ FiyatÄ±</label>
+              <label>Satış Fiyatı</label>
               <input data-testid="product-sale-price-input" type="number" min="0" step="0.01" value={form.satisFiyati} onChange={(event) => formGuncelle('satisFiyati', event.target.value)} />
               <label>Minimum Stok</label>
               <input data-testid="product-min-stock-input" type="number" min="0" step="1" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />
@@ -67,9 +67,9 @@ export default function InventoryModals({ inventoryData }) {
               <input data-testid="product-sku-input" value={form.urunId} onChange={(event) => formGuncelle('urunId', event.target.value)} />
               <label>Ürün Adedi</label>
               <input data-testid="product-warehouse-stock-input" type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
-              <label>AlÄ±ÅŸ FiyatÄ±</label>
+              <label>Alış Fiyatı</label>
               <input data-testid="product-purchase-price-input" type="number" min="0" step="0.01" value={form.alisFiyati} onChange={(event) => formGuncelle('alisFiyati', event.target.value)} />
-              <label>SatÄ±ÅŸ FiyatÄ±</label>
+              <label>Satış Fiyatı</label>
               <input data-testid="product-sale-price-input" type="number" min="0" step="0.01" value={form.satisFiyati} onChange={(event) => formGuncelle('satisFiyati', event.target.value)} />
               <label>Minimum Stok</label>
               <input data-testid="product-min-stock-input" type="number" min="0" step="1" value={form.minimumStok} onChange={(event) => formGuncelle('minimumStok', event.target.value)} />

@@ -297,6 +297,17 @@ export const merkezMenusu = [
   { sayfa: 'faturalama', baslik: 'Faturalama (PDF)', renk: 'kiremit', aciklama: 'Fatura üretimi' },
 ]
 
+export const merkezMenuPozisyonlari = [
+  { x: -0.707, y: -0.707 },
+  { x: 0, y: -1 },
+  { x: 0.707, y: -0.707 },
+  { x: 1, y: 0 },
+  { x: 0.707, y: 0.707 },
+  { x: 0, y: 1 },
+  { x: -0.707, y: 0.707 },
+  { x: -1, y: 0 },
+]
+
 export const aiHizliKonular = [
   { etiket: 'Bugünkü Satış', mesaj: 'Bugün kaç TLlik satış yaptım?' },
   { etiket: 'Aylık Ciro', mesaj: 'Bu ayki toplam ciromuz ne kadar?' },

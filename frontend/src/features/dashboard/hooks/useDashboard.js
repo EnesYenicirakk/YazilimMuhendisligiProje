@@ -36,6 +36,11 @@ const bugununBaslangiciniGetir = () => {
 
 const ayniGunMu = (sol, sag) => sol.toDateString() === sag.toDateString()
 
+const sonXGunIcerisindeMi = (tarih, referans, gunAraligi) => {
+  const fark = Math.floor((referans.getTime() - tarih.getTime()) / 86400000)
+  return fark >= 0 && fark < gunAraligi
+}
+
 const ayniAydaMi = (tarih, referans) =>
   tarih.getMonth() === referans.getMonth() && tarih.getFullYear() === referans.getFullYear()
 
@@ -108,8 +113,19 @@ export default function useDashboard({
   const [gizlenenOzetKartlari, setGizlenenOzetKartlari] = useState([])
   const [acikOzetMenusu, setAcikOzetMenusu] = useState('')
   const [dashboardBolumMenusuAcik, setDashboardBolumMenusuAcik] = useState(false)
+  const [enCokSatilanMenuAcik, setEnCokSatilanMenuAcik] = useState(false)
+  const [enCokSatilanGunAraligi, setEnCokSatilanGunAraligi] = useState(30)
   const [gorunenDashboardBolumleri, setGorunenDashboardBolumleri] = useState(
     dashboardBolumSablonu.reduce((acc, bolum) => ({ ...acc, [bolum.anahtar]: true }), {}),
+  )
+
+  const enCokSatilanAralikSecenekleri = useMemo(
+    () => [
+      { deger: 30, etiket: 'Son 30 Gun' },
+      { deger: 15, etiket: 'Son 15 Gun' },
+      { deger: 7, etiket: 'Son 7 Gun' },
+    ],
+    [],
   )
 
   const tamamlananSiparisler = useMemo(
@@ -177,11 +193,15 @@ export default function useDashboard({
 
   const enCokSatilanUrunler = useMemo(() => {
     const referansGun = bugununBaslangiciniGetir()
-    const buAyKiSiparisler = siraliSiparisler.filter((siparis) =>
-      ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), referansGun),
-    )
+    const filtreliSiparisler = siraliSiparisler.filter((siparis) => {
+      if (!siparisTamamlandiMi(siparis)) return false
 
-    const satisOzetleri = buAyKiSiparisler.reduce((harita, siparis) => {
+      const siparisTarihi = new Date(`${siparis.siparisTarihi}T00:00:00`)
+      siparisTarihi.setHours(0, 0, 0, 0)
+      return sonXGunIcerisindeMi(siparisTarihi, referansGun, enCokSatilanGunAraligi)
+    })
+
+    const satisOzetleri = filtreliSiparisler.reduce((harita, siparis) => {
       const urunAdi = String(siparis.urun ?? '').trim()
       if (!urunAdi) return harita
       harita.set(urunAdi, (harita.get(urunAdi) ?? 0) + siparisMiktariniGetir(siparis))
@@ -192,7 +212,14 @@ export default function useDashboard({
       .map(([ad, miktar]) => ({ ad, miktar }))
       .sort((a, b) => b.miktar - a.miktar || a.ad.localeCompare(b.ad, 'tr'))
       .slice(0, 6)
-  }, [siraliSiparisler])
+  }, [enCokSatilanGunAraligi, siraliSiparisler])
+
+  const enCokSatilanAltBaslik = useMemo(() => {
+    const secenek =
+      enCokSatilanAralikSecenekleri.find((item) => item.deger === enCokSatilanGunAraligi) ??
+      enCokSatilanAralikSecenekleri[0]
+    return secenek.etiket
+  }, [enCokSatilanAralikSecenekleri, enCokSatilanGunAraligi])
 
   const bugunkuOncelikler = useMemo(() => {
     const bekleyenSiparisler = siparisler.filter((s) => s.teslimatDurumu === 'Hazırlanıyor')
@@ -509,6 +536,10 @@ export default function useDashboard({
     dashboardBolumGorunurlukDegistir,
     dashboardBolumMenusuAcik,
     dashboardCanliOzetler,
+    enCokSatilanAltBaslik,
+    enCokSatilanAralikSecenekleri,
+    enCokSatilanGunAraligi,
+    enCokSatilanMenuAcik,
     bugunkuOncelikler,
     dashboardOzet,
     dashboardYakinSatislar,
@@ -518,6 +549,8 @@ export default function useDashboard({
     haftalikSatisGrafikUstSinir,
     haftalikSatisVerisi,
     ozetKartiniSil,
+    setEnCokSatilanGunAraligi,
+    setEnCokSatilanMenuAcik,
     setAcikOzetMenusu,
     setDashboardBolumMenusuAcik,
   }

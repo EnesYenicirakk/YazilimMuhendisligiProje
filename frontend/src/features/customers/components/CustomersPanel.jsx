@@ -74,7 +74,7 @@ export default function CustomersPanel({
                     <th>Telefon</th>
                     <th>Son Satın Alım</th>
                     <th>Sipariş Sayısı</th>
-                    <th>Toplam Harcama</th>
+                    <th>Toplam Kazanç</th>
                     <th>Not</th>
                     <th>İşlem</th>
                   </tr>
@@ -151,7 +151,7 @@ export default function CustomersPanel({
                         </div>
                       </div>
                       <div className="mobil-bilgi-satiri"><span>Sipariş Sayısı</span><strong>{musteri.toplamSiparis}</strong></div>
-                      <div className="mobil-bilgi-satiri"><span>Toplam Harcama</span><strong>{paraFormatla(musteri.toplamHarcama)}</strong></div>
+                      <div className="mobil-bilgi-satiri"><span>Toplam Kazanç</span><strong>{paraFormatla(musteri.toplamHarcama)}</strong></div>
                       <div className="mobil-bilgi-satiri tam"><span>Not</span><strong>{musteri.not}</strong></div>
                     </>
                   }

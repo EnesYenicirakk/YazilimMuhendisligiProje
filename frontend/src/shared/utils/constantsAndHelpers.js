@@ -162,20 +162,24 @@ export const negatifSayiVarMi = (...degerler) => degerler.some((deger) => Number
 export const bosForm = {
   urunId: '',
   ad: '',
+  kategori: '',
   urunAdedi: '',
   magazaStok: '',
   minimumStok: '',
   alisFiyati: '',
   satisFiyati: '',
+  tedarikciUid: '',
 }
 
 export const bosUrunDuzenlemeFormu = {
   urunId: '',
   ad: '',
+  kategori: '',
   urunAdedi: '',
   magazaStok: '',
   alisFiyati: '',
   satisFiyati: '',
+  tedarikciUid: '',
 }
 
 export const bosMusteriFormu = {

@@ -74,6 +74,24 @@ export default function useOrders({
   const [siparisDurumFormu, setSiparisDurumFormu] = useState(BOS_DURUM_FORMU)
   const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    const urunUid = siparisFormu.urunUid
+    const miktar = Number(siparisFormu.urunAdedi)
+    
+    if (!urunUid || !miktar || miktar < 1) return
+
+    const seciliUrun = urunler.find(u => String(u.uid) === String(urunUid))
+    if (seciliUrun) {
+      const birimFiyat = Number(seciliUrun.satisFiyati || 0)
+      const toplam = (birimFiyat * miktar).toFixed(2)
+      
+      setSiparisFormu(onceki => {
+        if (onceki.toplamTutar === toplam) return onceki
+        return { ...onceki, toplamTutar: toplam }
+      })
+    }
+  }, [siparisFormu.urunUid, siparisFormu.urunAdedi, urunler])
+
   const musteriSecenekleri = useMemo(
     () =>
       musteriler.map((musteri) => ({
@@ -345,7 +363,7 @@ export default function useOrders({
     setSiparisFormu((onceki) => ({
       ...onceki,
       [alan]: sonrakiDeger,
-      ...(alan === 'urun' ? { urunUid: '' } : {}),
+      ...(alan === 'urun' && deger === '' ? { urunUid: '' } : {}),
     }))
   }
 

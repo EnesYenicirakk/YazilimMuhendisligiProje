@@ -151,7 +151,7 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <label>Siparis Verilen Urun Adedi</label>
               <input data-cy="order-quantity-input" type="number" min="1" step="1" value={siparisFormu.urunAdedi} onChange={(event) => siparisFormuGuncelle('urunAdedi', event.target.value)} />
               <label>Toplam Tutar</label>
-              <input data-cy="order-total-input" type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
+              <input data-cy="order-total-input" type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} readOnly style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }} />
               <label>Siparis Tarihi</label>
               <input data-cy="order-date-input" type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
               <label>Ödeme Durumu</label>
@@ -261,7 +261,7 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <label>Siparis Verilen Urun Adedi</label>
               <input type="number" min="1" step="1" value={siparisFormu.urunAdedi} onChange={(event) => siparisFormuGuncelle('urunAdedi', event.target.value)} />
               <label>Toplam Tutar</label>
-              <input type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} onChange={(event) => siparisFormuGuncelle('toplamTutar', event.target.value)} />
+              <input type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} readOnly style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }} />
               <label>Siparis Tarihi</label>
               <input type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
               <label>Ödeme Durumu</label>

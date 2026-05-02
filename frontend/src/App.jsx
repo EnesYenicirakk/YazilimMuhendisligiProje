@@ -579,7 +579,10 @@ function App() {
       </Suspense>
 
       <Suspense fallback={null}>
-        <InventoryModals inventoryData={inventoryData} />
+        <InventoryModals 
+          inventoryData={inventoryData} 
+          suppliers={suppliersData.tedarikciler}
+        />
       </Suspense>
 
       <BarcodeStockModal inventoryData={inventoryData} />

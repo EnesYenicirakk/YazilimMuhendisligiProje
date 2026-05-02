@@ -22,10 +22,6 @@ export default function DashboardPage({
     ozetKartiniSil,
     dashboardCanliOzetler,
     bugunkuOncelikler,
-    enCokSatilanAltBaslik,
-    enCokSatilanAralikSecenekleri,
-    enCokSatilanGunAraligi,
-    enCokSatilanMenuAcik,
     enCokSatilanUrunler,
     haftalikSatisGrafikUstSinir,
     haftalikSatisVerisi,
@@ -35,8 +31,6 @@ export default function DashboardPage({
     aylikGiderSerisi,
     aylikSatilanUrunSerisi,
     gelirGiderGrafikUstSinir,
-    setEnCokSatilanGunAraligi,
-    setEnCokSatilanMenuAcik,
   } = dashboardData
 
   const aylikSatilanUrunMaksimum = Math.max(...aylikSatilanUrunSerisi, 1)
@@ -47,7 +41,7 @@ export default function DashboardPage({
         <header className="ust-baslik envanter-baslik">
           <div>
             <h1>Dashboard</h1>
-            <p>Genel stok ve siparis ozeti</p>
+            <p>Genel stok ve sipariş özeti</p>
           </div>
           <div className="dashboard-ust-aksiyonlar">
             <div className="dashboard-bolum-menu-sarmal">
@@ -56,7 +50,7 @@ export default function DashboardPage({
                 className="ikinci dashboard-bolum-buton"
                 onClick={() => setDashboardBolumMenusuAcik((onceki) => !onceki)}
               >
-                Tablolari Gizle/Goster
+                Tabloları Gizle/Göster
               </button>
               {dashboardBolumMenusuAcik && (
                 <div className="dashboard-bolum-menu">
@@ -88,7 +82,7 @@ export default function DashboardPage({
                   <button
                     type="button"
                     className="ozet-menu"
-                    aria-label="Kart menusu"
+                    aria-label="Kart Menüsü"
                     onClick={() => setAcikOzetMenusu((onceki) => (onceki === kart.baslik ? '' : kart.baslik))}
                   >
                     <KucukIkon tip="menu" />
@@ -96,7 +90,7 @@ export default function DashboardPage({
                   {acikOzetMenusu === kart.baslik && (
                     <div className="ozet-menu-acilir">
                       <button type="button" onClick={() => ozetKartiniSil(kart.baslik)}>
-                        Grafigi Sil
+                        Grafiği Sil
                       </button>
                     </div>
                   )}
@@ -117,35 +111,35 @@ export default function DashboardPage({
           <section className="dashboard-canli-grid">
             <article className="panel-kart canli-ozet-karti">
               <div className="panel-baslik">
-                <h2>Bugunku Siparisler</h2>
-                <small>Canli ozet</small>
+                <h2>Bugünkü Siparişler</h2>
+                <small>Canlı özet</small>
               </div>
               <strong className="canli-ozet-deger">{dashboardCanliOzetler.bugunkuSiparisAdedi}</strong>
-              <p className="canli-ozet-aciklama">Bugun acilan siparis sayisi</p>
+              <p className="canli-ozet-aciklama">Bugün açılan sipariş sayısı</p>
               <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bugunkuSiparisTutari)} toplam hacim</span>
             </article>
 
             <article className="panel-kart canli-ozet-karti">
               <div className="panel-baslik">
                 <h2>Bekleyen Tahsilatlar</h2>
-                <small>Odeme takibi</small>
+                <small>Ödeme takibi</small>
               </div>
               <strong className="canli-ozet-deger">{dashboardCanliOzetler.bekleyenTahsilatAdedi}</strong>
-              <p className="canli-ozet-aciklama">Tahsil edilmesi gereken siparis</p>
+              <p className="canli-ozet-aciklama">Tahsil edilmesi gereken sipariş</p>
               <span className="canli-ozet-alt">{paraFormatla(dashboardCanliOzetler.bekleyenTahsilatTutari)} bekleyen tutar</span>
             </article>
 
             <article className="panel-kart canli-ozet-karti">
               <div className="panel-baslik">
-                <h2>Geciken Siparisler</h2>
-                <small>Teslimat uyarisi</small>
+                <h2>Geciken Siparişler</h2>
+                <small>Teslimat uyarısı</small>
               </div>
               <strong className="canli-ozet-deger">{dashboardCanliOzetler.gecikenSiparisAdedi}</strong>
-              <p className="canli-ozet-aciklama">Tahmini suresi asilmis siparis</p>
+              <p className="canli-ozet-aciklama">Tahmini süresi aşılmış sipariş</p>
               <span className="canli-ozet-alt">
                 {dashboardCanliOzetler.gecikenSiparisAdedi > 0
                   ? dashboardCanliOzetler.gecikenSiparisler.slice(0, 2).map((siparis) => siparis.siparisNo).join(', ')
-                  : 'Su an gecikme gorunmuyor'}
+                  : 'Şu an gecikme görünmüyor'}
               </span>
             </article>
           </section>
@@ -157,14 +151,14 @@ export default function DashboardPage({
               <>
                 <article className="panel-kart">
                   <div className="panel-baslik">
-                    <h2>Haftalik Satis Grafigi</h2>
-                    <small>Son 7 gun</small>
+                    <h2>Haftalık Satış Grafiği</h2>
+                    <small>Son 7 gün</small>
                   </div>
                   <div className="haftalik-grafik-kapsayici">
                     <div className="satis-olcek">
                       {[haftalikSatisGrafikUstSinir, haftalikSatisGrafikUstSinir * 0.75, haftalikSatisGrafikUstSinir * 0.5, haftalikSatisGrafikUstSinir * 0.25, 0].map((deger) => (
                         <span key={deger} className="satis-olcek-etiketi">
-                          {deger === 0 ? '0' : `TL${Math.round(deger / 1000)}B`}
+                          {deger === 0 ? '0' : `₺${Math.round(deger / 1000)}B`}
                         </span>
                       ))}
                     </div>
@@ -195,66 +189,28 @@ export default function DashboardPage({
                 </article>
 
                 <article className="panel-kart">
-                  <div className="panel-baslik panel-baslik-secimli">
-                    <h2>En Cok Satilan Urunler</h2>
-                    <div className="dashboard-aralik-secici">
-                      <button
-                        type="button"
-                        className={`dashboard-aralik-buton ${enCokSatilanMenuAcik ? 'acik' : ''}`}
-                        onClick={() => setEnCokSatilanMenuAcik((onceki) => !onceki)}
-                        aria-expanded={enCokSatilanMenuAcik}
-                        aria-label="En cok satilan urun tarih araligini sec"
-                      >
-                        <span>{enCokSatilanAltBaslik}</span>
-                        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M3 5.25L7 9.25L11 5.25" />
-                        </svg>
-                      </button>
-                      <div className={`dashboard-aralik-menu ${enCokSatilanMenuAcik ? 'acik' : ''}`}>
-                        {enCokSatilanAralikSecenekleri.map((secenek) => (
-                          <button
-                            key={secenek.deger}
-                            type="button"
-                            className={enCokSatilanGunAraligi === secenek.deger ? 'secili' : ''}
-                            onClick={() => {
-                              setEnCokSatilanGunAraligi(secenek.deger)
-                              setEnCokSatilanMenuAcik(false)
-                            }}
-                          >
-                            {secenek.etiket}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                  <div className="panel-baslik">
+                    <h2>En Çok Satılan Ürünler</h2>
+                    <small>Aylık</small>
                   </div>
                   <ul className="dashboard-liste grafikli-liste">
-                    {enCokSatilanUrunler.length > 0 ? (
-                      enCokSatilanUrunler.map((urun) => {
-                        const maksimum = Math.max(...enCokSatilanUrunler.map((item) => item.miktar), 1)
-                        const oran = Math.max((urun.miktar / maksimum) * 100, 8)
-                        return (
-                          <li key={`${enCokSatilanGunAraligi}-${urun.ad}`}>
-                            <div className="urun-grafik-satiri">
-                              <div className="urun-grafik-ust">
-                                <span>{urun.ad}</span>
-                                <strong>{urun.miktar} adet</strong>
-                              </div>
-                              <div className="urun-grafik-zemin">
-                                <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
-                              </div>
+                    {enCokSatilanUrunler.map((urun) => {
+                      const maksimum = Math.max(...enCokSatilanUrunler.map((item) => item.miktar), 1)
+                      const oran = Math.max((urun.miktar / maksimum) * 100, 8)
+                      return (
+                        <li key={urun.ad}>
+                          <div className="urun-grafik-satiri">
+                            <div className="urun-grafik-ust">
+                              <span>{urun.ad}</span>
+                              <strong>{urun.miktar} adet</strong>
                             </div>
-                          </li>
-                        )
-                      })
-                    ) : (
-                      <li className="dashboard-bos-veri">
-                        <div className="urun-grafik-satiri">
-                          <div className="urun-grafik-ust">
-                            <span>Secilen tarih araliginda tamamlanan satis yok.</span>
+                            <div className="urun-grafik-zemin">
+                              <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
+                            </div>
                           </div>
-                        </div>
-                      </li>
-                    )}
+                        </li>
+                      )
+                    })}
                   </ul>
                 </article>
               </>
@@ -263,13 +219,13 @@ export default function DashboardPage({
             {gorunenDashboardBolumleri.kritik && (
               <article className="panel-kart kritik-stok-paneli">
                 <div className="panel-baslik">
-                  <h2>Kritik Stok Uyarisi</h2>
-                  <small>{dashboardCanliOzetler.kritikStokAdedi} urun esik altinda</small>
+                  <h2>Kritik Stok Uyarısı</h2>
+                  <small>{dashboardCanliOzetler.kritikStokAdedi} ürün eşik altında</small>
                 </div>
 
                 <div className="kritik-stok-ozet">
                   <strong>{dashboardCanliOzetler.kritikStokAdedi}</strong>
-                  <span>Minimum stok degerinin altina dusen urunler</span>
+                  <span>Minimum stok değerinin altına düşen ürünler</span>
                 </div>
 
                 <div className="kritik-stok-liste">
@@ -278,7 +234,7 @@ export default function DashboardPage({
                       <div className="kritik-stok-baslik">
                         <strong className="urun-ad-satiri">
                           <span>{urun.ad}</span>
-                          <span className="kritik-stok-rozet" data-tooltip="Bu urun kritik stok degerinin altindadir.">
+                          <span className="kritik-stok-rozet" data-tooltip="Bu ürün kritik stok değerinin altındadır.">
                             !
                           </span>
                         </strong>
@@ -297,8 +253,8 @@ export default function DashboardPage({
             {gorunenDashboardBolumleri.oncelikler && (
               <article className="panel-kart bugunku-oncelikler-paneli">
                 <div className="panel-baslik">
-                  <h2>Bugunku Oncelikler</h2>
-                  <small>Gunluk akis</small>
+                  <h2>Bugünkü Öncelikler</h2>
+                  <small>Günlük akış</small>
                 </div>
 
                 <div className="oncelik-grid">
@@ -324,16 +280,16 @@ export default function DashboardPage({
         {gorunenDashboardBolumleri.yakin && (
           <article className="panel-kart">
             <div className="panel-baslik">
-              <h2>Yakin Zamanda Satilan Urunler</h2>
-              <small>Sehir ici siparisler</small>
+              <h2>Yakın Zamanda Satılan Ürünler</h2>
+              <small>Şehir içi siparişler</small>
             </div>
             <div className="tablo-sarmal masaustu-tablo">
               <table>
                 <thead>
                   <tr>
-                    <th>Siparis No</th>
-                    <th>Urun</th>
-                    <th>Musteri</th>
+                    <th>Sipariş No</th>
+                    <th>Ürün</th>
+                    <th>Müşteri</th>
                     <th>Teslimat</th>
                     <th>Tutar</th>
                     <th>Durum</th>
@@ -363,7 +319,7 @@ export default function DashboardPage({
                 <h2>Harcanan Tutar ve Elde Edilen Gelir</h2>
                 <small>Son 6 ay</small>
               </div>
-              <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Gelir ve gider grafigi">
+              <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Gelir ve gider grafiği">
                 <line x1="10" y1="100" x2="310" y2="100" />
                 <polyline points={cizgiNoktalari(aylikGelirSerisi, gelirGiderGrafikUstSinir)} className="mavi-cizgi" />
                 <polyline points={cizgiNoktalari(aylikGiderSerisi, gelirGiderGrafikUstSinir)} className="kirmizi-cizgi" />
@@ -379,25 +335,25 @@ export default function DashboardPage({
 
             <article className="panel-kart grafik-kart">
               <div className="panel-baslik">
-                <h2>Aylara Gore Satilan Toplam Urun</h2>
-                <small>Adet bazli</small>
+                <h2>Aylara Göre Satılan Toplam Ürün</h2>
+                <small>Adet bazlı</small>
               </div>
-              <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Aylik satilan urun grafigi">
+              <svg viewBox="0 0 320 130" className="cizgi-grafik" aria-label="Aylık satılan ürün grafiği">
                 <line x1="10" y1="100" x2="310" y2="100" />
                 <polyline points={cizgiNoktalari(aylikSatilanUrunSerisi)} className="kirmizi-cizgi" />
               </svg>
               <div className="grafik-etiketleri">
                 {altGrafikAyEtiketleri.map((ay) => <span key={ay}>{ay}</span>)}
               </div>
-              <div className="grafik-lejant"><span><i className="lejant-kutu kirmizi" /> Satilan Urun (Adet)</span></div>
+              <div className="grafik-lejant"><span><i className="lejant-kutu kirmizi" /> Satılan Ürün (Adet)</span></div>
             </article>
 
             <article className="panel-kart grafik-kart">
               <div className="panel-baslik">
-                <h2>Satilan Urunlerin Sutun Grafigi</h2>
-                <small>Ayni verinin sutun gorunumu</small>
+                <h2>Satılan Ürünlerin Sütun Grafiği</h2>
+                <small>Aynı verinin sütun görünümü</small>
               </div>
-              <div className="sutun-grafik" aria-label="Satilan urunlerin sutun grafigi">
+              <div className="sutun-grafik" aria-label="Satılan ürünlerin sütun grafiği">
                 {aylikSatilanUrunSerisi.map((deger, index) => (
                   <div key={`${altGrafikAyEtiketleri[index]}-${deger}`} className="sutun-ogesi">
                     <span className="sutun-deger">{deger}</span>

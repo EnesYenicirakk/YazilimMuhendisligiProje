@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { authApi } from '../../../core/services/backendApiService'
 
 const BOS_KIMLIK = {
@@ -6,37 +6,40 @@ const BOS_KIMLIK = {
   password: '',
 }
 
-const TOKEN_KEY = 'access_token'
-
 export default function useAuth({
+  loginDelay = 500,
   onLoginSuccess,
 } = {}) {
-  const tokenDeposu = window.sessionStorage
   const [credentials, setCredentials] = useState(BOS_KIMLIK)
-  const [isLoggedIn, setIsLoggedIn] = useState(!!tokenDeposu.getItem(TOKEN_KEY))
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('access_token'))
   const [loginGecisiAktif, setLoginGecisiAktif] = useState(false)
   const [error, setError] = useState('')
   const [currentUser, setCurrentUser] = useState(null)
-  const [bekleyenKullanici, setBekleyenKullanici] = useState(null)
+  const timeoutRef = useRef(null)
+
+  // Sayfa yüklendiğinde token varsa kullanıcı bilgilerini çek
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      authApi.getUser()
+        .then(data => {
+          setCurrentUser(data)
+          setIsLoggedIn(true)
+        })
+        .catch(() => {
+          localStorage.removeItem('access_token')
+          setIsLoggedIn(false)
+        })
+    }
+  }, [])
 
   useEffect(() => {
-    const token = tokenDeposu.getItem(TOKEN_KEY)
-    if (!token) {
-      setIsLoggedIn(false)
-      return
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current)
+      }
     }
-
-    authApi.getUser()
-      .then((data) => {
-        setCurrentUser(data)
-        setIsLoggedIn(true)
-      })
-      .catch(() => {
-        tokenDeposu.removeItem(TOKEN_KEY)
-        setCurrentUser(null)
-        setIsLoggedIn(false)
-      })
-  }, [tokenDeposu])
+  }, [])
 
   const setField = useCallback((field, value) => {
     setCredentials((onceki) => ({ ...onceki, [field]: value }))
@@ -47,31 +50,23 @@ export default function useAuth({
   const setPassword = useCallback((value) => setField('password', value), [setField])
 
   const resetAuth = useCallback(() => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
     setCredentials(BOS_KIMLIK)
     setError('')
     setLoginGecisiAktif(false)
-    setBekleyenKullanici(null)
     setIsLoggedIn(false)
     setCurrentUser(null)
-    tokenDeposu.removeItem(TOKEN_KEY)
-  }, [tokenDeposu])
+    localStorage.removeItem('access_token')
+  }, [])
 
   const logout = useCallback(() => {
     authApi.logout().finally(() => {
       resetAuth()
     })
   }, [resetAuth])
-
-  const completeLoginTransition = useCallback(() => {
-    if (!bekleyenKullanici) return
-
-    setCurrentUser(bekleyenKullanici)
-    setIsLoggedIn(true)
-    setCredentials(BOS_KIMLIK)
-    setLoginGecisiAktif(false)
-    onLoginSuccess?.(bekleyenKullanici)
-    setBekleyenKullanici(null)
-  }, [bekleyenKullanici, onLoginSuccess])
 
   const handleLogin = useCallback(async (event) => {
     if (event) event.preventDefault()
@@ -85,17 +80,20 @@ export default function useAuth({
         password: credentials.password,
       })
 
-      tokenDeposu.setItem(TOKEN_KEY, data.access_token)
-      setBekleyenKullanici(data.user)
+      localStorage.setItem('access_token', data.access_token)
+      
+      const user = data.user
+      setCurrentUser(user)
+      setIsLoggedIn(true)
+      onLoginSuccess?.(user)
       return true
     } catch (err) {
-      tokenDeposu.removeItem(TOKEN_KEY)
-      setBekleyenKullanici(null)
-      setLoginGecisiAktif(false)
-      setError(err.message || 'Giris basarisiz oldu.')
+      setError(err.message || 'Giriş başarısız oldu.')
       return false
+    } finally {
+      setLoginGecisiAktif(false)
     }
-  }, [credentials.password, credentials.username, tokenDeposu])
+  }, [credentials.password, credentials.username, onLoginSuccess])
 
   return {
     username: credentials.username,
@@ -107,8 +105,8 @@ export default function useAuth({
     setUsername,
     setPassword,
     handleLogin,
-    completeLoginTransition,
     logout,
     resetAuth,
   }
 }
+

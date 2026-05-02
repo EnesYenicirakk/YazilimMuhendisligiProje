@@ -1,4 +1,4 @@
-﻿import { envanterKategorileri, kritikStoktaMi } from '../../../shared/utils/constantsAndHelpers'
+import { envanterKategorileri, kritikStoktaMi } from '../../../shared/utils/constantsAndHelpers'
 
 export default function InventoryPage({
   KucukIkon,
@@ -80,7 +80,7 @@ export default function InventoryPage({
                     <th>No</th>
                     <th>Ürün</th>
                     <th>Ürün ID</th>
-                    <th>Kategori</th>
+                    <th>Ürün Grubu</th>
                     <th>Depo Stok</th>
                     <th>Mağaza Stok</th>
                     <th>İşlem</th>

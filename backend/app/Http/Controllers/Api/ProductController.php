@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -74,6 +75,21 @@ class ProductController extends Controller
             'is_favorite' => $request->favori,
         ]);
 
+        // Kritik stok kontrolü ve bildirim
+        if ($product->store_stock <= $product->minimum_stock) {
+            Notification::create([
+                'user_id' => $request->user()->id,
+                'type' => 'kritik',
+                'title' => 'Kritik Stok Uyarısı',
+                'details' => $product->name . ' ürününün stoğu kritik seviyeye düştü: ' . $product->store_stock,
+                'page' => 'envanter',
+                'tab' => 'urunler',
+                'is_read' => false,
+                'is_archived' => false,
+                'is_transactional' => false
+            ]);
+        }
+
         \Illuminate\Support\Facades\Cache::forget('products_list');
         return response()->json($this->mapProductToFrontend($product));
     }
@@ -101,8 +117,22 @@ class ProductController extends Controller
             if ($request->type === 'alis') {
                 $product->increment('store_stock', $item['miktar']);
             } else {
-                // Satışta stok eksiye düşmemesi için kontrol (opsiyonel, bazen eksi stok istenir)
                 $product->decrement('store_stock', $item['miktar']);
+                
+                // Kritik stok kontrolü
+                if ($product->fresh()->store_stock <= $product->minimum_stock) {
+                    Notification::create([
+                        'user_id' => $request->user()->id,
+                        'type' => 'kritik',
+                        'title' => 'Kritik Stok Uyarısı',
+                        'details' => $product->name . ' ürününün stoğu kritik seviyeye düştü: ' . $product->store_stock,
+                        'page' => 'envanter',
+                        'tab' => 'urunler',
+                        'is_read' => false,
+                        'is_archived' => false,
+                        'is_transactional' => false
+                    ]);
+                }
             }
         }
 

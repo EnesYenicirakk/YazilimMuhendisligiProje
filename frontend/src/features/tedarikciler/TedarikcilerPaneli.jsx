@@ -96,10 +96,11 @@ function TedarikcilerPaneli(props) {
                         <th>Firma</th>
                         <th>Yetkili</th>
                         <th>Telefon</th>
+                        <th>Vergi No</th>
+                        <th>Adres</th>
                         <th>Ürün Grubu</th>
-                        <th>Toplam Alış</th>
-                        <th>Ortalama Teslim</th>
-                        <th>Toplam Harcama</th>
+                        <th>Alış</th>
+                        <th>Harcama</th>
                         <th>Not</th>
                         <th>İşlem</th>
                       </tr>
@@ -116,9 +117,10 @@ function TedarikcilerPaneli(props) {
                           </td>
                           <td>{tedarikci.yetkiliKisi}</td>
                           <td>{tedarikci.telefon}</td>
+                          <td>{tedarikci.vergiNumarasi}</td>
+                          <td className="tablo-adres-hucre">{tedarikci.adres}</td>
                           <td>{tedarikci.urunGrubu}</td>
                           <td>{tedarikci.toplamAlisSayisi}</td>
-                          <td>{tedarikci.ortalamaTeslimSuresi}</td>
                           <td>{paraFormatla(tedarikci.toplamHarcama)}</td>
                           <td className="musteri-not-ozet">{tedarikci.not}</td>
                           <td>

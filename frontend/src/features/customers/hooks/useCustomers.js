@@ -106,10 +106,14 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
   const musteriDuzenlemeAc = (musteri) => {
     setSeciliMusteriUid(musteri.uid)
     setMusteriFormu({
-      ad: musteri.ad,
-      telefon: musteri.telefon,
-      sonAlim: musteri.sonAlim,
-      not: musteri.not,
+      ad: musteri.ad ?? '',
+      yetkiliKisi: musteri.yetkiliKisi ?? '',
+      telefon: musteri.telefon ?? '',
+      email: musteri.email ?? '',
+      adres: musteri.adres ?? '',
+      vergiNumarasi: musteri.vergiNumarasi ?? '',
+      sonAlim: musteri.sonAlim ?? '',
+      not: musteri.not ?? '',
     })
     setMusteriDuzenlemeAcik(true)
   }
@@ -145,12 +149,16 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
 
   const musteriKaydet = (mod) => {
     const ad = musteriFormu.ad.trim()
+    const yetkiliKisi = musteriFormu.yetkiliKisi.trim()
     const telefon = musteriFormu.telefon.trim()
+    const email = musteriFormu.email.trim()
+    const adres = musteriFormu.adres.trim()
+    const vergiNumarasi = musteriFormu.vergiNumarasi.trim()
     const sonAlim = musteriFormu.sonAlim
     const not = musteriFormu.not.trim()
 
-    if (!ad || !telefon || !sonAlim || !not) {
-      toastGoster?.('hata', 'Müşteri formunda eksik veya hatalı alan var.')
+    if (!ad || !yetkiliKisi || !telefon || !email || !adres || !vergiNumarasi) {
+      toastGoster?.('hata', 'Lütfen tüm zorunlu alanları (*) doldurun.')
       return
     }
 
@@ -159,8 +167,13 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
       return
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toastGoster?.('hata', 'Lütfen geçerli bir e-posta adresi girin.')
+      return
+    }
+
     if (mod === 'ekle') {
-      const yeniMusteriData = { ad, telefon, sonAlim, not }
+      const yeniMusteriData = { ad, yetkiliKisi, telefon, email, adres, vergiNumarasi, sonAlim, not }
       customerApi.create(yeniMusteriData).then((sunucuVerisi) => {
         setMusteriler((onceki) => [sunucuVerisi, ...onceki])
         setMusteriSayfa(1)
@@ -173,7 +186,7 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
       return
     }
 
-    const guncellenenMusteriData = { ad, telefon, sonAlim, not }
+    const guncellenenMusteriData = { ad, yetkiliKisi, telefon, email, adres, vergiNumarasi, sonAlim, not }
     customerApi.update(seciliMusteriUid, guncellenenMusteriData).then((sunucuVerisi) => {
       setMusteriler((onceki) =>
         onceki.map((m) => (m.uid === seciliMusteriUid ? sunucuVerisi : m)),

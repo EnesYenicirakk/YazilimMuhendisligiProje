@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt } from '../../shared/utils/constantsAndHelpers'
+import { aiHizliKonular, enCokSatilanUrunleriHesapla, metniNormalizeEt, kritikStoktaMi } from '../../shared/utils/constantsAndHelpers'
 import { fetchAiResponse } from '../services/aiService'
 import { notificationApi } from '../services/backendApiService'
 
@@ -10,6 +10,8 @@ export default function useAppNotifications({
   siraliSiparisler,
   tedarikSiparisleri = [],
   urunler,
+  musteriler = [],
+  tedarikciler = [],
   paraFormatla,
   tarihFormatla,
   sayfaDegistir,
@@ -56,17 +58,62 @@ export default function useAppNotifications({
   }, [bildirimleriGetir])
 
   const bildirimler = useMemo(() => {
-    return backendBildirimler.map(b => ({
-      id: b.id,
-      tur: b.type,
-      baslik: b.title,
-      detay: b.details,
-      zaman: tarihFormatla(b.created_at),
-      sayfa: b.page,
-      sekme: b.tab,
-      is_read: b.is_read
-    }))
-  }, [backendBildirimler, tarihFormatla])
+    const list = backendBildirimler
+      .filter((b) => !temizlenenBildirimler.includes(b.id))
+      .map((b) => ({
+        id: b.id,
+        tur: b.type,
+        baslik: b.title,
+        detay: b.details,
+        zaman: tarihFormatla(b.created_at),
+        sayfa: b.page,
+        sekme: b.tab,
+        is_read: b.is_read,
+      }))
+
+    // Kritik Stokları ekle (Local-derived)
+    urunler
+      .filter((u) => kritikStoktaMi(u))
+      .forEach((u) => {
+        const localId = `local-kritik-${u.uid}`
+        if (!temizlenenBildirimler.includes(localId) && !list.some((b) => b.tur === 'kritik' && b.detay.includes(u.ad))) {
+          list.push({
+            id: localId,
+            tur: 'kritik',
+            baslik: 'Kritik Stok Uyarısı',
+            detay: `${u.ad} ürününün stoğu kritik seviyeye (${u.magazaStok}) düştü.`,
+            zaman: 'Sistem',
+            sayfa: 'envanter',
+            sekme: 'urunler',
+            is_read: okunanBildirimler.includes(localId),
+          })
+        }
+      })
+
+    // Stok loglarını ekle (Session-based)
+    stokDegisimLoglari
+      .filter((log) => !temizlenenBildirimler.includes(`local-log-${log.id}`))
+      .slice(0, 8)
+      .forEach((log) => {
+        const localId = `local-log-${log.id}`
+        list.push({
+          id: localId,
+          tur: 'stok',
+          baslik: log.islem,
+          detay: `${log.urun}: ${log.aciklama}`,
+          zaman: log.tarih,
+          sayfa: 'urun-duzenleme',
+          sekme: 'stok-hareketleri',
+          is_read: okunanBildirimler.includes(localId),
+        })
+      })
+
+    return list.sort((a, b) => {
+      if (a.zaman === 'Sistem') return -1
+      if (b.zaman === 'Sistem') return 1
+      return 0
+    })
+  }, [backendBildirimler, tarihFormatla, urunler, stokDegisimLoglari, temizlenenBildirimler, okunanBildirimler])
 
   const okunmamisBildirimSayisi = useMemo(
     () => bildirimler.length, // Backend zaten sadece okunmamışları ve arşivlenmemişleri gönderiyor (Controller kuralı)
@@ -125,8 +172,12 @@ export default function useAppNotifications({
         enSonSiparis
           ? `En son satış ${enSonSiparis.siparisNo} numarasıyla ${tarihFormatla(enSonSiparis.siparisTarihi)} tarihinde oluşturuldu. Ürün ${enSonSiparis.urun}, müşteri ${enSonSiparis.musteri}, tutar ${paraFormatla(enSonSiparis.toplamTutar)} ve teslimat durumu ${enSonSiparis.teslimatDurumu.toLocaleLowerCase('tr-TR')} olarak kayıtlı.`
           : 'En son satış kaydı şu anda bulunamadı.',
+      [metniNormalizeEt('Kayıtlı kaç tane müşterim var?')]:
+        `Şu anda sistemde kayıtlı toplam **${musteriler.length}** müşteriniz bulunuyor.`,
+      [metniNormalizeEt('Kaç tane tedarikçimiz var?')]:
+        `Sistemde kayıtlı toplam **${tedarikciler.length}** tedarikçiniz bulunuyor.`,
     }
-  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, tarihFormatla, urunler])
+  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, tarihFormatla, urunler, musteriler, tedarikciler])
 
   useEffect(() => {
     if (!aiPanelKapaniyor) return undefined
@@ -173,7 +224,17 @@ export default function useAppNotifications({
 
     if (normalizeMetin === metniNormalizeEt('Diğer')) return
 
-    const hazirCevap = aiHazirCevaplar[normalizeMetin]
+    let hazirCevap = aiHazirCevaplar[normalizeMetin]
+
+    // Basit anahtar kelime eşleşmesi (Yazım hatalarını ve varyasyonları yakalamak için)
+    if (!hazirCevap) {
+      if (normalizeMetin.includes('kac') && (normalizeMetin.includes('musteri') || normalizeMetin.includes('kayit'))) {
+        hazirCevap = aiHazirCevaplar[metniNormalizeEt('Kayıtlı kaç tane müşterim var?')]
+      } else if (normalizeMetin.includes('kac') && (normalizeMetin.includes('tedarikci') || normalizeMetin.includes('alici'))) {
+        hazirCevap = aiHazirCevaplar[metniNormalizeEt('Kaç tane tedarikçimiz var?')]
+      }
+    }
+
     if (hazirCevap) {
       window.setTimeout(() => {
         const botHazirId = `${Date.now()}-bot-ready`
@@ -184,7 +245,29 @@ export default function useAppNotifications({
       const botMesajId = `${Date.now()}-bot-async`
       setAiMesajlar((onceki) => [...onceki, { id: botMesajId, rol: 'bot', metin: 'Düşünüyorum...', saat: 'Şimdi' }])
 
-      fetchAiResponse(metin)
+      // AI için zengin veri bağlamı oluştur
+      const bugun = new Date().toISOString().split('T')[0]
+      const buAy = new Date().toISOString().slice(0, 7) // YYYY-MM
+      
+      const bugunSiparisleri = siraliSiparisler.filter(s => s.siparisTarihi === bugun)
+      const bugunToplamTutar = bugunSiparisleri.reduce((toplam, s) => toplam + Number(s.toplamTutar || 0), 0)
+      
+      const buAySiparisleri = siraliSiparisler.filter(s => s.siparisTarihi?.startsWith(buAy))
+      const buAyToplamTutar = buAySiparisleri.reduce((toplam, s) => toplam + Number(s.toplamTutar || 0), 0)
+      
+      const bekleyenSiparisler = siraliSiparisler.filter(s => s.teslimatDurumu === 'Hazırlanıyor')
+      const kritikStokSayisi = urunler.filter(u => kritikStoktaMi(u)).length
+      
+      const enCokSatan = enCokSatilanUrunleriHesapla(siraliSiparisler, 1)[0]?.ad || 'Bilinmiyor'
+
+      const aiBaglami = `Sistem Durumu Özeti:
+      - Kayıtlı: ${musteriler.length} müşteri, ${tedarikciler.length} tedarikçi, ${urunler.length} ürün.
+      - Finans: Bugün ${paraFormatla(bugunToplamTutar)} (${bugunSiparisleri.length} satış), Bu ay toplam ${paraFormatla(buAyToplamTutar)} ciro.
+      - Operasyon: ${bekleyenSiparisler.length} sipariş hazırlanıyor, ${kritikStokSayisi} ürünün stoğu kritik seviyede.
+      - Trend: En çok satan ürün "${enCokSatan}".
+      Lütfen bu verileri kullanarak kullanıcıya profesyonel analizler sun.`
+
+      fetchAiResponse(metin, aiBaglami)
         .then((cevap) => {
           setAiMesajlar((onceki) => 
             onceki.map(m => m.id === botMesajId ? { ...m, metin: cevap } : m)
@@ -235,6 +318,10 @@ export default function useAppNotifications({
   }
 
   const bildirimiOkunduYap = async (bildirimId) => {
+    if (String(bildirimId).startsWith('local-')) {
+      setOkunanBildirimler(onceki => [...onceki, bildirimId])
+      return
+    }
     try {
       await notificationApi.markAsRead(bildirimId)
       setBackendBildirimler(onceki => onceki.filter(b => b.id !== bildirimId))
@@ -244,13 +331,20 @@ export default function useAppNotifications({
   }
 
   const bildirimiOkunmadiYap = async (bildirimId) => {
-    // Bu özellik backend'de şu an için is_read: false yapacak şekilde update metodunda yok, 
-    // ama istersek ekleyebiliriz. Şimdilik arayüzden siliyoruz zaten.
+    if (String(bildirimId).startsWith('local-')) {
+      setOkunanBildirimler(onceki => onceki.filter(id => id !== bildirimId))
+      return
+    }
+    // Backend desteği geldiğinde burası güncellenebilir
   }
 
   const bildirimiTemizle = async (bildirimId) => {
+    if (String(bildirimId).startsWith('local-')) {
+      setTemizlenenBildirimler(onceki => [...onceki, bildirimId])
+      return
+    }
     try {
-      await notificationApi.delete(bildirimId)
+      await notificationApi.markAsRead(bildirimId) // Backend'de is_read: true yapıyoruz siliş yerine (kural gereği)
       setBackendBildirimler(onceki => onceki.filter(b => b.id !== bildirimId))
     } catch (err) {
       toastGoster?.('hata', 'Bildirim temizlenemedi.')
@@ -261,6 +355,11 @@ export default function useAppNotifications({
     try {
       await notificationApi.clearAll()
       setBackendBildirimler([])
+      // Yerel bildirimleri de temizlenenlere ekle
+      const yerelIdler = bildirimler
+        .filter((b) => String(b.id).startsWith('local-'))
+        .map((b) => b.id)
+      setTemizlenenBildirimler((onceki) => [...onceki, ...yerelIdler])
       toastGoster?.('basari', 'Tüm bildirimler temizlendi.')
     } catch (err) {
       toastGoster?.('hata', 'Bildirimler temizlenemedi.')

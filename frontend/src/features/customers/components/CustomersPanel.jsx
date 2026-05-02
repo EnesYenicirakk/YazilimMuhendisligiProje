@@ -71,10 +71,13 @@ export default function CustomersPanel({
                   <tr>
                     <th>No</th>
                     <th>Müşteri</th>
+                    <th>Yetkili</th>
                     <th>Telefon</th>
-                    <th>Son Satın Alım</th>
-                    <th>Sipariş Sayısı</th>
-                    <th>Toplam Kazanç</th>
+                    <th>Vergi No</th>
+                    <th>Adres</th>
+                    <th>Son Alım</th>
+                    <th>Sipariş</th>
+                    <th>Kazanç</th>
                     <th>Not</th>
                     <th>İşlem</th>
                   </tr>
@@ -94,7 +97,10 @@ export default function CustomersPanel({
                           <strong>{musteri.ad}</strong>
                         </div>
                       </td>
+                      <td>{musteri.yetkiliKisi}</td>
                       <td>{musteri.telefon}</td>
+                      <td>{musteri.vergiNumarasi}</td>
+                      <td>{musteri.adres}</td>
                       <td>{tarihFormatla(musteri.sonAlim)}</td>
                       <td>{musteri.toplamSiparis}</td>
                       <td>{paraFormatla(musteri.toplamHarcama)}</td>

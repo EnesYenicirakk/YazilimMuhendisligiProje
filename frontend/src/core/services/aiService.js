@@ -3,12 +3,15 @@ import { aiConfig } from '../config/aiConfig'
 /**
  * Yapay Zeka Asistanı API Servisi
  */
-export const fetchAiResponse = async (userMessage) => {
+export const fetchAiResponse = async (userMessage, context = '') => {
   if (!aiConfig.apiKey) {
     throw new Error('API anahtarı eksik. Lütfen yapılandırmayı kontrol edin.')
   }
 
   try {
+    const systemContent = `Sen yardımcı bir kişisel asistansın. Kullanıcının sorularına kısa, öz ve nazik cevaplar ver. 
+    ${context ? `Sistemin şu anki durumu hakkında bilgiler: ${context}` : ''}`
+
     const response = await fetch(aiConfig.apiUrl, {
       method: 'POST',
       headers: {
@@ -22,7 +25,7 @@ export const fetchAiResponse = async (userMessage) => {
         messages: [
           {
             role: 'system',
-            content: 'Sen yardımcı bir kişisel asistansın. Kullanıcının sorularına kısa, öz ve nazik cevaplar ver.'
+            content: systemContent
           },
           {
             role: 'user',

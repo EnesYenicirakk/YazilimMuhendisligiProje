@@ -184,10 +184,13 @@ export const bosUrunDuzenlemeFormu = {
 
 export const bosMusteriFormu = {
   ad: '',
+  yetkiliKisi: '',
   telefon: '',
+  email: '',
+  adres: '',
+  vergiNumarasi: '',
   sonAlim: '',
   not: '',
-  toplamHarcama: '',
 }
 
 export const bosTedarikciFormu = {
@@ -213,6 +216,8 @@ export const bosTedarikciSiparisFormu = {
 
 export const bosSiparisFormu = {
   musteriUid: '',
+  kayitsizMusteri: false,
+  musteri: '',
   urunUid: '',
   urun: '',
   urunAdedi: '1',
@@ -293,12 +298,12 @@ export const merkezMenusu = [
 ]
 
 export const aiHizliKonular = [
-  { etiket: 'Aylık Satış', mesaj: 'Bu ay gerçekleşen satışlar hakkında bilgi ver.' },
-  { etiket: 'Stok Durumu', mesaj: 'Bana stokları azalan ürünlerimiz hakkında bilgi ver.' },
-  { etiket: 'Kargolanmış Siparişler', mesaj: 'Kargolanan siparişlerin teslimi yapıldı mı' },
-  { etiket: 'Kargolanmamış Siparişler', mesaj: 'Hangi siparişlerimiz henüz kargolanmadı' },
-  { etiket: 'En Çok Satanlar', mesaj: 'En çok satan ürünlerimizden bana bahset.' },
-  { etiket: 'En Son Satış', mesaj: 'En son gerçekleşen satışın ayrıntılarını anlat.' },
+  { etiket: 'Bugünkü Satış', mesaj: 'Bugün kaç TLlik satış yaptım?' },
+  { etiket: 'Aylık Ciro', mesaj: 'Bu ayki toplam ciromuz ne kadar?' },
+  { etiket: 'Bekleyen İşler', mesaj: 'Kaç sipariş kargolanmayı bekliyor?' },
+  { etiket: 'Kritik Stoklar', mesaj: 'Stokları azalan kaç ürün var?' },
+  { etiket: 'En Popüler', mesaj: 'En çok satan ürünümüz hangisi?' },
+  { etiket: 'Müşteri Sayısı', mesaj: 'Kayıtlı kaç tane müşterim var?' },
   { etiket: 'Diğer', mesaj: null },
 ]
 

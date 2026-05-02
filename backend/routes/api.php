@@ -25,15 +25,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}', [NotificationController::class, 'update']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
     Route::post('/notifications/clear-all', [NotificationController::class, 'clearAll']);
-});
 
-Route::post('/products/bulk-stock-update', [ProductController::class, 'bulkStockUpdate']);
-Route::apiResource('products', ProductController::class);
-Route::apiResource('customers', CustomerController::class);
-Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
-Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
-Route::apiResource('orders', OrderController::class);
-Route::get('/categories', [CategoryController::class, 'index']);
-Route::get('/finance', [FinanceController::class, 'index']);
-Route::apiResource('suppliers', SupplierController::class);
-Route::post('/suppliers/{id}/orders', [SupplierController::class, 'storeOrder']);
+    // Ürünler
+    Route::post('/products/bulk-stock-update', [ProductController::class, 'bulkStockUpdate']);
+    Route::apiResource('products', ProductController::class);
+
+    // Müşteriler
+    Route::apiResource('customers', CustomerController::class);
+
+    // Siparişler
+    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+    Route::apiResource('orders', OrderController::class);
+
+    // Diğerleri
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/finance', [FinanceController::class, 'index']);
+    Route::apiResource('suppliers', SupplierController::class);
+    Route::post('/suppliers/{id}/orders', [SupplierController::class, 'storeOrder']);
+});

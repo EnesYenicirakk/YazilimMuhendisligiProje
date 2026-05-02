@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomerOrder;
 use App\Models\CustomerOrderItem;
 use App\Models\Product;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -26,14 +27,15 @@ class OrderController extends Controller
     {
         $validated = $this->validateOrderRequest($request);
 
-        $order = DB::transaction(function () use ($validated) {
+        $order = DB::transaction(function () use ($validated, $request) {
             $product = Product::query()->lockForUpdate()->findOrFail($validated['urunUid']);
             $quantity = (int) $validated['urunAdedi'];
 
             $this->ensureSufficientStock($product, $quantity);
 
             $order = CustomerOrder::create([
-                'customer_id' => $validated['musteriUid'],
+                'customer_id' => $validated['musteriUid'] ?? null,
+                'guest_name' => $validated['musteri'] ?? null,
                 'total_amount' => $validated['toplamTutar'],
                 'order_date' => $validated['siparisTarihi'],
                 'payment_status' => $this->mapPaymentStatusToBackend($validated['odemeDurumu'] ?? 'Beklemede'),
@@ -49,6 +51,40 @@ class OrderController extends Controller
             ]);
 
             $product->decrement('store_stock', $quantity);
+
+            // Müşterinin son satın alım tarihini güncelle
+            if ($order->customer_id) {
+                $order->customer->update([
+                    'last_purchase_date' => $validated['siparisTarihi']
+                ]);
+            }
+
+            // Bildirim oluştur
+            Notification::create([
+                'user_id' => $request->user()->id,
+                'type' => 'satis',
+                'title' => 'Yeni Sipariş Oluşturuldu',
+                'details' => ($order->customer ? $order->customer->full_name : ($order->guest_name ?? 'Kayıtsız Müşteri')) . ' için ' . $validated['urun'] . ' siparişi alındı. Tutar: ' . $validated['toplamTutar'],
+                'page' => 'siparisler',
+                'is_read' => false,
+                'is_archived' => false,
+                'is_transactional' => true
+            ]);
+
+            // Kritik stok bildirimi
+            if ($product->fresh()->store_stock <= $product->minimum_stock) {
+                Notification::create([
+                    'user_id' => $request->user()->id,
+                    'type' => 'kritik',
+                    'title' => 'Kritik Stok Uyarısı',
+                    'details' => $product->name . ' ürününün stoğu kritik seviyeye düştü: ' . $product->store_stock,
+                    'page' => 'envanter',
+                    'tab' => 'urunler',
+                    'is_read' => false,
+                    'is_archived' => false,
+                    'is_transactional' => false
+                ]);
+            }
 
             return $order->load(['customer', 'items.product']);
         });
@@ -163,7 +199,8 @@ class OrderController extends Controller
     private function validateOrderRequest(Request $request): array
     {
         return $request->validate([
-            'musteriUid' => 'required|exists:customers,id',
+            'musteriUid' => 'nullable|exists:customers,id',
+            'musteri' => 'nullable|string',
             'urunUid' => 'required|exists:products,id',
             'urun' => 'required|string',
             'urunAdedi' => 'required|integer|min:1',
@@ -198,7 +235,7 @@ class OrderController extends Controller
         return [
             'id' => $order->id,
             'siparisNo' => (string) $order->id,
-            'musteri' => $order->customer ? $order->customer->full_name : 'Bilinmeyen Musteri',
+            'musteri' => $order->customer ? $order->customer->full_name : ($order->guest_name ?? 'Kayıtsız Müşteri'),
             'musteriUid' => $order->customer_id,
             'urunUid' => $productId,
             'urun' => $productName,

@@ -78,8 +78,9 @@ export default function useOrders({
     const urunUid = siparisFormu.urunUid
     const miktar = Number(siparisFormu.urunAdedi)
     
-    if (!urunUid || !miktar || miktar < 1) return
-
+    // Kayıtsız müşteri seçiliyse otomatik fiyat hesaplamasını atla (elle girilecek)
+    if (siparisFormu.kayitsizMusteri || !urunUid || !miktar || miktar < 1) return
+ 
     const seciliUrun = urunler.find(u => String(u.uid) === String(urunUid))
     if (seciliUrun) {
       const birimFiyat = Number(seciliUrun.satisFiyati || 0)
@@ -90,7 +91,7 @@ export default function useOrders({
         return { ...onceki, toplamTutar: toplam }
       })
     }
-  }, [siparisFormu.urunUid, siparisFormu.urunAdedi, urunler])
+  }, [siparisFormu.urunUid, siparisFormu.urunAdedi, siparisFormu.kayitsizMusteri, urunler])
 
   const musteriSecenekleri = useMemo(
     () =>

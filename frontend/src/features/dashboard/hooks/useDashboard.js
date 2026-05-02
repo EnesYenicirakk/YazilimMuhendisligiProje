@@ -3,6 +3,7 @@ import {
   dashboardBolumSablonu,
   gerceklesenOdemeTutari,
   kritikStoktaMi,
+  odemeDurumunuStandartlastir,
   paraFormatla,
   siparisMiktariniGetir,
   siparisTamamlandiMi,
@@ -194,37 +195,31 @@ export default function useDashboard({
   }, [siraliSiparisler])
 
   const bugunkuOncelikler = useMemo(() => {
-    const bugun = bugununBaslangiciniGetir()
-    const gunAnahtari = formatYmd(bugun)
-    const tohumGovdesi = `${gunAnahtari}-${siparisler.length}-${urunler.length}-${gelenNakitKayitlari.length}-${gidenNakitKayitlari.length}`
+    const bekleyenSiparisler = siparisler.filter((s) => s.teslimatDurumu === 'Hazırlanıyor')
+    const onayBekleyenler = siparisler.filter((s) => s.odemeDurumu === 'Beklemede')
+    const vadesiYakinOdemeler = gelenNakitKayitlari.filter((k) => k.durum === 'Beklemede')
+    const tedarikBekleyenSiparisler = siparisler.filter((s) => s.urunHazirlik === 'Tedarik Bekleniyor')
 
-    const bekleyenSiparis = Math.max(4, Math.round(siparisler.length * 0.07))
-      + tohumluSayiUret(`${tohumGovdesi}-bekleyen-siparis`, 1, 6)
-    const vadesiYakinOdeme = Math.max(2, Math.round(gelenNakitKayitlari.length * 0.08))
-      + tohumluSayiUret(`${tohumGovdesi}-vadesi-yakin-odeme`, 1, 4)
-    const hazirlanacakUrun = Math.max(6, Math.round(urunler.length * 0.09))
-      + tohumluSayiUret(`${tohumGovdesi}-hazirlanacak-urun`, 2, 7)
-    const tedarikBekleyen = Math.max(2, Math.round(siparisler.length * 0.03))
-      + tohumluSayiUret(`${tohumGovdesi}-tedarik-bekleyen`, 1, 3)
-
-    const vadesiYakinTutar = (
-      vadesiYakinOdeme * tohumluSayiUret(`${tohumGovdesi}-odeme-tutar`, 4800, 12300)
+    const vadesiYakinTutar = vadesiYakinOdemeler.reduce((toplam, k) => toplam + Number(k.tutar || 0), 0)
+    const hazirlanacakUrunAdedi = bekleyenSiparisler.reduce(
+      (toplam, s) => toplam + (Number(s.urunAdedi) || 1),
+      0,
     )
 
     return [
       {
         anahtar: 'bekleyenSiparis',
         baslik: 'Bekleyen Sipariş',
-        deger: bekleyenSiparis,
+        deger: bekleyenSiparisler.length,
         ikon: 'liste',
         ton: 'mavi',
         rozet: 'Yoğun',
-        detay: `${tohumluSayiUret(`${tohumGovdesi}-bekleyen-detay`, 2, 5)} sipariş bugün onay bekliyor`,
+        detay: `${onayBekleyenler.length} sipariş bugün onay bekliyor`,
       },
       {
         anahtar: 'vadesiYakinOdeme',
         baslik: 'Vadesi Yaklaşan Ödeme',
-        deger: vadesiYakinOdeme,
+        deger: vadesiYakinOdemeler.length,
         ikon: 'cuzdan',
         ton: 'turuncu',
         rozet: 'Takip',
@@ -233,45 +228,71 @@ export default function useDashboard({
       {
         anahtar: 'hazirlanacakUrun',
         baslik: 'Hazırlanmayı Bekleyen Ürün',
-        deger: hazirlanacakUrun,
+        deger: hazirlanacakUrunAdedi,
         ikon: 'kutu',
         ton: 'yesil',
         rozet: 'Depo',
-        detay: `${tohumluSayiUret(`${tohumGovdesi}-hazirlik-detay`, 3, 8)} ürün raf toplamaya girecek`,
+        detay: `${bekleyenSiparisler.length} sipariş raf toplamaya girecek`,
       },
       {
         anahtar: 'tedarikBekleyenSiparis',
         baslik: 'Tedarik Bekleyen Sipariş',
-        deger: tedarikBekleyen,
+        deger: tedarikBekleyenSiparisler.length,
         ikon: 'fabrika',
         ton: 'kirmizi',
         rozet: 'Tedarik',
-        detay: `${tohumluSayiUret(`${tohumGovdesi}-tedarik-detay`, 1, 4)} sipariş tedarik onayında`,
+        detay: `${tedarikBekleyenSiparisler.length} sipariş tedarik onayında`,
       },
     ]
-  }, [gelenNakitKayitlari.length, gidenNakitKayitlari.length, siparisler.length, urunler.length])
+  }, [siparisler, gelenNakitKayitlari, paraFormatla])
 
   const dashboardOzet = useMemo(() => {
     const referansGun = bugununBaslangiciniGetir()
     const oncekiAyReferansi = new Date(referansGun)
     oncekiAyReferansi.setMonth(oncekiAyReferansi.getMonth() - 1)
 
+    const siparisGeliri = siparisler.reduce((toplam, siparis) => {
+      if (odemeDurumunuStandartlastir(siparis.odemeDurumu) === 'Ödendi') {
+        return toplam + Number(siparis.toplamTutar || 0)
+      }
+      return toplam
+    }, 0)
+
     const toplamGelir = gelenNakitKayitlari.reduce(
       (toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit),
       0,
-    )
+    ) + siparisGeliri
     const toplamGider = gidenNakitKayitlari.reduce(
       (toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit),
       0,
     )
     const netKar = toplamGelir - toplamGider
 
+    const buAySiparisGeliri = siparisler
+      .filter((siparis) => ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), referansGun))
+      .reduce((toplam, siparis) => {
+        if (odemeDurumunuStandartlastir(siparis.odemeDurumu) === 'Ödendi') {
+          return toplam + Number(siparis.toplamTutar || 0)
+        }
+        return toplam
+      }, 0)
+
+    const oncekiAySiparisGeliri = siparisler
+      .filter((siparis) => ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), oncekiAyReferansi))
+      .reduce((toplam, siparis) => {
+        if (odemeDurumunuStandartlastir(siparis.odemeDurumu) === 'Ödendi') {
+          return toplam + Number(siparis.toplamTutar || 0)
+        }
+        return toplam
+      }, 0)
+
     const buAyGelir = gelenNakitKayitlari
       .filter((kayit) => ayniAydaMi(new Date(`${kayit.tarih}T00:00:00`), referansGun))
-      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0)
+      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0) + buAySiparisGeliri
+
     const oncekiAyGelir = gelenNakitKayitlari
       .filter((kayit) => ayniAydaMi(new Date(`${kayit.tarih}T00:00:00`), oncekiAyReferansi))
-      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0)
+      .reduce((toplam, kayit) => toplam + gerceklesenOdemeTutari(kayit), 0) + oncekiAySiparisGeliri
 
     const buAyGider = gidenNakitKayitlari
       .filter((kayit) => ayniAydaMi(new Date(`${kayit.tarih}T00:00:00`), referansGun))
@@ -405,6 +426,18 @@ export default function useDashboard({
       gelirHaritasi.set(
         anahtar,
         (gelirHaritasi.get(anahtar) || 0) + gerceklesenOdemeTutari(kayit),
+      )
+    })
+
+    siparisler.forEach((siparis) => {
+      if (odemeDurumunuStandartlastir(siparis.odemeDurumu) !== 'Ödendi') return
+      const tarih = new Date(`${siparis.siparisTarihi}T00:00:00`)
+      const anahtar = formatAyAnahtari(tarih)
+      if (!gecerliAylar.has(anahtar)) return
+
+      gelirHaritasi.set(
+        anahtar,
+        (gelirHaritasi.get(anahtar) || 0) + Number(siparis.toplamTutar || 0),
       )
     })
 

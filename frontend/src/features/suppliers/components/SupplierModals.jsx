@@ -3,6 +3,8 @@ export default function SupplierModals({
   paraFormatla,
   tarihFormatla,
 }) {
+  const ZorunluYildiz = () => <span style={{ color: '#ff4d4f', marginLeft: '4px' }}>*</span>
+
   const {
     tedarikciEklemeAcik,
     tedarikciDuzenlemeAcik,
@@ -57,45 +59,39 @@ export default function SupplierModals({
   const renderTedarikciFormAlanlari = () => (
     <>
       <label className="modal-form-grup">
-        <span>Firma Adı</span>
+        <span>Firma Adı<ZorunluYildiz /></span>
         <input value={tedarikciFormu.firmaAdi} onChange={(event) => tedarikciFormuGuncelle('firmaAdi', event.target.value)} />
       </label>
       <label className="modal-form-grup">
-        <span>Yetkili Kişi</span>
+        <span>Yetkili Kişi<ZorunluYildiz /></span>
         <input value={tedarikciFormu.yetkiliKisi} onChange={(event) => tedarikciFormuGuncelle('yetkiliKisi', event.target.value)} />
       </label>
       <label className="modal-form-grup">
-        <span>Telefon</span>
+        <span>Telefon<ZorunluYildiz /></span>
         <input value={tedarikciFormu.telefon} onChange={(event) => tedarikciFormuGuncelle('telefon', event.target.value)} />
       </label>
       <label className="modal-form-grup">
-        <span>E-posta</span>
+        <span>E-posta<ZorunluYildiz /></span>
         <input value={tedarikciFormu.email} onChange={(event) => tedarikciFormuGuncelle('email', event.target.value)} />
       </label>
       <label className="modal-form-grup modal-form-grup-tam">
-        <span>Adres</span>
+        <span>Adres<ZorunluYildiz /></span>
         <textarea value={tedarikciFormu.adres} onChange={(event) => tedarikciFormuGuncelle('adres', event.target.value)} />
       </label>
       <label className="modal-form-grup">
-        <span>Vergi Numarası</span>
+        <span>Vergi Numarası<ZorunluYildiz /></span>
         <input value={tedarikciFormu.vergiNumarasi} onChange={(event) => tedarikciFormuGuncelle('vergiNumarasi', event.target.value)} />
       </label>
       <label className="modal-form-grup">
-        <span>Ürün Grubu</span>
-        <input value={tedarikciFormu.urunGrubu} onChange={(event) => tedarikciFormuGuncelle('urunGrubu', event.target.value)} />
+        <span>Ürün Grubu<ZorunluYildiz /></span>
+        <select value={tedarikciFormu.urunGrubu} onChange={(event) => tedarikciFormuGuncelle('urunGrubu', event.target.value)}>
+          <option value="">Kategori Seçin</option>
+          {suppliersData.kategoriler?.map((kategori) => (
+            <option key={`supplier-cat-${kategori.id}`} value={kategori.name}>{kategori.name}</option>
+          ))}
+        </select>
       </label>
-      <label className="modal-form-grup">
-        <span>Toplam Alış Sayısı</span>
-        <input type="number" min="0" step="1" value={tedarikciFormu.toplamAlisSayisi} onChange={(event) => tedarikciFormuGuncelle('toplamAlisSayisi', event.target.value)} />
-      </label>
-      <label className="modal-form-grup">
-        <span>Ortalama Teslim Süresi</span>
-        <input value={tedarikciFormu.ortalamaTeslimSuresi} onChange={(event) => tedarikciFormuGuncelle('ortalamaTeslimSuresi', event.target.value)} />
-      </label>
-      <label className="modal-form-grup">
-        <span>Toplam Harcama</span>
-        <input type="number" min="0" step="0.01" value={tedarikciFormu.toplamHarcama} onChange={(event) => tedarikciFormuGuncelle('toplamHarcama', event.target.value)} />
-      </label>
+
       <label className="modal-form-grup modal-form-grup-tam">
         <span>Not</span>
         <textarea value={tedarikciFormu.not} onChange={(event) => tedarikciFormuGuncelle('not', event.target.value)} />
@@ -193,7 +189,7 @@ export default function SupplierModals({
                 <div className="mobil-bilgi-satiri tam"><span>Adres</span><strong>{seciliTedarikci.adres}</strong></div>
                 <div className="mobil-bilgi-satiri"><span>Vergi No</span><strong>{seciliTedarikci.vergiNumarasi}</strong></div>
                 <div className="mobil-bilgi-satiri"><span>Toplam Alış</span><strong>{seciliTedarikci.toplamAlisSayisi}</strong></div>
-                <div className="mobil-bilgi-satiri"><span>Ortalama Teslim</span><strong>{seciliTedarikci.ortalamaTeslimSuresi}</strong></div>
+
                 <div className="mobil-bilgi-satiri"><span>Toplam Harcama</span><strong>{paraFormatla(seciliTedarikci.toplamHarcama)}</strong></div>
                 <div className="mobil-bilgi-satiri tam"><span>Not</span><strong>{seciliTedarikci.not}</strong></div>
                 <div className="mobil-bilgi-satiri tam"><span>Alınan Ürünler</span><strong>{alinanUrunlerMetni}</strong></div>

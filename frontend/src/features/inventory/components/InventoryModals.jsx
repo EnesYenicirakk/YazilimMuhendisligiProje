@@ -34,15 +34,15 @@ export default function InventoryModals({ inventoryData, suppliers = [] }) {
             <div className="modal-form">
               <label>Ürün İsmi<ZorunluYildiz /></label>
               <input data-testid="product-name-input" value={form.ad} onChange={(event) => formGuncelle('ad', event.target.value)} />
-              <label>Kategori<ZorunluYildiz /></label>
+              <label>Ürün Grubu<ZorunluYildiz /></label>
               <select value={form.kategori} onChange={(event) => formGuncelle('kategori', event.target.value)}>
                 <option value="">Seçiniz...</option>
                 {inventoryData.kategoriler.filter(k => k !== 'Tümü').map(k => (
                   <option key={k} value={k}>{k}</option>
                 ))}
               </select>
-              <label>Ürün ID<ZorunluYildiz /></label>
-              <input data-testid="product-sku-input" value={form.urunId} onChange={(event) => formGuncelle('urunId', event.target.value)} />
+              <label>Ürün ID<ZorunluYildiz /> (Otomatik Oluşturuldu)</label>
+              <input data-testid="product-sku-input" value={form.urunId} readOnly style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }} />
               <label>Ürün Adedi<ZorunluYildiz /></label>
               <input data-testid="product-warehouse-stock-input" type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
               <label>Alış Fiyatı<ZorunluYildiz /></label>
@@ -79,15 +79,15 @@ export default function InventoryModals({ inventoryData, suppliers = [] }) {
             <div className="modal-form">
               <label>Ürün İsmi<ZorunluYildiz /></label>
               <input data-testid="product-name-input" value={form.ad} onChange={(event) => formGuncelle('ad', event.target.value)} />
-              <label>Kategori<ZorunluYildiz /></label>
+              <label>Ürün Grubu<ZorunluYildiz /></label>
               <select value={form.kategori} onChange={(event) => formGuncelle('kategori', event.target.value)}>
                 <option value="">Seçiniz...</option>
                 {inventoryData.kategoriler.filter(k => k !== 'Tümü').map(k => (
                   <option key={k} value={k}>{k}</option>
                 ))}
               </select>
-              <label>Ürün ID<ZorunluYildiz /></label>
-              <input data-testid="product-sku-input" value={form.urunId} onChange={(event) => formGuncelle('urunId', event.target.value)} />
+              <label>Ürün ID</label>
+              <input data-testid="product-sku-input" value={form.urunId} readOnly style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }} />
               <label>Ürün Adedi<ZorunluYildiz /></label>
               <input data-testid="product-warehouse-stock-input" type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
               <label>Alış Fiyatı<ZorunluYildiz /></label>

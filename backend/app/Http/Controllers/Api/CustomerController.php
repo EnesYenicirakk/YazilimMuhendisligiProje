@@ -27,6 +27,7 @@ class CustomerController extends Controller
 
         $customer = Customer::create([
             'full_name' => $request->ad,
+            'authorized_person' => $request->yetkiliKisi ?? '',
             'phone' => $request->telefon,
             'email' => $request->email ?? '',
             'address' => $request->adres ?? '',
@@ -45,6 +46,7 @@ class CustomerController extends Controller
 
         $customer->update([
             'full_name' => $request->ad,
+            'authorized_person' => $request->yetkiliKisi,
             'phone' => $request->telefon,
             'email' => $request->email,
             'address' => $request->adres,
@@ -70,6 +72,7 @@ class CustomerController extends Controller
         return [
             'uid' => $customer->id,
             'ad' => $customer->full_name,
+            'yetkiliKisi' => $customer->authorized_person,
             'telefon' => $customer->phone,
             'email' => $customer->email,
             'adres' => $customer->address,

@@ -11,6 +11,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 1000px; /* Birçok sütun olduğu için tabloyu sıkıştırmamak adına minimum genişlik */
 }
 
 th,
@@ -140,10 +141,23 @@ th {
 }
 
 .musteri-not-ozet {
-  max-width: 220px;
-  white-space: normal;
-  line-height: 1.35;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #526981;
+}
+
+/* Sütun bazlı genişlik ayarları */
+th:nth-child(1), td:nth-child(1) { width: 45px; } /* No */
+th:nth-child(2), td:nth-child(2) { min-width: 160px; } /* Müşteri/Firma Adı */
+th:nth-child(6), td:nth-child(6) { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* Adres */
+
+.tablo-adres-hucre {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .satir-tiklanabilir {

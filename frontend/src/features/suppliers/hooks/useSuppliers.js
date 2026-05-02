@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { supplierApi } from '../../../core/services/backendApiService'
+import { supplierApi, categoryApi } from '../../../core/services/backendApiService'
 import {
   bosTedarikciFormu,
   bosTedarikciSiparisFormu,
@@ -75,6 +75,7 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     tedarikciUid: '',
     ...bosTedarikciSiparisFormu,
   })
+  const [kategoriler, setKategoriler] = useState([])
 
   const filtreliTedarikciler = useMemo(() => {
     const metin = tedarikciArama.trim().toLowerCase()
@@ -144,19 +145,23 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
   useEffect(() => {
     if (!isLoggedIn) return
 
-    const tedarikcileriYukle = async () => {
+    const verileriYukle = async () => {
       setLoading(true)
       try {
-        const veriler = await supplierApi.getAll()
-        setTedarikciler(veriler)
+        const [tedarikciVerileri, kategoriVerileri] = await Promise.all([
+          supplierApi.getAll(),
+          categoryApi.getAll()
+        ])
+        setTedarikciler(tedarikciVerileri)
+        setKategoriler(kategoriVerileri)
       } catch (error) {
-        console.error('Tedarikçiler yüklenirken hata oluştu:', error)
-        toastGoster?.('hata', 'Tedarikçi listesi veritabanından alınamadı.')
+        console.error('Veriler yüklenirken hata oluştu:', error)
+        toastGoster?.('hata', 'Tedarikçi ve kategori verileri alınamadı.')
       } finally {
         setLoading(false)
       }
     }
-    tedarikcileriYukle()
+    verileriYukle()
   }, [toastGoster, isLoggedIn])
 
   useEffect(() => {
@@ -246,20 +251,13 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     const toplamHarcama = Number(tedarikciFormu.toplamHarcama)
     const ortalamaTeslimSuresi = tedarikciFormu.ortalamaTeslimSuresi.trim()
 
-    if (!firmaAdi || !yetkiliKisi || !telefon) {
-      toastGoster?.('hata', 'Tedarikçi formunda eksik veya hatalı alan var.')
+    if (!firmaAdi || !yetkiliKisi || !telefon || !email || !adres || !vergiNumarasi || !urunGrubu) {
+      toastGoster?.('hata', 'Lütfen tüm zorunlu alanları (*) doldurun.')
       return
     }
-    if (!telefonGecerliMi(telefon)) {
-      toastGoster?.('hata', 'Telefon numarası 0 ile başlamalı ve 11 haneli olmalı.')
-      return
-    }
-    if (email && !epostaGecerliMi(email)) {
-      toastGoster?.('hata', 'Geçerli bir e-posta adresi girin.')
-      return
-    }
-    if (vergiNumarasi && !/^\d{10}$/.test(telefonuNormalizeEt(vergiNumarasi))) {
-      toastGoster?.('hata', 'Vergi numarası 10 haneli olmalı.')
+
+    if (!epostaGecerliMi(email)) {
+      toastGoster?.('hata', 'Geçerli bir e-posta adresi giriniz.')
       return
     }
     if (negatifSayiVarMi(toplamAlisSayisi, toplamHarcama)) {
@@ -588,6 +586,7 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     genelTedarikSiparisKaydet,
     otomatikTedarikSiparisiOlustur,
     tedarikciSil,
+    kategoriler,
     loading,
   }
 }

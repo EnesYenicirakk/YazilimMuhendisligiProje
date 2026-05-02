@@ -224,6 +224,8 @@ function App() {
     siraliSiparisler: ordersData.siraliSiparisler,
     tedarikSiparisleri: suppliersData.tumTedarikSiparisleri,
     urunler,
+    musteriler: customersData.musteriler,
+    tedarikciler: suppliersData.tedarikciler,
     paraFormatla,
     tarihFormatla,
     sayfaDegistir,

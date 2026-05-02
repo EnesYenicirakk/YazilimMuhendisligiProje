@@ -210,7 +210,13 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
 
   const formGuncelle = (alan, deger) => {
     const sonrakiDeger = NEGATIF_OLAMAZ_ALANLAR.has(alan) ? negatifOlmayanSayiyaDonustur(deger) : deger
-    setForm((onceki) => ({ ...onceki, [alan]: sonrakiDeger }))
+    setForm((onceki) => {
+      const yeniForm = { ...onceki, [alan]: sonrakiDeger }
+      if (alan === 'kategori' && eklemeAcik) {
+        yeniForm.urunId = urunIdOlustur(deger)
+      }
+      return yeniForm
+    })
   }
 
   const formuTemizle = () => {
@@ -218,8 +224,33 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     setSeciliUid(null)
   }
 
+  const urunIdOlustur = (kategori = 'Diğer') => {
+    const mapping = {
+      Elektrik: 'ELK',
+      Filtre: 'FLT',
+      Fren: 'FRN',
+      'Fren Balataları': 'BLT',
+      Motor: 'MTR',
+      Şanzıman: 'SNZ',
+      Diğer: 'DGR',
+      Aydınlatma: 'AYD',
+      'Süspansiyon ve Direksiyon': 'SSP',
+      'Soğutma Sistemi': 'SGT',
+      'Yakıt ve Ateşleme': 'YKT',
+      'Yağlar ve Sıvılar': 'YAG',
+      'Kaporta ve Karoseri': 'KPR',
+      'Debriyaj Sistemi': 'DBR',
+      'Egzoz Sistemi': 'EGZ',
+      'Aksesuar ve Bakım': 'AKS',
+    }
+    const prefix = mapping[kategori] || (kategori.substring(0, 3).toUpperCase())
+    const rastgeleSayi = Math.floor(1000 + Math.random() * 9000)
+    return `${prefix}-${rastgeleSayi}`
+  }
+
   const eklemePenceresiniAc = () => {
     formuTemizle()
+    setForm((onceki) => ({ ...onceki, urunId: urunIdOlustur() }))
     setEklemeAcik(true)
   }
 

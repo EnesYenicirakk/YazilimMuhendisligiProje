@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+const ZorunluYildiz = () => <span style={{ color: '#ff4d4f', marginLeft: '4px' }}>*</span>
+
 function UrunSecici({ value, onChange, urunSecenekleri }) {
   const [acik, setAcik] = useState(false)
   const kapsayiciRef = useRef(null)
@@ -130,16 +132,42 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
               <button type="button" className="modal-kapat" onClick={() => setYeniSiparisAcik(false)} aria-label="Kapat">×</button>
             </div>
             <div className="modal-form">
-              <label>Musteri</label>
-              <select data-cy="order-customer-select" value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
-                <option value="">Musteri secin</option>
-                {musteriSecenekleri.map((musteri) => (
-                  <option key={musteri.uid} value={musteri.uid}>
-                    {musteri.ad}
-                  </option>
-                ))}
-              </select>
-              <label>Urun</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '10px', backgroundColor: '#f0f7ff', borderRadius: '8px', border: '1px solid #cce3ff' }}>
+                <input 
+                  type="checkbox" 
+                  id="kayitsizMusteri" 
+                  checked={siparisFormu.kayitsizMusteri} 
+                  onChange={(e) => {
+                    siparisFormuGuncelle('kayitsizMusteri', e.target.checked)
+                    if (e.target.checked) {
+                      siparisFormuGuncelle('musteriUid', '')
+                    } else {
+                      siparisFormuGuncelle('musteri', '')
+                    }
+                  }} 
+                />
+                <label htmlFor="kayitsizMusteri" style={{ margin: 0, fontWeight: '600', color: '#1a4a7a', cursor: 'pointer' }}>Kayıtsız Müşteri (Hızlı Satış)</label>
+              </div>
+
+              <label>Musteri<ZorunluYildiz /></label>
+              {siparisFormu.kayitsizMusteri ? (
+                <input 
+                  data-cy="order-guest-name-input" 
+                  placeholder="Müşteri adını girin" 
+                  value={siparisFormu.musteri} 
+                  onChange={(e) => siparisFormuGuncelle('musteri', e.target.value)} 
+                />
+              ) : (
+                <select data-cy="order-customer-select" value={siparisFormu.musteriUid} onChange={(event) => siparisFormuGuncelle('musteriUid', event.target.value)}>
+                  <option value="">Musteri secin</option>
+                  {musteriSecenekleri.map((musteri) => (
+                    <option key={musteri.uid} value={musteri.uid}>
+                      {musteri.ad}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <label>Urun<ZorunluYildiz /></label>
               <UrunSecici
                 value={siparisFormu.urun}
                 onChange={(urun) => {
@@ -148,11 +176,20 @@ export default function OrderModals({ ordersData, paraFormatla, tarihFormatla })
                 }}
                 urunSecenekleri={urunSecenekleri}
               />
-              <label>Siparis Verilen Urun Adedi</label>
+              <label>Siparis Verilen Urun Adedi<ZorunluYildiz /></label>
               <input data-cy="order-quantity-input" type="number" min="1" step="1" value={siparisFormu.urunAdedi} onChange={(event) => siparisFormuGuncelle('urunAdedi', event.target.value)} />
-              <label>Toplam Tutar</label>
-              <input data-cy="order-total-input" type="number" min="0" step="0.01" value={siparisFormu.toplamTutar} readOnly style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }} />
-              <label>Siparis Tarihi</label>
+              <label>Toplam Tutar<ZorunluYildiz /> {siparisFormu.kayitsizMusteri ? '(Elle Girilebilir)' : '(Otomatik Hesaplanır)'}</label>
+              <input 
+                data-cy="order-total-input" 
+                type="number" 
+                min="0" 
+                step="0.01" 
+                value={siparisFormu.toplamTutar} 
+                onChange={siparisFormu.kayitsizMusteri ? (e) => siparisFormuGuncelle('toplamTutar', e.target.value) : undefined}
+                readOnly={!siparisFormu.kayitsizMusteri} 
+                style={{ backgroundColor: siparisFormu.kayitsizMusteri ? '#fff' : '#f9f9f9', cursor: siparisFormu.kayitsizMusteri ? 'text' : 'not-allowed' }} 
+              />
+              <label>Siparis Tarihi<ZorunluYildiz /></label>
               <input data-cy="order-date-input" type="date" value={siparisFormu.siparisTarihi} onChange={(event) => siparisFormuGuncelle('siparisTarihi', event.target.value)} />
               <label>Ödeme Durumu</label>
               <select data-cy="order-payment-status-select" value={siparisFormu.odemeDurumu} onChange={(event) => siparisFormuGuncelle('odemeDurumu', event.target.value)}>

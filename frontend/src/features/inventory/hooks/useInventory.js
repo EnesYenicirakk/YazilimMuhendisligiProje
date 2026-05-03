@@ -513,7 +513,17 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     if (!urun) return
 
     const guncellenenUrunData = {
-      ...urun,
+      urunId: urun.urunId,
+      barkod: urun.barkod ?? '',
+      ad: urun.ad,
+      avatar: urun.avatar ?? '',
+      kategori: urun.kategori || 'Diğer',
+      urunAdedi: Number(urun.urunAdedi ?? 0),
+      magazaStok: Number(urun.magazaStok ?? 0),
+      minimumStok: Number(urun.minimumStok ?? 0),
+      alisFiyati: Number(urun.alisFiyati ?? 0),
+      satisFiyati: Number(urun.satisFiyati ?? 0),
+      tedarikciUid: urun.tedarikciUid ?? '',
       favori: !urun.favori,
     }
 

@@ -232,7 +232,17 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     if (!tedarikci) return
 
     const guncellenenTedarikciData = {
-      ...tedarikci,
+      firmaAdi: tedarikci.firmaAdi,
+      yetkiliKisi: tedarikci.yetkiliKisi ?? '',
+      telefon: tedarikci.telefon ?? '',
+      email: tedarikci.email ?? '',
+      adres: tedarikci.adres ?? '',
+      vergiNumarasi: tedarikci.vergiNumarasi ?? '',
+      urunGrubu: tedarikci.urunGrubu ?? '',
+      not: tedarikci.not ?? '',
+      toplamAlisSayisi: Number(tedarikci.toplamAlisSayisi ?? 0),
+      ortalamaTeslimSuresi: tedarikci.ortalamaTeslimSuresi ?? '',
+      toplamHarcama: Number(tedarikci.toplamHarcama ?? 0),
       favori: !tedarikci.favori,
     }
 

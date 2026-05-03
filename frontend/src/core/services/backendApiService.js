@@ -1,18 +1,28 @@
 /**
- * Backend API Servis Yapılandırması
+ * Backend API Servis Yapilandirmasi
  */
 
-// Laravel 'php artisan serve' kullanıyorsan: http://127.0.0.1:8000/api
-// MAMP Virtual Host kullanıyorsan: http://localhost/api
-const BASE_URL = 'http://127.0.0.1:8000/api'; 
+// Laravel 'php artisan serve' kullaniyorsan: http://127.0.0.1:8000/api
+// MAMP Virtual Host kullaniyorsan: http://localhost/api
+const BASE_URL = 'http://127.0.0.1:8000/api';
+
+const ilkDogrulamaHatasiniGetir = (errors) => {
+  if (!errors || typeof errors !== 'object') return null;
+
+  const ilkAlanHatasi = Object.values(errors).find(
+    (deger) => Array.isArray(deger) && deger.length > 0,
+  );
+
+  return ilkAlanHatasi?.[0] ?? null;
+};
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = window.sessionStorage.getItem('access_token');
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
     ...options,
@@ -21,7 +31,12 @@ export const apiFetch = async (endpoint, options = {}) => {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || 'API isteği başarısız oldu.');
+    const hataMesaji =
+      ilkDogrulamaHatasiniGetir(data.errors) ||
+      data.message ||
+      'API istegi basarisiz oldu.';
+
+    throw new Error(hataMesaji);
   }
 
   return data;
@@ -71,6 +86,7 @@ export const categoryApi = {
 
 export const financeApi = {
   getAll: () => apiFetch('/finance'),
+  toggleFavorite: (id) => apiFetch(`/finance/${id}/favorite`, { method: 'PATCH' }),
 };
 
 export const supplierApi = {

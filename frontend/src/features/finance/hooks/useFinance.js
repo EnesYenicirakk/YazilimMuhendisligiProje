@@ -1,32 +1,89 @@
-import { useEffect, useMemo, useState } from 'react'
-import { financeApi } from '../../../core/services/backendApiService'
+import { useMemo, useState } from 'react'
 import {
   favorileriOneTasi,
   gerceklesenOdemeTutari,
-  negatifSayiVarMi,
   odemeDurumunuStandartlastir,
 } from '../../../shared/utils/constantsAndHelpers'
 
 const ODEME_SAYFA_BASINA = 10
 const BOS_ODEME_FORMU = { taraf: '', tarih: '', durum: '', tutar: '' }
-const negatifOlmayanSayiyaDonustur = (deger) => {
-  const temizDeger = String(deger ?? '').replace(',', '.').replace(/[^\d.]/g, '')
-  const ilkNokta = temizDeger.indexOf('.')
-  if (ilkNokta === -1) return temizDeger
 
-  return `${temizDeger.slice(0, ilkNokta + 1)}${temizDeger.slice(ilkNokta + 1).replace(/\./g, '')}`
+const tedarikSiparisiDurumunuFinansaCevir = (durum) => {
+  const normalize = String(durum ?? '').trim().toLocaleLowerCase('tr-TR')
+  if (normalize === 'teslim alındı') return 'Ödendi'
+  if (normalize === 'iptal') return 'İptal'
+  return 'Beklemede'
 }
 
-export default function useFinance({ toastGoster, isLoggedIn }) {
-  const [gelenNakitListesi, setGelenNakitListesi] = useState([])
-  const [gidenNakitListesi, setGidenNakitListesi] = useState([])
+const siparisiTahsilataDonustur = (siparis, favori = false) => {
+  const durum = odemeDurumunuStandartlastir(siparis?.odemeDurumu)
+  if ((siparis?.musteriUid == null && !siparis?.musteri) || (durum !== 'Ödendi' && durum !== 'Kısmi')) {
+    return null
+  }
+
+  const urunAdedi = Number(siparis?.urunAdedi ?? siparis?.miktar ?? 0)
+
+  return {
+    odemeNo: `TSL-${siparis.siparisNo}`,
+    taraf: siparis.musteri ?? 'Kayıtsız Müşteri',
+    tarih: siparis.siparisTarihi,
+    durum,
+    tutar: Number(siparis.toplamTutar ?? 0),
+    odenenTutar: Number(siparis.toplamTutar ?? 0),
+    favori,
+    aciklama: `${siparis.urun ?? 'Sipariş'} · ${urunAdedi} adet`,
+    kaynakTipi: 'musteri-siparisi',
+    kilitli: true,
+  }
+}
+
+const tedarikSiparisiniOdemeyeDonustur = (siparis, favori = false) => ({
+  odemeNo: `ODM-${siparis.siparisNo}`,
+  taraf: siparis.firmaAdi ?? 'Tedarikçi',
+  tarih: siparis.tarih,
+  durum: tedarikSiparisiDurumunuFinansaCevir(siparis.durum),
+  tutar: Number(siparis.tutar ?? 0),
+  odenenTutar: Number(siparis.tutar ?? 0),
+  favori,
+  aciklama: `${siparis.urun || 'Tedarik siparişi'} · ${Number(siparis.miktar ?? 0)} adet`,
+  kaynakTipi: 'tedarik-siparisi',
+  kilitli: true,
+})
+
+export default function useFinance({
+  toastGoster,
+  isLoggedIn,
+  siparisler = [],
+  tedarikSiparisleri = [],
+}) {
   const [odemeSekmesi, setOdemeSekmesi] = useState('gelen')
   const [gelenSayfa, setGelenSayfa] = useState(1)
   const [gidenSayfa, setGidenSayfa] = useState(1)
   const [duzenlenenOdeme, setDuzenlenenOdeme] = useState(null)
   const [odemeFormu, setOdemeFormu] = useState(BOS_ODEME_FORMU)
   const [silinecekOdeme, setSilinecekOdeme] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [favoriKayitlari, setFavoriKayitlari] = useState({})
+
+  const gelenNakitListesi = useMemo(
+    () =>
+      siparisler
+        .map((siparis) =>
+          siparisiTahsilataDonustur(siparis, Boolean(favoriKayitlari[`gelen:${siparis.siparisNo}`])),
+        )
+        .filter(Boolean),
+    [favoriKayitlari, siparisler],
+  )
+
+  const gidenNakitListesi = useMemo(
+    () =>
+      tedarikSiparisleri.map((siparis) =>
+        tedarikSiparisiniOdemeyeDonustur(
+          siparis,
+          Boolean(favoriKayitlari[`giden:${siparis.siparisNo}`]),
+        ),
+      ),
+    [favoriKayitlari, tedarikSiparisleri],
+  )
 
   const siraliGelenNakit = useMemo(
     () => favorileriOneTasi(gelenNakitListesi, (kayit) => new Date(kayit.tarih).getTime()),
@@ -62,51 +119,21 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
     gidenSayfa * ODEME_SAYFA_BASINA,
   )
 
-  useEffect(() => {
-    if (gelenSayfa > toplamGelenSayfa) setGelenSayfa(toplamGelenSayfa)
-  }, [gelenSayfa, toplamGelenSayfa])
+  const finansFavoriDegistir = (sekme, odemeNo) => {
+    const kayitAnahtari = `${sekme}:${String(odemeNo).replace(/^(TSL|ODM)-/i, '')}`
+    setFavoriKayitlari((onceki) => ({
+      ...onceki,
+      [kayitAnahtari]: !onceki[kayitAnahtari],
+    }))
+  }
 
-  useEffect(() => {
-    if (gidenSayfa > toplamGidenSayfa) setGidenSayfa(toplamGidenSayfa)
-  }, [gidenSayfa, toplamGidenSayfa])
-
-  useEffect(() => {
-    if (!isLoggedIn) return
-
-    const finansYukle = async () => {
-      setLoading(true)
-      try {
-        const veriler = await financeApi.getAll()
-        setGelenNakitListesi(veriler.gelen || [])
-        setGidenNakitListesi(veriler.giden || [])
-      } catch (error) {
-        console.error('Finans verileri yüklenirken hata oluştu:', error)
-        toastGoster?.('hata', 'Finansal veriler veritabanından alınamadı.')
-      } finally {
-        setLoading(false)
-      }
-    }
-    finansYukle()
-  }, [toastGoster, isLoggedIn])
-
-  const odemeListesiGuncelle = (sekme, guncelleyici) => {
-    if (sekme === 'gelen') {
-      setGelenNakitListesi((onceki) => guncelleyici(onceki))
+  const odemeDuzenlemeAc = (_sekme, kayit) => {
+    if (kayit?.kilitli) {
+      toastGoster?.('uyari', 'Bu kayıt siparişlerden otomatik oluşturuluyor. Düzenlemek için ilgili siparişi güncelleyin.')
       return
     }
-    setGidenNakitListesi((onceki) => guncelleyici(onceki))
-  }
 
-  const finansFavoriDegistir = (sekme, odemeNo) => {
-    odemeListesiGuncelle(sekme, (onceki) =>
-      onceki.map((kayit) =>
-        kayit.odemeNo === odemeNo ? { ...kayit, favori: !kayit.favori } : kayit,
-      ),
-    )
-  }
-
-  const odemeDuzenlemeAc = (sekme, kayit) => {
-    setDuzenlenenOdeme({ sekme, odemeNo: kayit.odemeNo })
+    setDuzenlenenOdeme({ sekme: _sekme, odemeNo: kayit.odemeNo })
     setOdemeFormu({
       taraf: kayit.taraf,
       tarih: kayit.tarih,
@@ -115,44 +142,27 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
     })
   }
 
+  const odemeSilmeAc = (kayit) => {
+    if (kayit?.kilitli) {
+      toastGoster?.('uyari', 'Bu kayıt siparişlerden otomatik oluşturuluyor. Silmek için ilgili siparişi iptal edin veya kaldırın.')
+      return
+    }
+
+    setSilinecekOdeme(kayit)
+  }
+
   const odemeDuzenlemeKapat = () => {
     setDuzenlenenOdeme(null)
     setOdemeFormu(BOS_ODEME_FORMU)
   }
 
   const odemeFormuGuncelle = (alan, deger) => {
-    const sonrakiDeger = alan === 'tutar' ? negatifOlmayanSayiyaDonustur(deger) : deger
-    setOdemeFormu((onceki) => ({ ...onceki, [alan]: sonrakiDeger }))
+    setOdemeFormu((onceki) => ({ ...onceki, [alan]: deger }))
   }
 
   const odemeDuzenlemeKaydet = () => {
-    if (!duzenlenenOdeme) return
-
-    const tutar = Number(String(odemeFormu.tutar).replace(/[^\d.-]/g, ''))
-    const taraf = odemeFormu.taraf.trim()
-    const tarih = odemeFormu.tarih.trim()
-    const durum = odemeDurumunuStandartlastir(odemeFormu.durum)
-
-    if (!taraf || !tarih || !durum || Number.isNaN(tutar)) {
-      toastGoster?.('hata', 'Finansal akış kaydında eksik veya hatalı bilgi var.')
-      return
-    }
-
-    if (negatifSayiVarMi(tutar)) {
-      toastGoster?.('hata', 'Ödeme veya tahsilat tutarı negatif olamaz.')
-      return
-    }
-
-    odemeListesiGuncelle(duzenlenenOdeme.sekme, (onceki) =>
-      onceki.map((kayit) =>
-        kayit.odemeNo === duzenlenenOdeme.odemeNo
-          ? { ...kayit, taraf, tarih, durum, tutar }
-          : kayit,
-      ),
-    )
-
+    toastGoster?.('uyari', 'Finans kayıtları sipariş akışından otomatik üretiliyor. Düzenleme için ilgili sipariş ekranını kullanın.')
     odemeDuzenlemeKapat()
-    toastGoster?.('basari', `${taraf} kaydı güncellendi.`)
   }
 
   const odemeSilmeKapat = () => {
@@ -160,33 +170,8 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
   }
 
   const odemeSil = () => {
-    if (!silinecekOdeme) return
-
-    const silinenOdeme = { ...silinecekOdeme }
-    const kaynakListe = silinenOdeme.sekme === 'gelen' ? gelenNakitListesi : gidenNakitListesi
-    const silinenKayit = kaynakListe.find((kayit) => kayit.odemeNo === silinenOdeme.odemeNo)
-    const silinenIndex = kaynakListe.findIndex((kayit) => kayit.odemeNo === silinenOdeme.odemeNo)
-    const silinenTaraf = silinenOdeme.taraf
-
-    odemeListesiGuncelle(silinenOdeme.sekme, (onceki) =>
-      onceki.filter((kayit) => kayit.odemeNo !== silinenOdeme.odemeNo),
-    )
+    toastGoster?.('uyari', 'Finans kayıtları sipariş akışından otomatik üretiliyor. Silme için ilgili sipariş ekranını kullanın.')
     odemeSilmeKapat()
-
-    toastGoster?.('basari', `${silinenTaraf} kaydı silindi.`, {
-      eylemEtiketi: 'Geri Al',
-      sure: 5000,
-      eylem: () => {
-        if (!silinenKayit) return
-        odemeListesiGuncelle(silinenOdeme.sekme, (onceki) => {
-          if (onceki.some((kayit) => kayit.odemeNo === silinenKayit.odemeNo)) return onceki
-          const yeni = [...onceki]
-          yeni.splice(silinenIndex < 0 ? yeni.length : silinenIndex, 0, silinenKayit)
-          return yeni
-        })
-        toastGoster?.('basari', `${silinenTaraf} kaydı geri alındı.`)
-      },
-    })
   }
 
   const financeModallariniKapat = () => {
@@ -215,6 +200,7 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
     siraliGidenNakit,
     finansFavoriDegistir,
     odemeDuzenlemeAc,
+    odemeSilmeAc,
     odemeDuzenlemeKapat,
     odemeFormuGuncelle,
     odemeDuzenlemeKaydet,
@@ -222,6 +208,6 @@ export default function useFinance({ toastGoster, isLoggedIn }) {
     odemeSilmeKapat,
     odemeSil,
     financeModallariniKapat,
-    loading,
+    loading: !isLoggedIn ? true : false,
   }
 }

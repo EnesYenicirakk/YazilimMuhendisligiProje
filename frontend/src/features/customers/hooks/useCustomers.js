@@ -133,7 +133,14 @@ export default function useCustomers({ toastGoster, isLoggedIn }) {
     if (!musteri) return
 
     const guncellenenMusteriData = {
-      ...musteri,
+      ad: musteri.ad,
+      yetkiliKisi: musteri.yetkiliKisi ?? '',
+      telefon: musteri.telefon ?? '',
+      email: musteri.email ?? '',
+      adres: musteri.adres ?? '',
+      vergiNumarasi: musteri.vergiNumarasi ?? '',
+      sonAlim: musteri.sonAlim ?? '',
+      not: musteri.not ?? '',
       favori: !musteri.favori,
     }
 

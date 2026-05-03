@@ -28,7 +28,7 @@ class FinanceController extends Controller
                     'durum' => $this->mapStatus($payment->status),
                     'tutar' => (float)$payment->amount,
                     'type' => $payment->type, // incoming / outgoing
-                    'favori' => false,
+                    'favori' => (bool) $payment->is_favorite,
                 ];
             });
 
@@ -39,6 +39,22 @@ class FinanceController extends Controller
         });
 
         return response()->json($data);
+    }
+
+    public function toggleFavorite($id)
+    {
+        $payment = Payment::findOrFail($id);
+        $payment->update([
+            'is_favorite' => !$payment->is_favorite,
+        ]);
+
+        \Illuminate\Support\Facades\Cache::forget('finance_summary');
+
+        return response()->json([
+            'odemeNo' => (string) $payment->id,
+            'favori' => (bool) $payment->is_favorite,
+            'type' => $payment->type,
+        ]);
     }
 
     private function mapStatus($status) {

@@ -26,11 +26,11 @@ import useGlobalSearch from './core/hooks/useGlobalSearch'
 import useAppNotifications from './core/hooks/useAppNotifications'
 import { useToast } from './core/contexts/ToastContext'
 import {
+  favorileriOneTasi,
   paraFormatla,
   durumSinifi,
   kritikStoktaMi,
   merkezMenusu,
-  siparisTamamlandiMi,
   tarihFormatla,
 } from './shared/utils/constantsAndHelpers'
 
@@ -60,7 +60,6 @@ function App() {
   const inventoryData = useInventory({ toastGoster, isLoggedIn: auth.isLoggedIn })
   const customersData = useCustomers({ toastGoster, isLoggedIn: auth.isLoggedIn })
   const suppliersData = useSuppliers({ toastGoster, isLoggedIn: auth.isLoggedIn })
-  const financeData = useFinance({ toastGoster, isLoggedIn: auth.isLoggedIn })
 
   const sayfaDegistir = (sayfa) => {
     setAktifSayfa(sayfa)
@@ -117,34 +116,77 @@ function App() {
     },
   })
 
+  const financeData = useFinance({
+    toastGoster,
+    isLoggedIn: auth.isLoggedIn,
+    siparisler: ordersData.siparisler,
+    tedarikSiparisleri: suppliersData.tumTedarikSiparisleri,
+  })
+
   const customersViewData = useMemo(() => {
     const musteriIstatistikleri = ordersData.siparisler.reduce((harita, siparis) => {
-      if (!siparisTamamlandiMi(siparis) || siparis.musteriUid == null) return harita
+      if (siparis.musteriUid == null || siparis.odemeDurumu === 'İptal') return harita
 
       const uid = String(siparis.musteriUid)
-      const onceki = harita.get(uid) ?? { toplamSiparis: 0, toplamHarcama: 0 }
+      const onceki = harita.get(uid) ?? {
+        toplamSiparis: 0,
+        toplamHarcama: 0,
+        sonAlim: null,
+      }
+      const siparisAdedi = Number(siparis.urunAdedi ?? siparis.miktar ?? 0)
+      const siparisTutari = Number(siparis.toplamTutar ?? 0)
+      const siparisTarihi = siparis.siparisTarihi ?? null
+      const sonAlim =
+        !siparisTarihi || (onceki.sonAlim && new Date(onceki.sonAlim) > new Date(siparisTarihi))
+          ? onceki.sonAlim
+          : siparisTarihi
+
       harita.set(uid, {
-        toplamSiparis: onceki.toplamSiparis + 1,
-        toplamHarcama: onceki.toplamHarcama + Number(siparis.toplamTutar || 0),
+        toplamSiparis: onceki.toplamSiparis + siparisAdedi,
+        toplamHarcama: onceki.toplamHarcama + siparisTutari,
+        sonAlim,
       })
       return harita
     }, new Map())
 
-    const zenginlestir = (liste) =>
-      liste.map((musteri) => {
-        const istatistik = musteriIstatistikleri.get(String(musteri.uid))
-        return {
-          ...musteri,
-          toplamSiparis: istatistik?.toplamSiparis ?? 0,
-          toplamHarcama: istatistik?.toplamHarcama ?? 0,
-        }
-      })
+    const zenginMusteriler = customersData.musteriler.map((musteri) => {
+      const istatistik = musteriIstatistikleri.get(String(musteri.uid))
+
+      return {
+        ...musteri,
+        sonAlim: istatistik?.sonAlim ?? musteri.sonAlim,
+        toplamSiparis: istatistik?.toplamSiparis ?? 0,
+        toplamHarcama: istatistik?.toplamHarcama ?? 0,
+      }
+    })
+
+    const aramaMetni = customersData.musteriArama.trim().toLowerCase()
+    const filtreliMusteriler = favorileriOneTasi(
+      !aramaMetni
+        ? zenginMusteriler
+        : zenginMusteriler.filter(
+            (musteri) =>
+              musteri.ad.toLowerCase().includes(aramaMetni) ||
+              musteri.telefon.toLowerCase().includes(aramaMetni),
+          ),
+      (musteri) => new Date(`${musteri.sonAlim ?? '1970-01-01'}T00:00:00`).getTime(),
+    )
+
+    const toplamMusteriSayfa = Math.max(
+      1,
+      Math.ceil(filtreliMusteriler.length / 8),
+    )
+    const aktifMusteriSayfa = Math.min(customersData.musteriSayfa, toplamMusteriSayfa)
+    const musteriBaslangic = (aktifMusteriSayfa - 1) * 8
+    const sayfadakiMusteriler = filtreliMusteriler.slice(musteriBaslangic, musteriBaslangic + 8)
 
     return {
       ...customersData,
-      musteriler: zenginlestir(customersData.musteriler),
-      filtreliMusteriler: zenginlestir(customersData.filtreliMusteriler),
-      sayfadakiMusteriler: zenginlestir(customersData.sayfadakiMusteriler),
+      musteriler: zenginMusteriler,
+      filtreliMusteriler,
+      toplamMusteriSayfa,
+      musteriBaslangic,
+      sayfadakiMusteriler,
     }
   }, [customersData, ordersData.siparisler])
 
@@ -350,7 +392,7 @@ function App() {
               gidenSayfadakiKayitlar={financeData.gidenSayfadakiKayitlar}
               finansFavoriDegistir={financeData.finansFavoriDegistir}
               odemeDuzenlemeAc={financeData.odemeDuzenlemeAc}
-              setSilinecekOdeme={financeData.setSilinecekOdeme}
+              odemeSilmeAc={financeData.odemeSilmeAc}
               gelenSayfa={financeData.gelenSayfa}
               setGelenSayfa={financeData.setGelenSayfa}
               toplamGelenSayfa={financeData.toplamGelenSayfa}

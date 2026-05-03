@@ -15,11 +15,13 @@ class Payment extends Model
         'invoice_id',
         'status',
         'description',
+        'is_favorite',
     ];
 
     protected $casts = [
         'payment_date' => 'date',
         'amount' => 'float',
+        'is_favorite' => 'boolean',
     ];
 
     public function customer()

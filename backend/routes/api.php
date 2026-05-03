@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Diğerleri
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/finance', [FinanceController::class, 'index']);
+    Route::patch('/finance/{id}/favorite', [FinanceController::class, 'toggleFavorite']);
     Route::apiResource('suppliers', SupplierController::class);
     Route::post('/suppliers/{id}/orders', [SupplierController::class, 'storeOrder']);
 });

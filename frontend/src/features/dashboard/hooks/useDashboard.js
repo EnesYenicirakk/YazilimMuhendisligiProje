@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   dashboardBolumSablonu,
   gerceklesenOdemeTutari,
@@ -30,6 +30,12 @@ const formatAyEtiketi = (tarih) => {
 
 const bugununBaslangiciniGetir = () => {
   const tarih = new Date()
+  tarih.setHours(0, 0, 0, 0)
+  return tarih
+}
+
+const siparisTarihineDonustur = (tarihMetni) => {
+  const tarih = new Date(`${tarihMetni}T00:00:00`)
   tarih.setHours(0, 0, 0, 0)
   return tarih
 }
@@ -108,9 +114,20 @@ export default function useDashboard({
   const [gizlenenOzetKartlari, setGizlenenOzetKartlari] = useState([])
   const [acikOzetMenusu, setAcikOzetMenusu] = useState('')
   const [dashboardBolumMenusuAcik, setDashboardBolumMenusuAcik] = useState(false)
+  const [enCokSatilanMenuAcik, setEnCokSatilanMenuAcik] = useState(false)
+  const [enCokSatilanGunAraligi, setEnCokSatilanGunAraligi] = useState(30)
+  const [bugunReferansi, setBugunReferansi] = useState(() => bugununBaslangiciniGetir())
   const [gorunenDashboardBolumleri, setGorunenDashboardBolumleri] = useState(
     dashboardBolumSablonu.reduce((acc, bolum) => ({ ...acc, [bolum.anahtar]: true }), {}),
   )
+
+  useEffect(() => {
+    const zamanlayici = window.setInterval(() => {
+      setBugunReferansi(bugununBaslangiciniGetir())
+    }, 60000)
+
+    return () => window.clearInterval(zamanlayici)
+  }, [])
 
   const tamamlananSiparisler = useMemo(
     () => siraliSiparisler.filter((siparis) => siparisTamamlandiMi(siparis)),
@@ -176,12 +193,11 @@ export default function useDashboard({
   }, [siraliSiparisler, urunler])
 
   const enCokSatilanUrunler = useMemo(() => {
-    const referansGun = bugununBaslangiciniGetir()
-    const buAyKiSiparisler = siraliSiparisler.filter((siparis) =>
-      ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), referansGun),
-    )
+    const satisOzetleri = tamamlananSiparisler.reduce((harita, siparis) => {
+      const siparisTarihi = siparisTarihineDonustur(siparis.siparisTarihi)
+      const gunFarki = Math.floor((bugunReferansi.getTime() - siparisTarihi.getTime()) / 86400000)
+      if (gunFarki < 0 || gunFarki >= enCokSatilanGunAraligi) return harita
 
-    const satisOzetleri = buAyKiSiparisler.reduce((harita, siparis) => {
       const urunAdi = String(siparis.urun ?? '').trim()
       if (!urunAdi) return harita
       harita.set(urunAdi, (harita.get(urunAdi) ?? 0) + siparisMiktariniGetir(siparis))
@@ -192,7 +208,22 @@ export default function useDashboard({
       .map(([ad, miktar]) => ({ ad, miktar }))
       .sort((a, b) => b.miktar - a.miktar || a.ad.localeCompare(b.ad, 'tr'))
       .slice(0, 6)
-  }, [siraliSiparisler])
+  }, [bugunReferansi, enCokSatilanGunAraligi, tamamlananSiparisler])
+
+  const enCokSatilanGunSecenekleri = useMemo(
+    () => [
+      { deger: 30, etiket: '30 Gün' },
+      { deger: 15, etiket: '15 Gün' },
+      { deger: 7, etiket: '7 Gün' },
+    ],
+    [],
+  )
+
+  const seciliEnCokSatilanGunEtiketi = useMemo(
+    () =>
+      enCokSatilanGunSecenekleri.find((secenek) => secenek.deger === enCokSatilanGunAraligi)?.etiket ?? '30 Gün',
+    [enCokSatilanGunAraligi, enCokSatilanGunSecenekleri],
+  )
 
   const bugunkuOncelikler = useMemo(() => {
     const bekleyenSiparisler = siparisler.filter((s) => s.teslimatDurumu === 'Hazırlanıyor')
@@ -510,6 +541,9 @@ export default function useDashboard({
     dashboardBolumMenusuAcik,
     dashboardCanliOzetler,
     bugunkuOncelikler,
+    enCokSatilanGunAraligi,
+    enCokSatilanGunSecenekleri,
+    enCokSatilanMenuAcik,
     dashboardOzet,
     dashboardYakinSatislar,
     enCokSatilanUrunler,
@@ -518,6 +552,9 @@ export default function useDashboard({
     haftalikSatisGrafikUstSinir,
     haftalikSatisVerisi,
     ozetKartiniSil,
+    seciliEnCokSatilanGunEtiketi,
+    setEnCokSatilanGunAraligi,
+    setEnCokSatilanMenuAcik,
     setAcikOzetMenusu,
     setDashboardBolumMenusuAcik,
   }

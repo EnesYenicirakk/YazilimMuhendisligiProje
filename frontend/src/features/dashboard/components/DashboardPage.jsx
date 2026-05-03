@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import {
   cizgiNoktalari,
   dashboardBolumSablonu,
@@ -11,6 +12,8 @@ export default function DashboardPage({
   sayfaDegistir,
   dashboardData,
 }) {
+  const enCokSatilanMenuRef = useRef(null)
+
   const {
     setDashboardBolumMenusuAcik,
     dashboardBolumMenusuAcik,
@@ -22,6 +25,9 @@ export default function DashboardPage({
     ozetKartiniSil,
     dashboardCanliOzetler,
     bugunkuOncelikler,
+    enCokSatilanGunAraligi,
+    enCokSatilanGunSecenekleri,
+    enCokSatilanMenuAcik,
     enCokSatilanUrunler,
     haftalikSatisGrafikUstSinir,
     haftalikSatisVerisi,
@@ -31,9 +37,26 @@ export default function DashboardPage({
     aylikGiderSerisi,
     aylikSatilanUrunSerisi,
     gelirGiderGrafikUstSinir,
+    seciliEnCokSatilanGunEtiketi,
+    setEnCokSatilanGunAraligi,
+    setEnCokSatilanMenuAcik,
   } = dashboardData
 
   const aylikSatilanUrunMaksimum = Math.max(...aylikSatilanUrunSerisi, 1)
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (!enCokSatilanMenuRef.current?.contains(event.target)) {
+        setEnCokSatilanMenuAcik(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+    }
+  }, [setEnCokSatilanMenuAcik])
 
   return (
     <>
@@ -191,26 +214,65 @@ export default function DashboardPage({
                 <article className="panel-kart">
                   <div className="panel-baslik">
                     <h2>En Çok Satılan Ürünler</h2>
-                    <small>Aylık</small>
+                    <div className="panel-baslik-aksiyon" ref={enCokSatilanMenuRef}>
+                      <button
+                        type="button"
+                        className={`donem-secici-buton ${enCokSatilanMenuAcik ? 'acik' : ''}`}
+                        onClick={() => setEnCokSatilanMenuAcik((onceki) => !onceki)}
+                        aria-haspopup="menu"
+                        aria-expanded={enCokSatilanMenuAcik}
+                      >
+                        <span>{seciliEnCokSatilanGunEtiketi}</span>
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                          <path d="m5 7 5 6 5-6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+
+                      <div className={`donem-secici-menu ${enCokSatilanMenuAcik ? 'acik' : ''}`} role="menu">
+                        {enCokSatilanGunSecenekleri.map((secenek) => (
+                          <button
+                            key={secenek.deger}
+                            type="button"
+                            role="menuitemradio"
+                            aria-checked={enCokSatilanGunAraligi === secenek.deger}
+                            className={enCokSatilanGunAraligi === secenek.deger ? 'secili' : ''}
+                            onClick={() => {
+                              setEnCokSatilanGunAraligi(secenek.deger)
+                              setEnCokSatilanMenuAcik(false)
+                            }}
+                          >
+                            <span>{secenek.etiket}</span>
+                            {enCokSatilanGunAraligi === secenek.deger && <i aria-hidden="true" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
+
                   <ul className="dashboard-liste grafikli-liste">
-                    {enCokSatilanUrunler.map((urun) => {
-                      const maksimum = Math.max(...enCokSatilanUrunler.map((item) => item.miktar), 1)
-                      const oran = Math.max((urun.miktar / maksimum) * 100, 8)
-                      return (
-                        <li key={urun.ad}>
-                          <div className="urun-grafik-satiri">
-                            <div className="urun-grafik-ust">
-                              <span>{urun.ad}</span>
-                              <strong>{urun.miktar} adet</strong>
+                    {enCokSatilanUrunler.length === 0 ? (
+                      <li className="dashboard-liste-bos">
+                        <span>Seçilen tarih aralığında tamamlanan sipariş bulunmuyor.</span>
+                      </li>
+                    ) : (
+                      enCokSatilanUrunler.map((urun) => {
+                        const maksimum = Math.max(...enCokSatilanUrunler.map((item) => item.miktar), 1)
+                        const oran = Math.max((urun.miktar / maksimum) * 100, 8)
+                        return (
+                          <li key={urun.ad}>
+                            <div className="urun-grafik-satiri">
+                              <div className="urun-grafik-ust">
+                                <span>{urun.ad}</span>
+                                <strong>{urun.miktar} adet</strong>
+                              </div>
+                              <div className="urun-grafik-zemin">
+                                <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
+                              </div>
                             </div>
-                            <div className="urun-grafik-zemin">
-                              <div className="urun-grafik-dolgu" style={{ width: `${oran}%` }} />
-                            </div>
-                          </div>
-                        </li>
-                      )
-                    })}
+                          </li>
+                        )
+                      })
+                    )}
                   </ul>
                 </article>
               </>

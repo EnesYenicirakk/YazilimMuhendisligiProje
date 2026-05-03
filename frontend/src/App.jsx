@@ -286,6 +286,7 @@ function App() {
               gecisBalonu={gecisBalonu}
               merkezGirisEfekti={merkezGirisEfekti}
               merkezdenSayfayaGit={merkezdenSayfayaGit}
+              onLogout={auth.logout}
             />
           )}
 

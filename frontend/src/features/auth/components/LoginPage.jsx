@@ -65,9 +65,6 @@ export default function LoginPage({ auth, merkezMenusu }) {
               <strong>%42</strong>
             </div>
           </div>
-
-          <h2>Stok yönetimini sadeleştirin</h2>
-          <p>Sanayi parçalarını tek ekrandan yönetin, stok seviyelerini hızlı takip edin.</p>
         </div>
       </section>
     </main>

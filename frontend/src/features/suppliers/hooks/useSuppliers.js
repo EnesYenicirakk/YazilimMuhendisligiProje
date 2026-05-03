@@ -52,6 +52,12 @@ const siparisZamaniniAl = (siparis) => {
   return Number.isNaN(gunBazliZaman) ? 0 : gunBazliZaman
 }
 
+const rastgeleOgeSec = (liste) => {
+  if (!Array.isArray(liste) || liste.length === 0) return null
+  const index = Math.floor(Math.random() * liste.length)
+  return liste[index] ?? null
+}
+
 export default function useSuppliers({ toastGoster, isLoggedIn }) {
   const [tedarikciler, setTedarikciler] = useState([])
   const [tedarikciArama, setTedarikciArama] = useState('')
@@ -119,7 +125,11 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
 
     if (kategoriEslesenTedarikciler[0]) return kategoriEslesenTedarikciler[0]
 
-    return favorileriOneTasi([...tedarikciler], (tedarikci) => tedarikci.toplamHarcama)[0] ?? null
+    const digerKategoriliTedarikciler = tedarikciler.filter(
+      (tedarikci) => metniNormalizeEt(tedarikci.urunGrubu) !== kategori,
+    )
+
+    return rastgeleOgeSec(digerKategoriliTedarikciler) ?? rastgeleOgeSec(tedarikciler)
   }
 
   const tumTedarikSiparisleri = useMemo(() => {

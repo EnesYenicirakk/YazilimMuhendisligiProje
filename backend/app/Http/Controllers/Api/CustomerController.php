@@ -44,16 +44,26 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($id);
 
+        $validated = $request->validate([
+            'ad' => 'required|string|max:255',
+            'telefon' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'adres' => 'nullable|string|max:1000',
+            'vergiNumarasi' => 'nullable|string|max:50',
+            'not' => 'nullable|string|max:2000',
+            'favori' => 'nullable|boolean',
+        ]);
+
         $customer->update([
-            'full_name' => $request->ad,
+            'full_name' => $validated['ad'],
             'authorized_person' => $request->yetkiliKisi,
-            'phone' => $request->telefon,
-            'email' => $request->email,
-            'address' => $request->adres,
-            'tax_number' => $request->vergiNumarasi,
-            'notes' => $request->not,
+            'phone' => $validated['telefon'],
+            'email' => $validated['email'],
+            'address' => $validated['adres'],
+            'tax_number' => $validated['vergiNumarasi'],
+            'notes' => $validated['not'],
             'last_purchase_date' => $request->sonAlim,
-            'is_favorite' => $request->favori ?? $customer->is_favorite,
+            'is_favorite' => $validated['favori'] ?? $customer->is_favorite,
         ]);
 
         \Illuminate\Support\Facades\Cache::forget('customers_list');

@@ -50,19 +50,31 @@ class SupplierController extends Controller
     {
         $supplier = Supplier::findOrFail($id);
 
+        $validated = $request->validate([
+            'firmaAdi' => 'required|string|max:255',
+            'yetkiliKisi' => 'required|string|max:255',
+            'telefon' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'adres' => 'nullable|string|max:1000',
+            'vergiNumarasi' => 'nullable|string|max:50',
+            'urunGrubu' => 'nullable|string|max:100',
+            'not' => 'nullable|string|max:2000',
+            'favori' => 'nullable|boolean',
+        ]);
+
         $supplier->update([
-            'company_name' => $request->firmaAdi,
-            'contact_person' => $request->yetkiliKisi,
-            'phone' => $request->telefon,
-            'email' => $request->email,
-            'address' => $request->adres,
-            'tax_number' => $request->vergiNumarasi,
-            'product_group' => $request->urunGrubu,
+            'company_name' => $validated['firmaAdi'],
+            'contact_person' => $validated['yetkiliKisi'],
+            'phone' => $validated['telefon'],
+            'email' => $validated['email'],
+            'address' => $validated['adres'],
+            'tax_number' => $validated['vergiNumarasi'],
+            'product_group' => $validated['urunGrubu'],
             'total_purchase_count' => $request->toplamAlisSayisi ?? $supplier->total_purchase_count,
             'average_delivery_time' => $request->ortalamaTeslimSuresi ?? $supplier->average_delivery_time,
             'total_spent' => $request->toplamHarcama ?? $supplier->total_spent,
-            'notes' => $request->not,
-            'is_favorite' => $request->favori ?? $supplier->is_favorite,
+            'notes' => $validated['not'],
+            'is_favorite' => $validated['favori'] ?? $supplier->is_favorite,
         ]);
 
         return response()->json($this->mapSupplierToFrontend($supplier->load('orders')));

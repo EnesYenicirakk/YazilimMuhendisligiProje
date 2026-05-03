@@ -59,20 +59,33 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        $category = Category::firstOrCreate(['name' => $request->kategori]);
+        $validated = $request->validate([
+            'ad' => 'required|string|max:255',
+            'urunId' => 'required|string|unique:products,sku,' . $id,
+            'kategori' => 'required|string|max:50',
+            'urunAdedi' => 'required|integer|min:0',
+            'magazaStok' => 'required|integer|min:0',
+            'minimumStok' => 'nullable|integer|min:0',
+            'alisFiyati' => 'nullable|numeric|min:0',
+            'satisFiyati' => 'nullable|numeric|min:0',
+            'favori' => 'nullable|boolean',
+        ]);
+
+        // Kategori ID bul veya oluştur (Güvenlik için isim uzunluğu kısıtlandı)
+        $category = Category::firstOrCreate(['name' => trim($validated['kategori'])]);
 
         $product->update([
             'category_id' => $category->id,
-            'sku' => $request->urunId,
+            'sku' => $validated['urunId'],
             'barcode' => $request->barkod,
-            'name' => $request->ad,
+            'name' => $validated['ad'],
             'avatar' => $request->avatar,
-            'stock_quantity' => $request->urunAdedi,
-            'store_stock' => $request->magazaStok,
-            'minimum_stock' => $request->minimumStok,
-            'purchase_price' => $request->alisFiyati,
-            'sale_price' => $request->satisFiyati,
-            'is_favorite' => $request->favori,
+            'stock_quantity' => $validated['urunAdedi'],
+            'store_stock' => $validated['magazaStok'],
+            'minimum_stock' => $validated['minimumStok'] ?? 5,
+            'purchase_price' => $validated['alisFiyati'] ?? 0,
+            'sale_price' => $validated['satisFiyati'] ?? 0,
+            'is_favorite' => $validated['favori'] ?? false,
         ]);
 
         // Kritik stok kontrolü ve bildirim

@@ -5,7 +5,6 @@ import DashboardPage from './features/dashboard/components/DashboardPage'
 import OdemelerPage from './features/finance/components/OdemelerPage'
 import UrunDuzenlemePage from './features/inventory/components/UrunDuzenlemePage'
 import InventoryPage from './features/inventory/components/InventoryPage'
-import BarcodeStockModal from './features/inventory/components/BarcodeStockModal'
 import BosDurumKarti from './components/common/BosDurumKarti'
 import { KucukIkon } from './components/common/Ikonlar'
 import MobilKart from './components/common/MobilKart'
@@ -558,27 +557,6 @@ function App() {
       {aktifSayfa !== 'merkez' && (
         <button
           type="button"
-          className="barkod-dugmesi"
-          aria-label="Barkod tara"
-          title="Barkod Tara"
-          onClick={inventoryData.barkodModaliniAc}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M4 8V6a2 2 0 0 1 2-2h2" />
-            <path d="M20 8V6a2 2 0 0 0-2-2h-2" />
-            <path d="M4 16v2a2 2 0 0 0 2 2h2" />
-            <path d="M20 16v2a2 2 0 0 1-2 2h-2" />
-            <path d="M8 7v10" />
-            <path d="M10.5 6.5v11" />
-            <path d="M13 7.5v9" />
-            <path d="M15.5 6.5v11" />
-          </svg>
-        </button>
-      )}
-
-      {aktifSayfa !== 'merkez' && (
-        <button
-          type="button"
           className="ai-yardim-buton"
           aria-label="Yapay zeka yardımı"
           onClick={appNotifications.aiPanelDugmeTikla}
@@ -629,8 +607,6 @@ function App() {
           suppliers={suppliersData.tedarikciler}
         />
       </Suspense>
-
-      <BarcodeStockModal inventoryData={inventoryData} />
 
       <Suspense fallback={null}>
         <SupplierModals

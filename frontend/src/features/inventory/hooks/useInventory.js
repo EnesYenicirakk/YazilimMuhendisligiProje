@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   avatarOlustur,
-  barkodOlustur,
   bosForm,
   bosUrunDuzenlemeFormu,
   favorileriOneTasi,
@@ -11,7 +10,6 @@ import { productApi, categoryApi } from '../../../core/services/backendApiServic
 
 const SAYFA_BASINA_URUN = 8
 const STOK_LOG_SAYFA_BASINA = 8
-const barkodMetniniNormalizeEt = (deger) => String(deger ?? '').replace(/\s+/g, '').toLocaleLowerCase('tr-TR')
 const NEGATIF_OLAMAZ_ALANLAR = new Set(['urunAdedi', 'magazaStok', 'minimumStok', 'alisFiyati', 'satisFiyati'])
 
 const negatifOlmayanSayiyaDonustur = (deger) => {
@@ -43,11 +41,6 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
   const [form, setForm] = useState(bosForm)
   const [urunDuzenlemeUid, setUrunDuzenlemeUid] = useState(null)
   const [urunDuzenlemeFormu, setUrunDuzenlemeFormu] = useState(bosUrunDuzenlemeFormu)
-  const [barkodModalAcik, setBarkodModalAcik] = useState(false)
-  const [barkodIslemTuru, setBarkodIslemTuru] = useState('alis')
-  const [barkodMetni, setBarkodMetni] = useState('')
-  const [barkodMiktari, setBarkodMiktari] = useState('1')
-  const [barkodSepeti, setBarkodSepeti] = useState([])
 
   const stokLogTarihiOlustur = () => {
     const tarih = new Date()
@@ -101,8 +94,7 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
       : kategoriyeGore.filter(
           (urun) =>
             urun.ad.toLowerCase().includes(metin) ||
-            urun.urunId.toLowerCase().includes(metin) ||
-            barkodMetniniNormalizeEt(urun.barkod).includes(metin),
+            urun.urunId.toLowerCase().includes(metin),
         )
 
     return favorileriOneTasi(sonuc)
@@ -119,40 +111,11 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
       : urunler.filter(
           (urun) =>
             urun.ad.toLowerCase().includes(metin) ||
-            urun.urunId.toLowerCase().includes(metin) ||
-            barkodMetniniNormalizeEt(urun.barkod).includes(metin),
+            urun.urunId.toLowerCase().includes(metin),
         )
 
     return favorileriOneTasi(sonuc)
   }, [urunDuzenlemeArama, urunler])
-
-  const barkodAramaMetni = barkodMetniniNormalizeEt(barkodMetni)
-
-  const barkodEslesmeleri = useMemo(() => {
-    if (!barkodAramaMetni) return []
-
-    return urunler
-      .filter(
-        (urun) =>
-          barkodMetniniNormalizeEt(urun.barkod).includes(barkodAramaMetni) ||
-          urun.urunId.toLowerCase().includes(barkodAramaMetni) ||
-          urun.ad.toLowerCase().includes(barkodAramaMetni),
-      )
-      .slice(0, 6)
-  }, [barkodAramaMetni, urunler])
-
-  const barkodSeciliUrun = useMemo(
-    () =>
-      barkodEslesmeleri.find(
-        (urun) =>
-          barkodMetniniNormalizeEt(urun.barkod) === barkodAramaMetni ||
-          urun.urunId.toLowerCase() === barkodAramaMetni,
-      ) ?? barkodEslesmeleri[0] ?? null,
-    [barkodAramaMetni, barkodEslesmeleri],
-  )
-
-  const barkodToplamKalem = barkodSepeti.length
-  const barkodToplamAdet = barkodSepeti.reduce((toplam, kalem) => toplam + kalem.miktar, 0)
 
   const toplamUrunDuzenlemeSayfa = Math.max(1, Math.ceil(filtreliDuzenlemeUrunleri.length / SAYFA_BASINA_URUN))
   const urunDuzenlemeBaslangic = (urunDuzenlemeSayfa - 1) * SAYFA_BASINA_URUN
@@ -319,7 +282,6 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
         satisFiyati,
         kategori,
         tedarikciUid,
-        barkod: barkodOlustur(Date.now()),
         avatar: avatarOlustur(ad),
       }
 
@@ -599,213 +561,12 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     setUrunDuzenlemeSayfa(sayfa)
   }
 
-  const barkodAlanlariniTemizle = () => {
-    setBarkodMetni('')
-    setBarkodMiktari('1')
-  }
-
-  const barkodModaliniAc = () => {
-    barkodAlanlariniTemizle()
-    setBarkodSepeti([])
-    setBarkodIslemTuru('alis')
-    setBarkodModalAcik(true)
-  }
-
-  const barkodModaliniKapat = () => {
-    barkodAlanlariniTemizle()
-    setBarkodSepeti([])
-    setBarkodIslemTuru('alis')
-    setBarkodModalAcik(false)
-  }
-
-  const barkodIslemTurunuDegistir = (yeniTur) => {
-    if (yeniTur === barkodIslemTuru) return
-
-    if (barkodSepeti.length > 0) {
-      setBarkodSepeti([])
-      toastGoster?.('uyari', 'İşlem türü değiştiği için mevcut sepet temizlendi.')
-    }
-
-    barkodAlanlariniTemizle()
-    setBarkodIslemTuru(yeniTur)
-  }
-
-  const barkodMiktariGuncelle = (deger) => {
-    if (deger === '') {
-      setBarkodMiktari('')
-      return
-    }
-
-    setBarkodMiktari(deger.replace(/[^\d]/g, ''))
-  }
-
-  const barkodAdayiniSec = (urun, secenekler = {}) => {
-    if (!urun) return
-    setBarkodMetni(secenekler.barkodMetni ?? urun.urunId ?? urun.barkod)
-  }
-
-  const barkodSepeteEkle = (adayUrun = barkodSeciliUrun, secenekler = {}) => {
-    const miktar = Number(barkodMiktari)
-
-    if (!adayUrun) {
-      toastGoster?.('hata', 'Geçerli bir barkod veya ürün ID girin.')
-      return
-    }
-
-    if (!Number.isInteger(miktar) || miktar <= 0) {
-      toastGoster?.('hata', 'Miktar en az 1 olmalıdır.')
-      return
-    }
-
-    const sepettekiKalem = barkodSepeti.find((kalem) => kalem.uid === adayUrun.uid)
-    const sepettekiMevcutMiktar = sepettekiKalem?.miktar ?? 0
-    const toplamIstenenMiktar = sepettekiMevcutMiktar + miktar
-
-    if (barkodIslemTuru === 'satis' && toplamIstenenMiktar > adayUrun.magazaStok) {
-      toastGoster?.('hata', `${adayUrun.ad} için yeterli mağaza stoğu yok.`)
-      return
-    }
-
-    setBarkodSepeti((onceki) => {
-      if (sepettekiKalem) {
-        return onceki.map((kalem) =>
-          kalem.uid === adayUrun.uid ? { ...kalem, miktar: toplamIstenenMiktar } : kalem,
-        )
-      }
-
-      return [
-        ...onceki,
-        {
-          uid: adayUrun.uid,
-          urunId: adayUrun.urunId,
-          barkod: adayUrun.barkod,
-          ad: adayUrun.ad,
-          kategori: adayUrun.kategori,
-          avatar: adayUrun.avatar,
-          miktar,
-          mevcutStok: adayUrun.magazaStok,
-        },
-      ]
-    })
-
-    if (secenekler.metniKoru) {
-      setBarkodMiktari('1')
-    } else {
-      barkodAlanlariniTemizle()
-    }
-    toastGoster?.('basari', `${adayUrun.ad} sepete eklendi.`)
-  }
-
-  const barkodKalemMiktariniDegistir = (uid, yeniMiktar) => {
-    const miktar = Number(yeniMiktar)
-    if (!Number.isInteger(miktar) || miktar <= 0) return
-
-    setBarkodSepeti((onceki) =>
-      onceki.map((kalem) => {
-        if (kalem.uid !== uid) return kalem
-
-        const ilgiliUrun = urunler.find((urun) => urun.uid === uid)
-        if (barkodIslemTuru === 'satis' && ilgiliUrun && miktar > ilgiliUrun.magazaStok) {
-          return kalem
-        }
-
-        return { ...kalem, miktar }
-      }),
-    )
-  }
-
-  const barkodKaleminiKaldir = (uid) => {
-    setBarkodSepeti((onceki) => onceki.filter((kalem) => kalem.uid !== uid))
-  }
-
-  const barkodSepetiniTemizle = () => {
-    setBarkodSepeti([])
-    barkodAlanlariniTemizle()
-  }
-
-  const barkodStoklariniGuncelle = () => {
-    if (barkodSepeti.length === 0) {
-      toastGoster?.('hata', 'Önce sepete en az bir ürün ekleyin.')
-      return
-    }
-
-    const yetersizKalem =
-      barkodIslemTuru === 'satis'
-        ? barkodSepeti.find((kalem) => {
-            const ilgiliUrun = urunler.find((urun) => urun.uid === kalem.uid)
-            return !ilgiliUrun || kalem.miktar > ilgiliUrun.magazaStok
-          })
-        : null
-
-    if (yetersizKalem) {
-      toastGoster?.('hata', `${yetersizKalem.ad} için yeterli stok bulunmuyor.`)
-      return
-    }
-
-    const updateData = {
-      items: barkodSepeti.map((kalem) => ({ uid: kalem.uid, miktar: kalem.miktar })),
-      type: barkodIslemTuru,
-    }
-
-    productApi.bulkStockUpdate(updateData).then(() => {
-      setUrunler((onceki) =>
-        onceki.map((urun) => {
-          const kalem = barkodSepeti.find((item) => item.uid === urun.uid)
-          if (!kalem) return urun
-
-          const yeniStok = barkodIslemTuru === 'alis'
-            ? urun.magazaStok + kalem.miktar
-            : urun.magazaStok - kalem.miktar
-
-          return {
-            ...urun,
-            magazaStok: yeniStok,
-          }
-        }),
-      )
-
-      barkodSepeti.forEach((kalem) => {
-        const ilgiliUrun = urunler.find((urun) => urun.uid === kalem.uid)
-        if (!ilgiliUrun) return
-
-        const yeniStok = barkodIslemTuru === 'alis'
-          ? ilgiliUrun.magazaStok + kalem.miktar
-          : ilgiliUrun.magazaStok - kalem.miktar
-
-        stokLoguEkle({
-          urun: ilgiliUrun.ad,
-          urunId: ilgiliUrun.urunId,
-          eskiStok: ilgiliUrun.magazaStok,
-          yeniStok,
-          islem: barkodIslemTuru === 'alis' ? 'Stok artışı' : 'Stok düşüşü',
-          aciklama:
-            barkodIslemTuru === 'alis'
-              ? `Barkod ekranından ${kalem.miktar} adet stok girişi yapıldı.`
-              : `Barkod ekranından ${kalem.miktar} adet stok çıkışı yapıldı.`,
-        })
-      })
-
-      toastGoster?.(
-        'basari',
-        barkodIslemTuru === 'alis'
-          ? `${barkodToplamKalem} kalem için stok girişi tamamlandı.`
-          : `${barkodToplamKalem} kalem için stok çıkışı tamamlandı.`,
-      )
-
-      barkodModaliniKapat()
-    }).catch((err) => {
-      console.error('Stoklar güncellenirken hata:', err)
-      toastGoster?.('hata', 'Stoklar güncellenirken sunucu hatası oluştu.')
-    })
-  }
-
   const inventoryModallariniKapat = () => {
     eklemePenceresiniKapat()
     duzenlemePenceresiniKapat()
     setSilinecekUrun(null)
     urunDuzenlemeModaliniKapat()
     setSilinecekDuzenlemeUrunu(null)
-    barkodModaliniKapat()
   }
 
   return {
@@ -835,15 +596,6 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     setSilinecekDuzenlemeUrunu,
     form,
     urunDuzenlemeFormu,
-    barkodModalAcik,
-    barkodIslemTuru,
-    barkodMetni,
-    barkodMiktari,
-    barkodSepeti,
-    barkodEslesmeleri,
-    barkodSeciliUrun,
-    barkodToplamKalem,
-    barkodToplamAdet,
     filtreliUrunler,
     toplamEnvanterSayfa,
     sayfaBaslangic,
@@ -866,17 +618,6 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     urunDuzenlemeFormuGuncelle,
     urunDuzenlemeKaydet,
     urunDuzenlemeSil,
-    barkodModaliniAc,
-    barkodModaliniKapat,
-    barkodIslemTurunuDegistir,
-    barkodAdayiniSec,
-    setBarkodMetni,
-    barkodMiktariGuncelle,
-    barkodSepeteEkle,
-    barkodKalemMiktariniDegistir,
-    barkodKaleminiKaldir,
-    barkodSepetiniTemizle,
-    barkodStoklariniGuncelle,
     favoriDegistir,
     urunStokunuAzalt,
     otomatikStokKorumasiniUygula,
@@ -886,3 +627,4 @@ export default function useInventory({ toastGoster, isLoggedIn }) {
     loading,
   }
 }
+

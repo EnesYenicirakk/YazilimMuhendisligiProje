@@ -21,8 +21,10 @@ export default function SupplierModals({
     tedarikciNotKaydet,
     tedarikciSiparisEklemeAcik,
     tedarikciSiparisFormu,
+    duzenlenenTedarikciSiparisi,
     tedarikciSiparisFormuGuncelle,
     tedarikciSiparisKaydet,
+    tedarikciSiparisDuzenlemeAc,
     genelTedarikSiparisAcik,
     genelTedarikSiparisFormu,
     genelTedarikSiparisFormuGuncelle,
@@ -202,7 +204,17 @@ export default function SupplierModals({
                 {seciliTedarikci.siparisler.map((siparis) => (
                   <div key={`${seciliTedarikci.uid}-${siparis.siparisNo}`} className="mobil-bilgi-satiri tam">
                     <span>{siparis.siparisNo}</span>
-                    <strong>{siparisOzeti(siparis)}</strong>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between', width: '100%' }}>
+                      <strong>{siparisOzeti(siparis)}</strong>
+                      <button
+                        type="button"
+                        className="ikon-dugme duzenle"
+                        title="D?zenle"
+                        onClick={() => tedarikciSiparisDuzenlemeAc(seciliTedarikci.uid, siparis)}
+                      >
+                        <KucukIkon tip="duzenle" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -219,7 +231,7 @@ export default function SupplierModals({
         <div className="modal-kaplama">
           <div className="modal-kutu">
             <div className="modal-baslik">
-              <h3>Tedarikçi Siparişi Oluştur</h3>
+              <h3>{duzenlenenTedarikciSiparisi ? 'Tedarik?i Sipari?ini D?zenle' : 'Tedarik?i Sipari?i Olu?tur'}</h3>
               <button type="button" className="modal-kapat" onClick={tedarikciSiparisKapat} aria-label="Kapat">×</button>
             </div>
             <div className="modal-form">
@@ -238,7 +250,7 @@ export default function SupplierModals({
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={tedarikciSiparisKapat}>İptal</button>
-              <button type="button" onClick={tedarikciSiparisKaydet}>Kaydet</button>
+              <button type="button" onClick={tedarikciSiparisKaydet}>{duzenlenenTedarikciSiparisi ? 'G?ncelle' : 'Kaydet'}</button>
             </div>
           </div>
         </div>
@@ -298,3 +310,4 @@ export default function SupplierModals({
     </>
   )
 }
+

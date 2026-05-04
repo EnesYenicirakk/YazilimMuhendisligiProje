@@ -10,6 +10,7 @@ class CustomerOrder extends Model
 {
     protected $fillable = [
         'customer_id',
+        'guest_name',
         'total_amount',
         'order_date',
         'payment_status',

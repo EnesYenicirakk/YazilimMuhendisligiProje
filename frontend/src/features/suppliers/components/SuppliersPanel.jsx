@@ -29,6 +29,7 @@ export default function SuppliersPanel({
       setTedarikciSayfa={suppliersData.setTedarikciSayfa}
       sayfadakiTedarikSiparisleri={suppliersData.sayfadakiTedarikSiparisleri}
       genelTedarikSiparisEklemeAc={suppliersData.genelTedarikSiparisEklemeAc}
+      tedarikciSiparisDuzenlemeAc={suppliersData.tedarikciSiparisDuzenlemeAc}
       tarihFormatla={tarihFormatla}
       tedarikciler={suppliersData.tedarikciler}
       seciliTedarikci={suppliersData.seciliTedarikci}

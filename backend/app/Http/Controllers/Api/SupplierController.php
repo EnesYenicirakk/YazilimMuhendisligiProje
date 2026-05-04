@@ -136,6 +136,56 @@ class SupplierController extends Controller
         return response()->json($this->mapOrderToFrontend($order), 201);
     }
 
+    /**
+     * PUT /suppliers/{supplierId}/orders/{orderId}
+     * Var olan tedarik siparişini günceller
+     */
+    public function updateOrder(Request $request, $supplierId, $orderId)
+    {
+        $supplier = Supplier::findOrFail($supplierId);
+        $order = SupplierOrder::where('supplier_id', $supplier->id)->findOrFail($orderId);
+
+        $request->validate([
+            'siparisNo'   => 'required|string|unique:supplier_orders,order_number,' . $order->id,
+            'tarih'       => 'required|string',
+            'tutar'       => 'required|numeric|min:0',
+            'durum'       => 'required|string',
+            'urun'        => 'nullable|string',
+            'urunId'      => 'nullable|string',
+            'miktar'      => 'nullable|integer|min:0',
+            'birimFiyat'  => 'nullable|numeric|min:0',
+            'otomatik'    => 'nullable|boolean',
+            'kaynak'      => 'nullable|string',
+            'oncekiStok'  => 'nullable|integer',
+            'hedefStok'   => 'nullable|integer',
+            'beklenenStok' => 'nullable|integer',
+        ]);
+
+        $oncekiTutar = (float) $order->total_amount;
+
+        $order->update([
+            'order_number'   => $request->siparisNo,
+            'total_amount'   => $request->tutar,
+            'order_date'     => $request->tarih,
+            'status'         => $request->durum,
+            'product_name'   => $request->urun,
+            'product_sku'    => $request->urunId,
+            'quantity'       => $request->miktar ?? 0,
+            'unit_price'     => $request->birimFiyat ?? 0,
+            'is_automatic'   => $request->otomatik ?? false,
+            'source'         => $request->kaynak,
+            'previous_stock' => $request->oncekiStok,
+            'target_stock'   => $request->hedefStok,
+            'expected_stock' => $request->beklenenStok,
+        ]);
+
+        $supplier->update([
+            'total_spent' => max(0, (float) $supplier->total_spent - $oncekiTutar + (float) $request->tutar),
+        ]);
+
+        return response()->json($this->mapOrderToFrontend($order->fresh()));
+    }
+
     private function mapSupplierToFrontend($supplier)
     {
         $orders = $supplier->relationLoaded('orders')

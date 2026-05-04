@@ -1,4 +1,6 @@
-﻿import { SayfaIkonu } from '../common/Ikonlar'
+import { useEffect, useRef, useState } from 'react'
+import { SayfaIkonu } from '../common/Ikonlar'
+import SnakeMiniGame from './SnakeMiniGame'
 
 const MENU_OGELERI = [
   { sayfa: 'dashboard', etiket: 'Dashboard' },
@@ -11,13 +13,61 @@ const MENU_OGELERI = [
   { sayfa: 'faturalama', etiket: 'Faturalama (PDF)' },
 ]
 
+const EASTER_EGG_CLICK_WINDOW_MS = 800
+
 export default function Sidebar({
   aktifSayfa,
   sayfaDegistir,
   mobilMenuAcik,
   setMobilMenuAcik,
 }) {
+  const [snakeAcik, setSnakeAcik] = useState(false)
+  const [logoTiklamaSayisi, setLogoTiklamaSayisi] = useState(0)
+  const clickTimerRef = useRef(null)
+  const logoWrapRef = useRef(null)
+
+  useEffect(() => () => {
+    if (clickTimerRef.current) {
+      window.clearTimeout(clickTimerRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!snakeAcik) return undefined
+
+    const handlePointerDown = (event) => {
+      if (logoWrapRef.current?.contains(event.target)) return
+      setSnakeAcik(false)
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    return () => window.removeEventListener('pointerdown', handlePointerDown)
+  }, [snakeAcik])
+
   if (aktifSayfa === 'merkez') return null
+
+  const logoTiklandi = () => {
+    sayfaDegistir('dashboard')
+
+    const yeniSayi = logoTiklamaSayisi + 1
+    setLogoTiklamaSayisi(yeniSayi)
+
+    if (clickTimerRef.current) {
+      window.clearTimeout(clickTimerRef.current)
+    }
+
+    if (yeniSayi >= 3) {
+      setSnakeAcik((onceki) => !onceki)
+      setLogoTiklamaSayisi(0)
+      clickTimerRef.current = null
+      return
+    }
+
+    clickTimerRef.current = window.setTimeout(() => {
+      setLogoTiklamaSayisi(0)
+      clickTimerRef.current = null
+    }, EASTER_EGG_CLICK_WINDOW_MS)
+  }
 
   return (
     <>
@@ -56,17 +106,20 @@ export default function Sidebar({
           </button>
         </div>
 
-        <img
-          src="/ytu-logo.png"
-          alt="MTÜ Sanayi logosu"
-          className="sayfa-logo menu-logo"
-          style={{ cursor: 'pointer' }}
-          onClick={() => sayfaDegistir('dashboard')}
-          onError={(event) => {
-            event.currentTarget.onerror = null
-            event.currentTarget.src = '/ytu-logo.svg'
-          }}
-        />
+        <div ref={logoWrapRef} className="sidebar-logo-wrap">
+          <img
+            src="/ytu-logo.png"
+            alt="MTÜ Sanayi logosu"
+            className="sayfa-logo menu-logo"
+            style={{ cursor: 'pointer' }}
+            onClick={logoTiklandi}
+            onError={(event) => {
+              event.currentTarget.onerror = null
+              event.currentTarget.src = '/ytu-logo.svg'
+            }}
+          />
+          {snakeAcik && <SnakeMiniGame onClose={() => setSnakeAcik(false)} />}
+        </div>
 
         <nav>
           {MENU_OGELERI.map((oge) => (

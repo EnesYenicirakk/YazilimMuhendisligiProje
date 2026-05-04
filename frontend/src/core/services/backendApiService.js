@@ -95,4 +95,5 @@ export const supplierApi = {
   update: (id, data) => apiFetch(`/suppliers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => apiFetch(`/suppliers/${id}`, { method: 'DELETE' }),
   createOrder: (supplierId, data) => apiFetch(`/suppliers/${supplierId}/orders`, { method: 'POST', body: JSON.stringify(data) }),
+  updateOrder: (supplierId, orderId, data) => apiFetch(`/suppliers/${supplierId}/orders/${orderId}`, { method: 'PUT', body: JSON.stringify(data) }),
 };

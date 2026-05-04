@@ -24,6 +24,7 @@ function TedarikcilerPaneli(props) {
     setTedarikciSayfa,
     sayfadakiTedarikSiparisleri,
     genelTedarikSiparisEklemeAc,
+    tedarikciSiparisDuzenlemeAc,
     tarihFormatla,
     tedarikciler,
     seciliTedarikci,
@@ -225,6 +226,7 @@ function TedarikcilerPaneli(props) {
                         <th>Tarih</th>
                         <th>Tutar</th>
                         <th>Durum</th>
+                        <th>??lem</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -244,6 +246,21 @@ function TedarikcilerPaneli(props) {
                           <td>{tarihFormatla(siparis.tarih)}</td>
                           <td>{paraFormatla(siparis.tutar)}</td>
                           <td><span className={`tedarik-durum ${siparis.durum === 'Bekliyor' ? 'bekliyor' : siparis.durum === 'Hazırlanıyor' ? 'hazirlaniyor' : 'teslim'}`}>{siparis.durum}</span></td>
+                          <td>
+                            <div className="islem-dugmeleri">
+                              <button
+                                type="button"
+                                className="ikon-dugme duzenle"
+                                title="D?zenle"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  tedarikciSiparisDuzenlemeAc(siparis.tedarikciUid, siparis)
+                                }}
+                              >
+                                <KucukIkon tip="duzenle" />
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -261,6 +278,12 @@ function TedarikcilerPaneli(props) {
                           id: 'git',
                           etiket: 'Detay',
                           onClick: () => tedarikciDetayAc(tedarikciler.find((item) => item.uid === siparis.tedarikciUid) ?? seciliTedarikci),
+                        },
+                        {
+                          id: 'duzenle',
+                          etiket: 'D?zenle',
+                          varyant: 'ikincil',
+                          onClick: () => tedarikciSiparisDuzenlemeAc(siparis.tedarikciUid, siparis),
                         },
                       ]}
                       ust={

@@ -44,4 +44,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/finance/{id}/favorite', [FinanceController::class, 'toggleFavorite']);
     Route::apiResource('suppliers', SupplierController::class);
     Route::post('/suppliers/{id}/orders', [SupplierController::class, 'storeOrder']);
+    Route::put('/suppliers/{supplierId}/orders/{orderId}', [SupplierController::class, 'updateOrder']);
 });

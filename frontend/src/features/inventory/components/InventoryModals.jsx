@@ -43,7 +43,7 @@ export default function InventoryModals({ inventoryData, suppliers = [] }) {
               </select>
               <label>Ürün ID<ZorunluYildiz /> (Otomatik Oluşturuldu)</label>
               <input data-testid="product-sku-input" value={form.urunId} readOnly style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }} />
-              <label>Ürün Adedi<ZorunluYildiz /></label>
+              <label>Depo Stok<ZorunluYildiz /></label>
               <input data-testid="product-warehouse-stock-input" type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
               <label>Alış Fiyatı<ZorunluYildiz /></label>
               <input data-testid="product-purchase-price-input" type="number" min="0" step="0.01" value={form.alisFiyati} onChange={(event) => formGuncelle('alisFiyati', event.target.value)} />
@@ -88,7 +88,7 @@ export default function InventoryModals({ inventoryData, suppliers = [] }) {
               </select>
               <label>Ürün ID</label>
               <input data-testid="product-sku-input" value={form.urunId} readOnly style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }} />
-              <label>Ürün Adedi<ZorunluYildiz /></label>
+              <label>Depo Stok<ZorunluYildiz /></label>
               <input data-testid="product-warehouse-stock-input" type="number" min="0" step="1" value={form.urunAdedi} onChange={(event) => formGuncelle('urunAdedi', event.target.value)} />
               <label>Alış Fiyatı<ZorunluYildiz /></label>
               <input data-testid="product-purchase-price-input" type="number" min="0" step="0.01" value={form.alisFiyati} onChange={(event) => formGuncelle('alisFiyati', event.target.value)} />
@@ -133,7 +133,7 @@ export default function InventoryModals({ inventoryData, suppliers = [] }) {
               </select>
               <label>Ürün ID<ZorunluYildiz /></label>
               <input data-testid="product-sku-input" value={urunDuzenlemeFormu.urunId} onChange={(event) => urunDuzenlemeFormuGuncelle('urunId', event.target.value)} />
-              <label>Ürün Adedi<ZorunluYildiz /></label>
+              <label>Depo Stok<ZorunluYildiz /></label>
               <input data-testid="product-warehouse-stock-input" type="number" min="0" step="1" value={urunDuzenlemeFormu.urunAdedi} onChange={(event) => urunDuzenlemeFormuGuncelle('urunAdedi', event.target.value)} />
               <label>Alış Fiyatı<ZorunluYildiz /></label>
               <input data-testid="product-purchase-price-input" type="number" min="0" step="0.01" value={urunDuzenlemeFormu.alisFiyati} onChange={(event) => urunDuzenlemeFormuGuncelle('alisFiyati', event.target.value)} />

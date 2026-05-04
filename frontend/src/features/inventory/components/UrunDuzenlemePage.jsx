@@ -81,7 +81,7 @@ export default function UrunDuzenlemePage({
                         <th>No</th>
                         <th>Ürün</th>
                         <th>Ürün ID</th>
-                        <th>Ürün Adedi</th>
+                        <th>Depo Stok</th>
                         <th>Alış Fiyatı</th>
                         <th>Satış Fiyatı</th>
                         <th>Mağaza Stok</th>
@@ -177,7 +177,7 @@ export default function UrunDuzenlemePage({
                               <span>{urun.urunId}</span>
                             </div>
                           </div>
-                          <div className="mobil-bilgi-satiri"><span>Ürün Adedi</span><strong>{urun.urunAdedi}</strong></div>
+                          <div className="mobil-bilgi-satiri"><span>Depo Stok</span><strong>{urun.urunAdedi}</strong></div>
                           <div className="mobil-bilgi-satiri"><span>Minimum Stok</span><strong>{urun.minimumStok}</strong></div>
                           <div className="mobil-bilgi-satiri"><span>Alış Fiyatı</span><strong>{paraFormatla(urun.alisFiyati ?? 0)}</strong></div>
                           <div className="mobil-bilgi-satiri"><span>Satış Fiyatı</span><strong>{paraFormatla(urun.satisFiyati ?? 0)}</strong></div>

@@ -383,12 +383,6 @@ export default function useDashboard({
         degisim: yuzdeselDegisimMetni(acilSiparisSayisi, oncekiAyAcilSiparisSayisi),
         ikon: 'kutu',
       },
-      {
-        baslik: 'Ortalama Teslimat',
-        deger: `${ortalamaTeslimat.toFixed(1).replace('.', ',')} Gün`,
-        degisim: tersYuzdeselDegisimMetni(ortalamaTeslimat, oncekiAyOrtalamaTeslimat),
-        ikon: 'saat',
-      },
     ].filter((kart) => !gizlenenOzetKartlari.includes(kart.baslik))
   }, [gelenNakitKayitlari, gidenNakitKayitlari, gizlenenOzetKartlari, siparisler, tamamlananSiparisler])
 

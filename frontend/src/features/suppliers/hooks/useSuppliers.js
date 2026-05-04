@@ -431,11 +431,11 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     const durum = tedarikciSiparisFormu.durum.trim()
 
     if (!seciliTedarikciUid || !siparisNo || !tarih || !durum || Number.isNaN(tutar)) {
-      toastGoster?.('hata', 'Tedarik??i sipari??i formunda eksik veya hatal?? bilgi var.')
+      toastGoster?.('hata', 'Tedarikçi siparişi formunda eksik veya hatalı bilgi var.')
       return
     }
     if (negatifSayiVarMi(tutar)) {
-      toastGoster?.('hata', 'Sipari?? tutar?? negatif olamaz.')
+      toastGoster?.('hata', 'Sipariş tutarı negatif olamaz.')
       return
     }
 
@@ -452,7 +452,7 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
       return true
     })
     if (tekrarVar) {
-      toastGoster?.('hata', 'Bu sipari?? numaras?? zaten mevcut.')
+      toastGoster?.('hata', 'Bu sipariş numarası zaten mevcut.')
       return
     }
 
@@ -489,10 +489,10 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
       .then((sunucuSiparisi) => {
         tedarikciSiparisiniYerlestir(seciliTedarikciUid, sunucuSiparisi, oncekiSiparisNo)
         tedarikciSiparisKapat()
-        toastGoster?.('basari', isEditing ? `${siparisNo} numaral?? tedarik??i sipari??i g??ncellendi.` : `${siparisNo} numaral?? tedarik??i sipari??i olu??turuldu.`)
+        toastGoster?.('basari', isEditing ? `${siparisNo} numaralı tedarikçi siparişi güncellendi.` : `${siparisNo} numaralı tedarikçi siparişi oluşturuldu.`)
       })
       .catch((hata) => {
-        toastGoster?.('hata', hata.message || 'Tedarik??i sipari??i kaydedilirken bir hata olu??tu.')
+        toastGoster?.('hata', hata.message || 'Tedarikçi siparişi kaydedilirken bir hata oluştu.')
       })
   }
 
@@ -505,16 +505,16 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     const durum = genelTedarikSiparisFormu.durum.trim()
 
     if (!tedarikciUid || !secili || !siparisNo || !tarih || !durum || Number.isNaN(tutar)) {
-      toastGoster?.('hata', 'Yeni tedarik sipari??i i??in eksik veya hatal?? alan var.')
+      toastGoster?.('hata', 'Yeni tedarik siparişi için eksik veya hatalı alan var.')
       return
     }
     if (negatifSayiVarMi(tutar)) {
-      toastGoster?.('hata', 'Sipari?? tutar?? negatif olamaz.')
+      toastGoster?.('hata', 'Sipariş tutarı negatif olamaz.')
       return
     }
     const tekrarVar = tedarikciler.some((tedarikci) => tedarikci.uid === tedarikciUid && tedarikci.siparisler.some((siparis) => siparis.siparisNo.toLowerCase() === siparisNo.toLowerCase()))
     if (tekrarVar) {
-      toastGoster?.('hata', 'Bu tedarik??i i??in ayn?? sipari?? numaras?? zaten mevcut.')
+      toastGoster?.('hata', 'Bu tedarikçi için aynı sipariş numarası zaten mevcut.')
       return
     }
 
@@ -528,10 +528,10 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
         tedarikciSiparisiniYerlestir(tedarikciUid, sunucuSiparisi)
         setTedarikciSiparisSayfa(1)
         genelTedarikSiparisKapat()
-        toastGoster?.('basari', `${secili.firmaAdi} i??in ${siparisNo} numaral?? sipari?? olu??turuldu.`)
+        toastGoster?.('basari', `${secili.firmaAdi} için ${siparisNo} numaralı sipariş oluşturuldu.`)
       })
       .catch((hata) => {
-        toastGoster?.('hata', hata.message || 'Tedarik sipari??i kaydedilirken bir hata olu??tu.')
+        toastGoster?.('hata', hata.message || 'Tedarik siparişi kaydedilirken bir hata oluştu.')
       })
   }
 

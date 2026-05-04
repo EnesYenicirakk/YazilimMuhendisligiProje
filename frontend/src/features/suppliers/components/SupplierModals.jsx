@@ -209,7 +209,7 @@ export default function SupplierModals({
                       <button
                         type="button"
                         className="ikon-dugme duzenle"
-                        title="D?zenle"
+                        title="Düzenle"
                         onClick={() => tedarikciSiparisDuzenlemeAc(seciliTedarikci.uid, siparis)}
                       >
                         <KucukIkon tip="duzenle" />
@@ -231,7 +231,7 @@ export default function SupplierModals({
         <div className="modal-kaplama">
           <div className="modal-kutu">
             <div className="modal-baslik">
-              <h3>{duzenlenenTedarikciSiparisi ? 'Tedarik?i Sipari?ini D?zenle' : 'Tedarik?i Sipari?i Olu?tur'}</h3>
+              <h3>{duzenlenenTedarikciSiparisi ? 'Tedarikçi Siparişini Düzenle' : 'Tedarikçi Siparişi Oluştur'}</h3>
               <button type="button" className="modal-kapat" onClick={tedarikciSiparisKapat} aria-label="Kapat">×</button>
             </div>
             <div className="modal-form">
@@ -250,7 +250,7 @@ export default function SupplierModals({
             </div>
             <div className="modal-aksiyon">
               <button type="button" className="ikinci" onClick={tedarikciSiparisKapat}>İptal</button>
-              <button type="button" onClick={tedarikciSiparisKaydet}>{duzenlenenTedarikciSiparisi ? 'G?ncelle' : 'Kaydet'}</button>
+              <button type="button" onClick={tedarikciSiparisKaydet}>{duzenlenenTedarikciSiparisi ? 'Güncelle' : 'Kaydet'}</button>
             </div>
           </div>
         </div>

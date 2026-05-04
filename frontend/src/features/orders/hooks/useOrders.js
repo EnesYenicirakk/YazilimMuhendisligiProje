@@ -439,11 +439,10 @@ export default function useOrders({
       toastGoster?.('basari', `${sunucuVerisi.siparisNo} numaralı yeni sipariş oluşturuldu.`)
     }).catch(err => {
       console.error('Sipariş eklenirken hata:', err)
-      console.error('Sipari?? g??ncellenirken hata:', err)
       const hataMesaji = String(err?.message ?? '').toLocaleLowerCase('tr-TR')
       const kullaniciMesaji = hataMesaji.includes('yeterli stok')
-        ? 'Yeterli stok bulunam??yor.'
-        : (err?.message || 'Sipari?? olu??turulurken bir hata olu??tu.')
+        ? 'Yeterli stok bulunamıyor.'
+        : (err?.message || 'Sipariş oluşturulurken bir hata oluştu.')
       toastGoster?.('hata', kullaniciMesaji)
     })
   }
@@ -506,10 +505,9 @@ export default function useOrders({
     }).catch(err => {
       const hataMesaji = String(err?.message ?? '').toLocaleLowerCase('tr-TR')
       const kullaniciMesaji = hataMesaji.includes('yeterli stok')
-        ? 'Yeterli stok bulunam??yor.'
-        : (err?.message || 'Sipari?? g??ncellenirken sunucu hatas?? olu??tu.')
+        ? 'Yeterli stok bulunamıyor.'
+        : (err?.message || 'Sipariş güncellenirken sunucu hatası oluştu.')
       toastGoster?.('hata', kullaniciMesaji)
-      toastGoster?.('hata', 'Sipariş güncellenirken sunucu hatası oluştu.')
     })
   }
 

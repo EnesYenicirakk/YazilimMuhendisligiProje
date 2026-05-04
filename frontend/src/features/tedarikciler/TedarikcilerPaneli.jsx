@@ -226,7 +226,7 @@ function TedarikcilerPaneli(props) {
                         <th>Tarih</th>
                         <th>Tutar</th>
                         <th>Durum</th>
-                        <th>??lem</th>
+                        <th>İşlem</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -251,7 +251,7 @@ function TedarikcilerPaneli(props) {
                               <button
                                 type="button"
                                 className="ikon-dugme duzenle"
-                                title="D?zenle"
+                                title="Düzenle"
                                 onClick={(event) => {
                                   event.stopPropagation()
                                   tedarikciSiparisDuzenlemeAc(siparis.tedarikciUid, siparis)
@@ -281,7 +281,7 @@ function TedarikcilerPaneli(props) {
                         },
                         {
                           id: 'duzenle',
-                          etiket: 'D?zenle',
+                          etiket: 'Düzenle',
                           varyant: 'ikincil',
                           onClick: () => tedarikciSiparisDuzenlemeAc(siparis.tedarikciUid, siparis),
                         },

@@ -274,6 +274,8 @@ function App() {
     onOdemeSekmeDegistir: financeData.setOdemeSekmesi,
     onTedarikciSekmeDegistir: suppliersData.setTedarikciSekmesi,
     toastGoster,
+    dashboardOzet: dashboardData.dashboardOzet,
+    bugunkuOncelikler: dashboardData.bugunkuOncelikler,
   })
 
   const merkezeDon = () => {

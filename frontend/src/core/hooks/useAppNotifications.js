@@ -19,6 +19,8 @@ export default function useAppNotifications({
   onOdemeSekmeDegistir,
   onTedarikciSekmeDegistir,
   toastGoster,
+  dashboardOzet = [],
+  bugunkuOncelikler = [],
 }) {
   const [aiPanelAcik, setAiPanelAcik] = useState(false)
   const [aiPanelKucuk, setAiPanelKucuk] = useState(false)
@@ -176,8 +178,12 @@ export default function useAppNotifications({
         `Şu anda sistemde kayıtlı toplam **${musteriler.length}** müşteriniz bulunuyor.`,
       [metniNormalizeEt('Kaç tane tedarikçimiz var?')]:
         `Sistemde kayıtlı toplam **${tedarikciler.length}** tedarikçiniz bulunuyor.`,
+      [metniNormalizeEt('Genel finansal durumumuz ve net karımız ne kadar?')]:
+        `Sistemin genel finansal özetine göre: Toplam Ciro **${dashboardOzet.find(k => k.baslik === 'Toplam Gelir')?.deger || 'Bilinmiyor'}**, Net Kar ise **${dashboardOzet.find(k => k.baslik === 'Net Kar')?.deger || 'Bilinmiyor'}** olarak görünüyor.`,
+      [metniNormalizeEt('Toplam sipariş sayımız nedir?')]:
+        `Sistemde kayıtlı toplam **${dashboardOzet.find(k => k.baslik === 'Toplam Sipariş')?.deger || siraliSiparisler.length}** sipariş bulunmaktadır.`,
     }
-  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, tarihFormatla, urunler, musteriler, tedarikciler])
+  }, [dashboardCanliOzetler.kritikStokluUrunler, paraFormatla, siraliSiparisler, tarihFormatla, urunler, musteriler, tedarikciler, dashboardOzet])
 
   useEffect(() => {
     if (!aiPanelKapaniyor) return undefined
@@ -260,12 +266,21 @@ export default function useAppNotifications({
       
       const enCokSatan = enCokSatilanUrunleriHesapla(siraliSiparisler, 1)[0]?.ad || 'Bilinmiyor'
 
+      const toplamSiparis = dashboardOzet.find(k => k.baslik === 'Toplam Sipariş')?.deger || siraliSiparisler.length
+      const netKar = dashboardOzet.find(k => k.baslik === 'Net Kar')?.deger || 'Hesaplanamadı'
+      const toplamGelir = dashboardOzet.find(k => k.baslik === 'Toplam Gelir')?.deger || 'Hesaplanamadı'
+
       const aiBaglami = `Sistem Durumu Özeti:
-      - Kayıtlı: ${musteriler.length} müşteri, ${tedarikciler.length} tedarikçi, ${urunler.length} ürün.
-      - Finans: Bugün ${paraFormatla(bugunToplamTutar)} (${bugunSiparisleri.length} satış), Bu ay toplam ${paraFormatla(buAyToplamTutar)} ciro.
-      - Operasyon: ${bekleyenSiparisler.length} sipariş hazırlanıyor, ${kritikStokSayisi} ürünün stoğu kritik seviyede.
+      - Genel İstatistikler: Toplam ${toplamSiparis} sipariş, ${musteriler.length} müşteri, ${tedarikciler.length} tedarikçi, ${urunler.length} ürün.
+      - Finansal Durum: Toplam Ciro ${toplamGelir}, Net Kar ${netKar}. Bugünün cirosu ${paraFormatla(bugunToplamTutar)}.
+      - Operasyonel Durum: ${bekleyenSiparisler.length} sipariş hazırlanıyor, ${kritikStokSayisi} ürünün stoğu kritik seviyede.
+      - Bugünün Öncelikleri: ${bugunkuOncelikler.map(o => `${o.baslik}: ${o.deger} (${o.detay})`).join(', ')}.
       - Trend: En çok satan ürün "${enCokSatan}".
-      Lütfen bu verileri kullanarak kullanıcıya profesyonel analizler sun.`
+      
+      Senin Adın: Nex. Sen profesyonel bir iş asistanısın. 
+      Lütfen bu verileri kullanarak kullanıcıya yardımcı, nazik ve çözüm odaklı cevaplar ver. 
+      Eğer bir veri eksikse (örneğin kar bilgisi -L1850 ise bu gerçek veridir), 'bilmiyorum' demek yerine eldeki veriyi yorumla.`
+
 
       fetchAiResponse(metin, aiBaglami)
         .then((cevap) => {

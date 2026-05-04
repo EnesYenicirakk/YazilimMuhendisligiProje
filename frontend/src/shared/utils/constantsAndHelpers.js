@@ -280,6 +280,7 @@ export const merkezMenusu = [
 export const aiHizliKonular = [
   { etiket: 'Bugünkü Satış', mesaj: 'Bugün kaç TLlik satış yaptım?' },
   { etiket: 'Aylık Ciro', mesaj: 'Bu ayki toplam ciromuz ne kadar?' },
+  { etiket: 'Net Kar Analizi', mesaj: 'Genel finansal durumumuz ve net karımız ne kadar?' },
   { etiket: 'Bekleyen İşler', mesaj: 'Kaç sipariş kargolanmayı bekliyor?' },
   { etiket: 'Kritik Stoklar', mesaj: 'Stokları azalan kaç ürün var?' },
   { etiket: 'En Popüler', mesaj: 'En çok satan ürünümüz hangisi?' },

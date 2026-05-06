@@ -33,4 +33,19 @@ export default [
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    files: ['cypress.config.js', 'cypress/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        Cypress: 'readonly',
+        cy: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        beforeEach: 'readonly',
+        expect: 'readonly',
+      },
+    },
+  },
 ]

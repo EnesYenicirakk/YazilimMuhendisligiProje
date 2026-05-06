@@ -582,7 +582,6 @@ function App() {
             aiMesajMetni={appNotifications.aiMesajMetni}
             aiMesajlar={appNotifications.aiMesajlar}
             aiPanelKapaniyor={appNotifications.aiPanelKapaniyor}
-            aiPaneliKapat={appNotifications.aiPaneliKapat}
             aiYukleniyor={appNotifications.aiYukleniyor}
             setAiMesajMetni={appNotifications.setAiMesajMetni}
             setAiHizliKonularAcik={appNotifications.setAiHizliKonularAcik}

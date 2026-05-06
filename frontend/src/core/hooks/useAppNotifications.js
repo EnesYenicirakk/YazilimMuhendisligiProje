@@ -8,7 +8,6 @@ export default function useAppNotifications({
   dashboardCanliOzetler,
   stokDegisimLoglari = [],
   siraliSiparisler,
-  tedarikSiparisleri = [],
   urunler,
   musteriler = [],
   tedarikciler = [],
@@ -37,18 +36,14 @@ export default function useAppNotifications({
   ])
 
   const [backendBildirimler, setBackendBildirimler] = useState([])
-  const [loading, setLoading] = useState(false)
 
   // Bildirimleri API'den çek
   const bildirimleriGetir = useCallback(async () => {
-    setLoading(true)
     try {
       const data = await notificationApi.getAll()
       setBackendBildirimler(data)
     } catch (error) {
       console.error('Bildirimler yüklenemedi:', error)
-    } finally {
-      setLoading(false)
     }
   }, [])
 
@@ -204,10 +199,6 @@ export default function useAppNotifications({
   }, [bildirimPanelKapaniyor])
 
   useEffect(() => {
-    // Backend verisi geldiği için artık local cleanup'a gerek yok
-  }, [backendBildirimler])
-
-  useEffect(() => {
     setAiTemaMenuAcik(false)
     if (aktifSayfa === 'merkez') {
       setBildirimPanelAcik(false)
@@ -253,13 +244,8 @@ export default function useAppNotifications({
 
       // AI için zengin veri bağlamı oluştur
       const bugun = new Date().toISOString().split('T')[0]
-      const buAy = new Date().toISOString().slice(0, 7) // YYYY-MM
-      
       const bugunSiparisleri = siraliSiparisler.filter(s => s.siparisTarihi === bugun)
       const bugunToplamTutar = bugunSiparisleri.reduce((toplam, s) => toplam + Number(s.toplamTutar || 0), 0)
-      
-      const buAySiparisleri = siraliSiparisler.filter(s => s.siparisTarihi?.startsWith(buAy))
-      const buAyToplamTutar = buAySiparisleri.reduce((toplam, s) => toplam + Number(s.toplamTutar || 0), 0)
       
       const bekleyenSiparisler = siraliSiparisler.filter(s => s.teslimatDurumu === 'Hazırlanıyor')
       const kritikStokSayisi = urunler.filter(u => kritikStoktaMi(u)).length
@@ -340,7 +326,7 @@ export default function useAppNotifications({
     try {
       await notificationApi.markAsRead(bildirimId)
       setBackendBildirimler(onceki => onceki.filter(b => b.id !== bildirimId))
-    } catch (err) {
+    } catch {
       toastGoster?.('hata', 'Bildirim okundu işaretlenemedi.')
     }
   }
@@ -361,7 +347,7 @@ export default function useAppNotifications({
     try {
       await notificationApi.markAsRead(bildirimId) // Backend'de is_read: true yapıyoruz siliş yerine (kural gereği)
       setBackendBildirimler(onceki => onceki.filter(b => b.id !== bildirimId))
-    } catch (err) {
+    } catch {
       toastGoster?.('hata', 'Bildirim temizlenemedi.')
     }
   }
@@ -376,7 +362,7 @@ export default function useAppNotifications({
         .map((b) => b.id)
       setTemizlenenBildirimler((onceki) => [...onceki, ...yerelIdler])
       toastGoster?.('basari', 'Tüm bildirimler temizlendi.')
-    } catch (err) {
+    } catch {
       toastGoster?.('hata', 'Bildirimler temizlenemedi.')
     }
   }

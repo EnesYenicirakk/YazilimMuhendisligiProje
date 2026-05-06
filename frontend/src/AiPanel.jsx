@@ -8,7 +8,6 @@ export default function AiPanel({
   aiMesajMetni,
   aiMesajlar,
   aiPanelKapaniyor,
-  aiPaneliKapat,
   aiYukleniyor,
   setAiMesajMetni,
   setAiHizliKonularAcik,

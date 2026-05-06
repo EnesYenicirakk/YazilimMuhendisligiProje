@@ -56,35 +56,6 @@ const yuzdeselDegisimMetni = (mevcutDeger, oncekiDeger) => {
   return `${mevcut >= onceki ? '+' : '-'}%${yuzde}`
 }
 
-const tersYuzdeselDegisimMetni = (mevcutDeger, oncekiDeger) => {
-  const mevcut = Number(mevcutDeger || 0)
-  const onceki = Number(oncekiDeger || 0)
-
-  if (mevcut === 0 && onceki === 0) return '+%0'
-  if (onceki === 0) return `+%${mevcut > 0 ? 100 : 0}`
-
-  const yuzde = Math.round((Math.abs(mevcut - onceki) / Math.abs(onceki)) * 100)
-  return `${mevcut <= onceki ? '+' : '-'}%${yuzde}`
-}
-
-const ortalamaHesapla = (liste) => {
-  if (liste.length === 0) return 0
-  return liste.reduce((toplam, deger) => toplam + deger, 0) / liste.length
-}
-
-const tohumluSayiUret = (tohum, min, max) => {
-  const altSinir = Math.min(min, max)
-  const ustSinir = Math.max(min, max)
-  const aralik = ustSinir - altSinir + 1
-  let toplam = 0
-
-  for (let index = 0; index < tohum.length; index += 1) {
-    toplam = (toplam * 31 + tohum.charCodeAt(index)) % 2147483647
-  }
-
-  return altSinir + (toplam % aralik)
-}
-
 const siparisAcilMi = (siparis, referansGun) => {
   if (siparisTamamlandiMi(siparis)) return false
 
@@ -275,7 +246,7 @@ export default function useDashboard({
         detay: `${tedarikBekleyenSiparisler.length} sipariş tedarik onayında`,
       },
     ]
-  }, [siparisler, gelenNakitKayitlari, paraFormatla])
+  }, [siparisler, gelenNakitKayitlari])
 
   const dashboardOzet = useMemo(() => {
     const referansGun = bugununBaslangiciniGetir()
@@ -345,19 +316,6 @@ export default function useDashboard({
       return ayniAydaMi(siparisTarihi, oncekiAyReferansi) && siparisAcilMi(siparis, referansGun)
     }).length
 
-    const teslimatGunleri = tamamlananSiparisler
-      .map((siparis) => teslimatGununuCoz(siparis.teslimatSuresi))
-      .filter((gun) => gun > 0)
-    const oncekiAyTeslimatGunleri = tamamlananSiparisler
-      .filter((siparis) =>
-        ayniAydaMi(new Date(`${siparis.siparisTarihi}T00:00:00`), oncekiAyReferansi),
-      )
-      .map((siparis) => teslimatGununuCoz(siparis.teslimatSuresi))
-      .filter((gun) => gun > 0)
-
-    const ortalamaTeslimat = ortalamaHesapla(teslimatGunleri)
-    const oncekiAyOrtalamaTeslimat = ortalamaHesapla(oncekiAyTeslimatGunleri)
-
     return [
       {
         baslik: 'Toplam Gelir',
@@ -384,7 +342,7 @@ export default function useDashboard({
         ikon: 'kutu',
       },
     ].filter((kart) => !gizlenenOzetKartlari.includes(kart.baslik))
-  }, [gelenNakitKayitlari, gidenNakitKayitlari, gizlenenOzetKartlari, siparisler, tamamlananSiparisler])
+  }, [gelenNakitKayitlari, gidenNakitKayitlari, gizlenenOzetKartlari, siparisler])
 
   const haftalikSatisVerisi = useMemo(() => {
     const referansGun = bugununBaslangiciniGetir()

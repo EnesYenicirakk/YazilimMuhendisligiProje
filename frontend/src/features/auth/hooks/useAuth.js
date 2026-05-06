@@ -9,7 +9,6 @@ const BOS_KIMLIK = {
 const TOKEN_KEY = 'access_token'
 
 export default function useAuth({
-  loginDelay = 500,
   onLoginSuccess,
 } = {}) {
   const tokenDeposu = window.sessionStorage

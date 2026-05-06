@@ -78,7 +78,7 @@ export function ToastProvider({ children }) {
 
     window.addEventListener('keydown', tusYakala)
     return () => window.removeEventListener('keydown', tusYakala)
-  }, [sonGeriAlma])
+  }, [sonGeriAlma, toastKapat])
 
   return (
     <ToastContext.Provider value={{ toastGoster }}>

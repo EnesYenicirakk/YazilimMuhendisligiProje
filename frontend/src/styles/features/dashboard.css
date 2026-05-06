@@ -1751,6 +1751,10 @@
 }
 
 @media (max-width: 420px) {
+  .dashboard-page > [data-cy="dashboard-page"] {
+    padding-bottom: calc(124px + env(safe-area-inset-bottom, 0px));
+  }
+
   .ozet-grid {
     grid-template-columns: 1fr;
   }

@@ -1,3 +1,5 @@
+import { KucukIkon } from '../../../components/common/Ikonlar'
+
 export default function SupplierModals({
   suppliersData,
   paraFormatla,

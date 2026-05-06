@@ -19,7 +19,6 @@ export default function OrdersPanel({ ordersData, paraFormatla, tarihFormatla, d
       setDetaySiparis={ordersData.setDetaySiparis}
       siparisDuzenlemeAc={ordersData.siparisDuzenlemeAc}
       siparisDurumGuncellemeAc={ordersData.siparisDurumGuncellemeAc}
-      setSilinecekSiparis={ordersData.setSilinecekSiparis}
       siparisMusteriAra={ordersData.siparisMusteriAra}
       siparisIptalAc={ordersData.siparisIptalAc}
       siparisSayfa={ordersData.siparisSayfa}

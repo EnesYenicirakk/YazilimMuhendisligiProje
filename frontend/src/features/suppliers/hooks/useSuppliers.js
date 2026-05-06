@@ -5,9 +5,7 @@ import {
   bosTedarikciSiparisFormu,
   favorileriOneTasi,
   metniNormalizeEt,
-  negatifSayiVarMi,
-  telefonGecerliMi,
-  telefonuNormalizeEt,
+  negatifSayiVarMi
 } from '../../../shared/utils/constantsAndHelpers'
 
 const TEDARIKCI_SAYFA_BASINA = 8
@@ -295,7 +293,6 @@ export default function useSuppliers({ toastGoster, isLoggedIn }) {
     const not = tedarikciFormu.not.trim()
     const toplamAlisSayisi = Number(tedarikciFormu.toplamAlisSayisi)
     const toplamHarcama = Number(tedarikciFormu.toplamHarcama)
-    const ortalamaTeslimSuresi = tedarikciFormu.ortalamaTeslimSuresi.trim()
 
     if (!firmaAdi || !yetkiliKisi || !telefon || !email || !adres || !vergiNumarasi || !urunGrubu) {
       toastGoster?.('hata', 'Lütfen tüm zorunlu alanları (*) doldurun.')

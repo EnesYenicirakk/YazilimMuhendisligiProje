@@ -543,7 +543,6 @@ export default function useOrders({
     if (!silinecekSiparis) return
     const silinenSiparis = { ...silinecekSiparis }
     const silinenNo = silinenSiparis.siparisNo
-    const silinenIndex = siparisler.findIndex((siparis) => siparis.siparisNo === silinenNo)
     orderApi.delete(silinenNo).then(() => {
       setSiparisler((onceki) => onceki.filter((siparis) => siparis.siparisNo !== silinenNo))
       setSilinecekSiparis(null)

@@ -8,7 +8,7 @@ export default defineConfig({
     requestTimeout: 10000,
     responseTimeout: 10000,
     video: false,
-    setupNodeEvents(on, config) {
+    setupNodeEvents() {
       // implement node event listeners here
     },
   },
